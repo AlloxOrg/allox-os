@@ -6,7 +6,7 @@ import sys
 from datetime import timedelta
 
 import click
-from opensandbox.models.sandboxes import SandboxFilter
+from opensandbox.models.sandboxes import Host, SandboxFilter, Volume
 from opensandbox.sync.sandbox import SandboxSync
 
 from allox import __version__
@@ -60,6 +60,15 @@ def _needs_windows_browser_no_sandbox(obj: ClientContext, image: str) -> bool:
 @click.option("--metadata", "-m", "metadata_kv", multiple=True, type=KEY_VALUE)
 @click.option("--env", "-e", "env_kv", multiple=True, type=KEY_VALUE, help="Environment KEY=VALUE (repeatable).")
 @click.option(
+    "--host-volume",
+    "host_volumes",
+    multiple=True,
+    nargs=2,
+    type=(click.Path(path_type=str), str),
+    metavar="HOST_PATH MOUNT_PATH",
+    help="Mount a trusted host directory into the Allox VM (repeatable).",
+)
+@click.option(
     "--entrypoint",
     multiple=True,
     help="Override entrypoint (default: /opt/gem/run.sh for AIO).",
@@ -75,6 +84,7 @@ def sandbox_create(
     timeout_raw: str | None,
     metadata_kv: tuple[tuple[str, str], ...],
     env_kv: tuple[tuple[str, str], ...],
+    host_volumes: tuple[tuple[str, str], ...],
     entrypoint: tuple[str, ...],
     skip_health_check: bool,
     ready_timeout: str | None,
@@ -124,6 +134,15 @@ def sandbox_create(
         env.setdefault("BROWSER_NO_SANDBOX", "--no-sandbox")
     if env:
         kwargs["env"] = env
+    if host_volumes:
+        kwargs["volumes"] = [
+            Volume(
+                name=f"allox-host-{index}",
+                host=Host(path=host_path),
+                mount_path=mount_path,
+            )
+            for index, (host_path, mount_path) in enumerate(host_volumes)
+        ]
 
     ready_info: dict = {}
     if not effective_skip:

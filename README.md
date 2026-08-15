@@ -4,6 +4,9 @@
 
 # Allox CLI
 
+> Allox 2.0 development: per-Agent/per-Session workspace isolation and
+> rollback are documented in [docs/ALLOX_2_WORKSPACES.md](docs/ALLOX_2_WORKSPACES.md).
+
 **面向 AI Agent 的可恢复执行工作区**
 
 从环境创建、任务执行到断点恢复，用一套 CLI 完成完整 Agent 工作流。

@@ -119,3 +119,31 @@ def test_windows_browser_no_sandbox_is_not_enabled_for_remote_server(monkeypatch
     assert not _needs_windows_browser_no_sandbox(
         obj, "ghcr.io/agent-infra/sandbox:latest"
     )
+
+
+@patch("allox.commands.sandbox.SandboxSync.create")
+def test_sandbox_create_passes_workspace_host_volume(
+    mock_create, runner, tmp_path, monkeypatch
+):
+    monkeypatch.setattr("allox.session.DEFAULT_SESSIONS_PATH", tmp_path / "sessions.json")
+    sandbox = MagicMock(id="allox-vm")
+    sandbox.get_endpoint.side_effect = RuntimeError("no endpoint")
+    mock_create.return_value = sandbox
+
+    result = runner(
+        [
+            "sandbox",
+            "create",
+            "--skip-health-check",
+            "--host-volume",
+            "/data/allox/user-1",
+            "/var/lib/allox-store",
+            "-o",
+            "json",
+        ]
+    )
+
+    assert result.exit_code == 0, result.output
+    volume = mock_create.call_args.kwargs["volumes"][0]
+    assert volume.host.path == "/data/allox/user-1"
+    assert volume.mount_path == "/var/lib/allox-store"

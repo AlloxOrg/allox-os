@@ -15,6 +15,7 @@ from opensandbox.sync.sandbox import SandboxSync
 
 from allox.output import OutputFormatter
 from allox.session import get_current_session
+from allox.workspace_client import WorkspaceClient
 
 
 @dataclass
@@ -25,6 +26,7 @@ class ClientContext:
     output: OutputFormatter = field(init=False)
     _connection_config: ConnectionConfigSync | None = field(default=None, init=False, repr=False)
     _manager: SandboxManagerSync | None = field(default=None, init=False, repr=False)
+    _workspace_client: WorkspaceClient | None = field(default=None, init=False, repr=False)
 
     def __post_init__(self) -> None:
         self.output = OutputFormatter("table", color=self.resolved_config.get("color", True))
@@ -46,6 +48,16 @@ class ClientContext:
         if self._manager is None:
             self._manager = SandboxManagerSync.create(self.connection_config)
         return self._manager
+
+    def get_workspace_client(self) -> WorkspaceClient:
+        if self._workspace_client is None:
+            cfg = self.resolved_config
+            self._workspace_client = WorkspaceClient(
+                str(cfg.get("workspace_daemon_url", "http://127.0.0.1:8092")),
+                token=str(cfg.get("workspace_token", "")),
+                timeout=float(cfg.get("workspace_request_timeout", 30)),
+            )
+        return self._workspace_client
 
     def resolve_sandbox_id(self, sandbox_id: str | None) -> str:
         """Use explicit id or fall back to current session."""
@@ -100,6 +112,9 @@ class ClientContext:
         return formatter
 
     def close(self) -> None:
+        if self._workspace_client is not None:
+            self._workspace_client.close()
+            self._workspace_client = None
         if self._manager is not None:
             self._manager.close()
             self._manager = None

@@ -48,6 +48,12 @@ DEFAULT_CONFIG_TEMPLATE = """\
 # interval = "5m"
 # strict = false
 # create_timeout = 900
+
+[workspace]
+# daemon_url = "http://127.0.0.1:8092"
+# request_timeout = 30
+# vm_root = "/var/lib/allox-store"
+# token is read from ALLOX_WORKSPACE_TOKEN; do not store it in this file
 """
 
 
@@ -114,6 +120,7 @@ def resolve_config(
     ready_timeout = defaults.get("ready_timeout", "30s")
     skip_health_check = bool(defaults.get("skip_health_check", False))
     checkpoint = file_cfg.get("checkpoint", {})
+    workspace = file_cfg.get("workspace", {})
 
     return {
         "api_key": api_key,
@@ -137,6 +144,11 @@ def resolve_config(
         "checkpoint_interval": checkpoint.get("interval", "5m"),
         "checkpoint_strict": bool(checkpoint.get("strict", False)),
         "checkpoint_create_timeout": int(checkpoint.get("create_timeout", 900)),
+        "workspace_daemon_url": _env("ALLOX_WORKSPACE_DAEMON_URL")
+        or workspace.get("daemon_url", "http://127.0.0.1:8092"),
+        "workspace_token": _env("ALLOX_WORKSPACE_TOKEN") or "",
+        "workspace_request_timeout": int(workspace.get("request_timeout", 30)),
+        "workspace_vm_root": workspace.get("vm_root", "/var/lib/allox-store"),
     }
 
 

@@ -23,6 +23,7 @@ dependencies = [
 
 [project.scripts]
 allox = "allox.main:cli"
+allox-workspace-daemon = "allox.workspace_daemon:main"
 
 [project.urls]
 Repository = "https://github.com/your-org/allox-cli"

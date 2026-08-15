@@ -1,0 +1,408 @@
+"""Allox 2.0 Agent/Session workspace commands."""
+
+from __future__ import annotations
+
+import posixpath
+import shlex
+import sys
+from pathlib import PurePosixPath
+from typing import Any
+
+import click
+from opensandbox.models.execd import RunCommandOpts
+from opensandbox.models.execd_sync import ExecutionHandlersSync
+
+from allox.context import ClientContext
+from allox.utils import KEY_VALUE, handle_errors, output_option, parse_duration, prepare_output
+from allox.workspace_store import WorkspaceError, validate_id
+
+
+@click.group("workspace", invoke_without_command=True)
+@click.pass_context
+def workspace_group(ctx: click.Context) -> None:
+    """Manage Allox 2.0 Agent/Session workspaces."""
+    if ctx.invoked_subcommand is None:
+        click.echo(ctx.get_help())
+
+
+def _client(obj: ClientContext):
+    return obj.get_workspace_client()
+
+
+def _emit_result(obj: ClientContext, result: dict[str, Any], title: str) -> None:
+    obj.output.success_panel(result, title=title)
+
+
+@workspace_group.command("init")
+@output_option("table", "json", "yaml")
+@click.pass_obj
+@handle_errors
+def workspace_init(obj: ClientContext, output_format: str | None) -> None:
+    """Initialize the daemon's Btrfs workspace store."""
+    prepare_output(obj, output_format, allowed=("table", "json", "yaml", "raw"))
+    _emit_result(obj, _client(obj).rpc("store.initialize"), "Workspace Store Initialized")
+
+
+@workspace_group.command("agent-create")
+@click.argument("agent_id")
+@output_option("table", "json", "yaml")
+@click.pass_obj
+@handle_errors
+def workspace_agent_create(
+    obj: ClientContext, agent_id: str, output_format: str | None
+) -> None:
+    """Create an Agent's first-level workspace."""
+    prepare_output(obj, output_format, allowed=("table", "json", "yaml", "raw"))
+    validate_id("agent", agent_id)
+    result = _client(obj).rpc("agent.create", agent_id=agent_id, origin="allox-cli")
+    _emit_result(obj, result, "Agent Workspace Created")
+
+
+@workspace_group.command("session-create")
+@click.argument("agent_id")
+@click.argument("session_id")
+@output_option("table", "json", "yaml")
+@click.pass_obj
+@handle_errors
+def workspace_session_create(
+    obj: ClientContext,
+    agent_id: str,
+    session_id: str,
+    output_format: str | None,
+) -> None:
+    """Create a Session Btrfs subvolume below an Agent."""
+    prepare_output(obj, output_format, allowed=("table", "json", "yaml", "raw"))
+    validate_id("agent", agent_id)
+    validate_id("session", session_id)
+    result = _client(obj).rpc(
+        "session.create", agent_id=agent_id, session_id=session_id, origin="allox-cli"
+    )
+    _emit_result(obj, result, "Session Workspace Created")
+
+
+@workspace_group.command("get")
+@click.argument("agent_id")
+@click.argument("session_id")
+@output_option("table", "json", "yaml")
+@click.pass_obj
+@handle_errors
+def workspace_get(
+    obj: ClientContext,
+    agent_id: str,
+    session_id: str,
+    output_format: str | None,
+) -> None:
+    """Describe one Agent/Session workspace."""
+    prepare_output(obj, output_format, allowed=("table", "json", "yaml", "raw"))
+    result = _client(obj).rpc(
+        "session.describe", agent_id=agent_id, session_id=session_id
+    )
+    _emit_result(obj, result, "Session Workspace")
+
+
+@workspace_group.command("checkpoint")
+@click.argument("agent_id")
+@click.argument("session_id")
+@click.option("--name", "checkpoint_id", default=None)
+@output_option("table", "json", "yaml")
+@click.pass_obj
+@handle_errors
+def workspace_checkpoint(
+    obj: ClientContext,
+    agent_id: str,
+    session_id: str,
+    checkpoint_id: str | None,
+    output_format: str | None,
+) -> None:
+    """Checkpoint only the selected Session workspace."""
+    prepare_output(obj, output_format, allowed=("table", "json", "yaml", "raw"))
+    result = _client(obj).rpc(
+        "checkpoint.create",
+        agent_id=agent_id,
+        session_id=session_id,
+        checkpoint_id=checkpoint_id,
+        origin="allox-cli",
+    )
+    _emit_result(obj, result, "Session Checkpoint Created")
+
+
+@workspace_group.command("checkpoint-list")
+@click.argument("agent_id")
+@click.argument("session_id")
+@output_option("table", "json", "yaml")
+@click.pass_obj
+@handle_errors
+def workspace_checkpoint_list(
+    obj: ClientContext,
+    agent_id: str,
+    session_id: str,
+    output_format: str | None,
+) -> None:
+    """List checkpoints belonging to one Session."""
+    prepare_output(obj, output_format, allowed=("table", "json", "yaml", "raw"))
+    result = _client(obj).rpc(
+        "checkpoint.list", agent_id=agent_id, session_id=session_id
+    )
+    rows = [
+        {"agent_id": agent_id, "session_id": session_id, "checkpoint_id": item}
+        for item in result["checkpoint_ids"]
+    ]
+    obj.output.print_rows(
+        rows,
+        ["agent_id", "session_id", "checkpoint_id"],
+        title="Session Checkpoints",
+    )
+
+
+@workspace_group.command("checkpoint-delete")
+@click.argument("agent_id")
+@click.argument("session_id")
+@click.argument("checkpoint_id")
+@output_option("table", "json", "yaml")
+@click.pass_obj
+@handle_errors
+def workspace_checkpoint_delete(
+    obj: ClientContext,
+    agent_id: str,
+    session_id: str,
+    checkpoint_id: str,
+    output_format: str | None,
+) -> None:
+    """Delete a Session checkpoint."""
+    prepare_output(obj, output_format, allowed=("table", "json", "yaml", "raw"))
+    result = _client(obj).rpc(
+        "checkpoint.delete",
+        agent_id=agent_id,
+        session_id=session_id,
+        checkpoint_id=checkpoint_id,
+        origin="allox-cli",
+    )
+    _emit_result(obj, result, "Session Checkpoint Deleted")
+
+
+@workspace_group.command("rollback")
+@click.argument("agent_id")
+@click.argument("session_id")
+@click.argument("checkpoint_id")
+@click.option(
+    "--scrub-runtime/--keep-runtime-entries",
+    default=True,
+    help="Remove stale socket/FIFO nodes restored below the Session /tmp.",
+)
+@output_option("table", "json", "yaml")
+@click.pass_obj
+@handle_errors
+def workspace_rollback(
+    obj: ClientContext,
+    agent_id: str,
+    session_id: str,
+    checkpoint_id: str,
+    scrub_runtime: bool,
+    output_format: str | None,
+) -> None:
+    """Rollback only the selected Session, in the same Allox VM."""
+    prepare_output(obj, output_format, allowed=("table", "json", "yaml", "raw"))
+    result = _client(obj).rpc(
+        "session.rollback",
+        agent_id=agent_id,
+        session_id=session_id,
+        checkpoint_id=checkpoint_id,
+        scrub_runtime=scrub_runtime,
+        origin="allox-cli",
+    )
+    _emit_result(obj, result, "Session Rolled Back")
+
+
+def _workspace_path(vm_root: str, relative_workspace: str) -> str:
+    relative = PurePosixPath(relative_workspace)
+    if relative.is_absolute() or not relative.parts or any(
+        part in {"", ".", ".."} for part in relative.parts
+    ):
+        raise WorkspaceError("workspace daemon returned an unsafe relative path")
+    return posixpath.join(posixpath.normpath(vm_root), *relative.parts)
+
+
+def build_bwrap_argv(
+    workspace_path: str,
+    agent_id: str,
+    session_id: str,
+    command: tuple[str, ...],
+    environment: tuple[tuple[str, str], ...] = (),
+) -> list[str]:
+    """Build a mount namespace that exposes only one Session as /workspace."""
+    validate_id("agent", agent_id)
+    validate_id("session", session_id)
+    if not command:
+        raise WorkspaceError("workspace run requires a command after --")
+    argv = [
+        "bwrap",
+        "--die-with-parent",
+        "--new-session",
+        "--unshare-user",
+        "--unshare-pid",
+        "--tmpfs",
+        "/",
+        "--ro-bind",
+        "/usr",
+        "/usr",
+        "--symlink",
+        "usr/bin",
+        "/bin",
+        "--symlink",
+        "usr/sbin",
+        "/sbin",
+        "--symlink",
+        "usr/lib",
+        "/lib",
+        "--symlink",
+        "usr/lib64",
+        "/lib64",
+        "--ro-bind",
+        "/etc",
+        "/etc",
+        "--dev",
+        "/dev",
+        "--bind",
+        workspace_path,
+        "/workspace",
+        "--tmpfs",
+        "/tmp",
+        "--clearenv",
+        "--setenv",
+        "PATH",
+        "/usr/local/bin:/usr/bin:/bin",
+        "--setenv",
+        "HOME",
+        "/workspace",
+        "--setenv",
+        "TMPDIR",
+        "/tmp",
+        "--setenv",
+        "ALLOX_AGENT_ID",
+        agent_id,
+        "--setenv",
+        "ALLOX_SESSION_ID",
+        session_id,
+    ]
+    for key, value in environment:
+        argv.extend(["--setenv", key, value])
+    wrapper = """\
+set -eu
+cp -a /workspace/.allox-tmp/. /tmp/
+status=0
+"$@" || status=$?
+find /tmp -xdev \\( -type s -o -type p -o -type b -o -type c \\) -delete
+rm -rf /workspace/.allox-tmp.new
+install -d -m 700 /workspace/.allox-tmp.new
+cp -a /tmp/. /workspace/.allox-tmp.new/
+rm -rf /workspace/.allox-tmp
+mv /workspace/.allox-tmp.new /workspace/.allox-tmp
+exit "$status"
+"""
+    argv.extend(["--chdir", "/workspace", "sh", "-c", wrapper, "allox-runtime", *command])
+    return argv
+
+
+@workspace_group.command(
+    "run",
+    context_settings={"allow_interspersed_args": False},
+)
+@click.argument("agent_id")
+@click.argument("session_id")
+@click.option("--sandbox", "sandbox_id", default=None, help="Allox VM sandbox ID.")
+@click.option("--timeout", default=None, help="Command timeout, e.g. 30s or 5m.")
+@click.option("--env", "environment", multiple=True, type=KEY_VALUE)
+@click.option("--checkpoint-on-success", is_flag=True)
+@output_option("raw", "json")
+@click.argument("command", nargs=-1, type=click.UNPROCESSED)
+@click.pass_obj
+@handle_errors
+def workspace_run(
+    obj: ClientContext,
+    agent_id: str,
+    session_id: str,
+    sandbox_id: str | None,
+    timeout: str | None,
+    environment: tuple[tuple[str, str], ...],
+    checkpoint_on_success: bool,
+    output_format: str | None,
+    command: tuple[str, ...],
+) -> None:
+    """Run a command inside one isolated Session workspace."""
+    prepare_output(obj, output_format, allowed=("raw", "json"), fallback="raw")
+    if command and command[0] == "--":
+        command = command[1:]
+    resolved_sandbox = obj.resolve_sandbox_id(sandbox_id)
+    client = _client(obj)
+    description = client.rpc(
+        "session.describe", agent_id=agent_id, session_id=session_id
+    )
+    workspace_path = _workspace_path(
+        str(obj.resolved_config.get("workspace_vm_root", "/var/lib/allox-store")),
+        description["relative_workspace"],
+    )
+    bwrap_argv = build_bwrap_argv(
+        workspace_path, agent_id, session_id, command, environment
+    )
+    command_string = shlex.join(bwrap_argv)
+    lease = client.rpc(
+        "execution.acquire",
+        agent_id=agent_id,
+        session_id=session_id,
+    )
+    sandbox = None
+    execution = None
+    succeeded = False
+    try:
+        sandbox = obj.connect_sandbox(resolved_sandbox)
+        handlers = ExecutionHandlersSync(
+            on_stdout=lambda message: (sys.stdout.write(message.text), sys.stdout.flush()),
+            on_stderr=lambda message: (sys.stderr.write(message.text), sys.stderr.flush()),
+        )
+        execution = sandbox.commands.run(
+            command_string,
+            opts=RunCommandOpts(
+                background=False,
+                timeout=parse_duration(timeout) if timeout else None,
+            ),
+            handlers=handlers,
+        )
+        succeeded = not execution.error and getattr(execution, "exit_code", 0) in (0, None)
+    finally:
+        if sandbox is not None:
+            sandbox.close()
+        try:
+            client.rpc("execution.release", lease_token=lease["lease_token"])
+        except click.ClickException as exc:
+            click.echo(f"Warning: failed to release workspace execution lease: {exc}", err=True)
+
+    checkpoint = None
+    if succeeded and checkpoint_on_success:
+        checkpoint = client.rpc(
+            "checkpoint.create",
+            agent_id=agent_id,
+            session_id=session_id,
+            checkpoint_id=None,
+            origin="workspace.run",
+        )
+
+    if obj.output.fmt == "json":
+        from allox.utils import emit_json
+
+        emit_json(
+            {
+                "sandbox_id": resolved_sandbox,
+                "agent_id": agent_id,
+                "session_id": session_id,
+                "execution_id": getattr(execution, "id", None),
+                "exit_code": getattr(execution, "exit_code", None),
+                "checkpoint_id": checkpoint.get("checkpoint_id") if checkpoint else None,
+                "error": (
+                    {"name": execution.error.name, "value": execution.error.value}
+                    if execution and execution.error
+                    else None
+                ),
+            }
+        )
+    if not succeeded:
+        raise SystemExit(1)

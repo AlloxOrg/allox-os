@@ -15,6 +15,7 @@ from allox.commands.file_cmd import file_group
 from allox.commands.run_cmd import run_command
 from allox.commands.sandbox import sandbox_group
 from allox.commands.session_cmd import session_group
+from allox.commands.workspace_cmd import workspace_group
 from allox.config import resolve_config, resolve_config_path
 from allox.context import ClientContext
 
@@ -113,3 +114,4 @@ cli.add_command(config_group)
 cli.add_command(run_command)
 cli.add_command(file_group)
 cli.add_command(checkpoint_group)
+cli.add_command(workspace_group)
