@@ -104,6 +104,8 @@ def workspace_get(
 @click.argument("agent_id")
 @click.argument("session_id")
 @click.option("--name", "checkpoint_id", default=None)
+@click.option("--message", default=None, help="Human-readable checkpoint message.")
+@click.option("--pin", "pinned", is_flag=True, help="Mark this checkpoint as pinned.")
 @output_option("table", "json", "yaml")
 @click.pass_obj
 @handle_errors
@@ -112,6 +114,8 @@ def workspace_checkpoint(
     agent_id: str,
     session_id: str,
     checkpoint_id: str | None,
+    message: str | None,
+    pinned: bool,
     output_format: str | None,
 ) -> None:
     """Checkpoint only the selected Session workspace."""
@@ -122,6 +126,8 @@ def workspace_checkpoint(
         session_id=session_id,
         checkpoint_id=checkpoint_id,
         origin="allox-cli",
+        message=message,
+        pinned=pinned,
     )
     _emit_result(obj, result, "Session Checkpoint Created")
 
@@ -143,13 +149,30 @@ def workspace_checkpoint_list(
     result = _client(obj).rpc(
         "checkpoint.list", agent_id=agent_id, session_id=session_id
     )
-    rows = [
-        {"agent_id": agent_id, "session_id": session_id, "checkpoint_id": item}
-        for item in result["checkpoint_ids"]
-    ]
+    rows = []
+    for item in result.get("checkpoints", []):
+        rows.append(
+            {
+                "agent_id": agent_id,
+                "session_id": session_id,
+                "checkpoint_id": item["checkpoint_id"],
+                "head": item["checkpoint_id"] == result.get("head"),
+                "parent_id": item.get("parent_id"),
+                "message": item.get("message"),
+                "pinned": item.get("pinned", False),
+            }
+        )
     obj.output.print_rows(
         rows,
-        ["agent_id", "session_id", "checkpoint_id"],
+        [
+            "agent_id",
+            "session_id",
+            "checkpoint_id",
+            "head",
+            "parent_id",
+            "message",
+            "pinned",
+        ],
         title="Session Checkpoints",
     )
 
@@ -158,6 +181,7 @@ def workspace_checkpoint_list(
 @click.argument("agent_id")
 @click.argument("session_id")
 @click.argument("checkpoint_id")
+@click.option("--force", is_flag=True, help="Delete even when the checkpoint is pinned.")
 @output_option("table", "json", "yaml")
 @click.pass_obj
 @handle_errors
@@ -166,6 +190,7 @@ def workspace_checkpoint_delete(
     agent_id: str,
     session_id: str,
     checkpoint_id: str,
+    force: bool,
     output_format: str | None,
 ) -> None:
     """Delete a Session checkpoint."""
@@ -176,6 +201,7 @@ def workspace_checkpoint_delete(
         session_id=session_id,
         checkpoint_id=checkpoint_id,
         origin="allox-cli",
+        force=force,
     )
     _emit_result(obj, result, "Session Checkpoint Deleted")
 
@@ -183,7 +209,14 @@ def workspace_checkpoint_delete(
 @workspace_group.command("rollback")
 @click.argument("agent_id")
 @click.argument("session_id")
-@click.argument("checkpoint_id")
+@click.argument("checkpoint_id", required=False, default=None)
+@click.option(
+    "--num-ancestors",
+    "-n",
+    type=click.IntRange(min=1),
+    default=None,
+    help="Rollback by lineage depth; 1 selects the current checkpoint head.",
+)
 @click.option(
     "--scrub-runtime/--keep-runtime-entries",
     default=True,
@@ -196,7 +229,8 @@ def workspace_rollback(
     obj: ClientContext,
     agent_id: str,
     session_id: str,
-    checkpoint_id: str,
+    checkpoint_id: str | None,
+    num_ancestors: int | None,
     scrub_runtime: bool,
     output_format: str | None,
 ) -> None:
@@ -207,6 +241,7 @@ def workspace_rollback(
         agent_id=agent_id,
         session_id=session_id,
         checkpoint_id=checkpoint_id,
+        num_ancestors=num_ancestors,
         scrub_runtime=scrub_runtime,
         origin="allox-cli",
     )

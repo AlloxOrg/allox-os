@@ -45,6 +45,9 @@ def test_workspace_checkpoint_is_scoped_by_agent_and_session(runner):
                 "session-1",
                 "--name",
                 "cp1",
+                "--message",
+                "before retry",
+                "--pin",
                 "-o",
                 "json",
             ]
@@ -57,5 +60,40 @@ def test_workspace_checkpoint_is_scoped_by_agent_and_session(runner):
         agent_id="agent-a",
         session_id="session-1",
         checkpoint_id="cp1",
+        origin="allox-cli",
+        message="before retry",
+        pinned=True,
+    )
+
+
+def test_workspace_rollback_accepts_ancestor_depth(runner):
+    client = MagicMock()
+    client.rpc.return_value = {
+        "agent_id": "agent-a",
+        "session_id": "session-1",
+        "checkpoint_id": "cp1",
+    }
+    with patch("allox.context.ClientContext.get_workspace_client", return_value=client):
+        result = runner(
+            [
+                "workspace",
+                "rollback",
+                "agent-a",
+                "session-1",
+                "--num-ancestors",
+                "2",
+                "-o",
+                "json",
+            ]
+        )
+
+    assert result.exit_code == 0, result.output
+    client.rpc.assert_called_once_with(
+        "session.rollback",
+        agent_id="agent-a",
+        session_id="session-1",
+        checkpoint_id=None,
+        num_ancestors=2,
+        scrub_runtime=True,
         origin="allox-cli",
     )

@@ -51,6 +51,28 @@ only that Session's stable `current` path. Restored socket/FIFO nodes below
 `.allox-tmp` are removed by default because a filesystem snapshot cannot
 restore their live kernel state.
 
+## Distilled ANOLISA checkpoint core
+
+Allox does not embed ANOLISA's `ws-ckpt` daemon or CLI. It distills the parts
+that match the Agent/Session storage model:
+
+- a storage-backend boundary, currently implemented by native Btrfs;
+- read-only COW checkpoints and writable-snapshot rollback;
+- a per-Session checkpoint DAG with `head`, parent/child links, messages, pins,
+  unique-prefix lookup, and ancestor-based rollback;
+- an atomically persisted index outside the rollback scope, reconciled against
+  snapshot subvolumes after interrupted metadata writes;
+- a durable rollback transaction with `preparing`, `prepared`, `old_moved`, and
+  `committed` phases. Daemon startup either finishes or safely aborts an
+  interrupted workspace swap before serving requests.
+
+Allox deliberately keeps its execution lease instead of ANOLISA's inotify
+quiescence heuristic: commands for a Session are launched through the Allox
+control plane, so checkpoint and rollback can be rejected while an exact
+execution lease is active. ANOLISA's directory-to-symlink migration,
+loop-backed Btrfs image, systemd integration, Agent plugins, diff/preview, and
+retention scheduler are not part of this minimal core.
+
 ## Session execution
 
 `allox workspace run` acquires an execution lease and enters the selected
@@ -74,9 +96,11 @@ allox-workspace-daemon --root /data/allox/user-1
 
 allox workspace agent-create agent-a
 allox workspace session-create agent-a session-1
-allox workspace checkpoint agent-a session-1 --name clean
+allox workspace checkpoint agent-a session-1 --name clean --message "before retry" --pin
 allox workspace run agent-a session-1 -- sh -c 'printf changed > state.txt'
 allox workspace rollback agent-a session-1 clean
+# ANOLISA-compatible lineage semantics: 1=head, 2=head's parent, ...
+allox workspace rollback agent-a session-1 --num-ancestors 2
 ```
 
 The Allox VM must mount the same store at the configured `workspace.vm_root`:

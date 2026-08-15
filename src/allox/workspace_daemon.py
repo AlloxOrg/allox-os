@@ -68,6 +68,13 @@ class WorkspaceService:
             raise WorkspaceError(f"missing string parameter: {key}")
         return value
 
+    @staticmethod
+    def _boolean(params: dict[str, Any], key: str, default: bool) -> bool:
+        value = params.get(key, default)
+        if not isinstance(value, bool):
+            raise WorkspaceError(f"{key} must be a boolean")
+        return value
+
     def dispatch(self, action: str, params: dict[str, Any]) -> Any:
         agent_id = params.get("agent_id")
         session_id = params.get("session_id")
@@ -91,11 +98,7 @@ class WorkspaceService:
         if action == "checkpoint.list":
             agent_id = self._required(params, "agent_id")
             session_id = self._required(params, "session_id")
-            return {
-                "agent_id": agent_id,
-                "session_id": session_id,
-                "checkpoint_ids": self.store.list_checkpoints(agent_id, session_id),
-            }
+            return self.store.checkpoint_status(agent_id, session_id)
         if action == "execution.acquire":
             return self.executions.acquire(
                 self._required(params, "agent_id"),
@@ -112,25 +115,40 @@ class WorkspaceService:
                     checkpoint_id = params.get("checkpoint_id")
                     if checkpoint_id is not None and not isinstance(checkpoint_id, str):
                         raise WorkspaceError("checkpoint_id must be a string")
+                    message = params.get("message")
+                    if message is not None and not isinstance(message, str):
+                        raise WorkspaceError("message must be a string")
                     return self.store.create_checkpoint(
                         agent_id,
                         session_id,
                         checkpoint_id,
                         origin=origin,
+                        message=message,
+                        pinned=self._boolean(params, "pinned", False),
                     )
-                checkpoint_id = self._required(params, "checkpoint_id")
                 if action == "checkpoint.delete":
+                    checkpoint_id = self._required(params, "checkpoint_id")
                     return self.store.delete_checkpoint(
                         agent_id,
                         session_id,
                         checkpoint_id,
                         origin=origin,
+                        force=self._boolean(params, "force", False),
                     )
+                checkpoint_id = params.get("checkpoint_id")
+                if checkpoint_id is not None and not isinstance(checkpoint_id, str):
+                    raise WorkspaceError("checkpoint_id must be a string")
+                num_ancestors = params.get("num_ancestors")
+                if num_ancestors is not None and (
+                    isinstance(num_ancestors, bool) or not isinstance(num_ancestors, int)
+                ):
+                    raise WorkspaceError("num_ancestors must be an integer")
                 return self.store.rollback(
                     agent_id,
                     session_id,
                     checkpoint_id,
-                    scrub_runtime=bool(params.get("scrub_runtime", True)),
+                    num_ancestors=num_ancestors,
+                    scrub_runtime=self._boolean(params, "scrub_runtime", True),
                     origin=origin,
                 )
 

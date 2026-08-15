@@ -82,6 +82,125 @@ def test_audit_log_is_outside_rollback_scope(store):
     assert "session.rollback" in events
 
 
+def test_checkpoint_metadata_and_ancestor_rollback(store):
+    store.create_session("agent-a", "session-1")
+    current = store.current("agent-a", "session-1")
+    (current / "state.txt").write_text("v1", encoding="utf-8")
+    first = store.create_checkpoint(
+        "agent-a",
+        "session-1",
+        "cp1",
+        origin="agent-loop",
+        message="before retry",
+        pinned=True,
+    )
+    (current / "state.txt").write_text("v2", encoding="utf-8")
+    second = store.create_checkpoint("agent-a", "session-1", "cp2")
+    (current / "state.txt").write_text("v3", encoding="utf-8")
+
+    restored = store.rollback("agent-a", "session-1", num_ancestors=2)
+    status = store.checkpoint_status("agent-a", "session-1")
+
+    assert first["parent_id"] is None
+    assert second["parent_id"] == "cp1"
+    assert restored["checkpoint_id"] == "cp1"
+    assert (current / "state.txt").read_text(encoding="utf-8") == "v1"
+    assert status["head"] == "cp1"
+    assert status["checkpoints"][0]["message"] == "before retry"
+    assert status["checkpoints"][0]["pinned"] is True
+
+
+def test_initialize_finishes_interrupted_rollback(store):
+    store.create_session("agent-a", "session-1")
+    current = store.current("agent-a", "session-1")
+    (current / "state.txt").write_text("v1", encoding="utf-8")
+    store.create_checkpoint("agent-a", "session-1", "cp1")
+    (current / "state.txt").write_text("v2", encoding="utf-8")
+    store.create_checkpoint("agent-a", "session-1", "cp2")
+
+    session_dir = store.session_dir("agent-a", "session-1")
+    restored = session_dir / ".restore-crash"
+    discarded = session_dir / ".discard-crash"
+    store.backend.snapshot(
+        store.checkpoints("agent-a", "session-1") / "cp1",
+        restored,
+        readonly=False,
+    )
+    current.rename(discarded)
+    store._write_transaction(
+        "agent-a",
+        "session-1",
+        {
+            "version": 1,
+            "phase": "old_moved",
+            "checkpoint_id": "cp1",
+            "restore_name": restored.name,
+            "discard_name": discarded.name,
+            "scrub_runtime": True,
+            "origin": "test-crash",
+        },
+    )
+
+    restarted = WorkspaceStore(store.root, store.backend)
+    result = restarted.initialize()
+
+    assert result["recovered_sessions"] == ["agent-a/session-1"]
+    assert (current / "state.txt").read_text(encoding="utf-8") == "v1"
+    assert restarted.checkpoint_status("agent-a", "session-1")["head"] == "cp1"
+    assert not restored.exists()
+    assert not discarded.exists()
+    assert not restarted._transaction_path("agent-a", "session-1").exists()
+
+
+def test_initialize_aborts_prepared_rollback_before_workspace_swap(store):
+    store.create_session("agent-a", "session-1")
+    current = store.current("agent-a", "session-1")
+    (current / "state.txt").write_text("v1", encoding="utf-8")
+    store.create_checkpoint("agent-a", "session-1", "cp1")
+    (current / "state.txt").write_text("v2", encoding="utf-8")
+    store.create_checkpoint("agent-a", "session-1", "cp2")
+
+    session_dir = store.session_dir("agent-a", "session-1")
+    restored = session_dir / ".restore-prepared"
+    discarded = session_dir / ".discard-prepared"
+    store.backend.snapshot(
+        store.checkpoints("agent-a", "session-1") / "cp1",
+        restored,
+        readonly=False,
+    )
+    store._write_transaction(
+        "agent-a",
+        "session-1",
+        {
+            "version": 1,
+            "phase": "prepared",
+            "checkpoint_id": "cp1",
+            "restore_name": restored.name,
+            "discard_name": discarded.name,
+            "scrub_runtime": True,
+            "origin": "test-crash",
+        },
+    )
+
+    restarted = WorkspaceStore(store.root, store.backend)
+    restarted.initialize()
+
+    assert (current / "state.txt").read_text(encoding="utf-8") == "v2"
+    assert restarted.checkpoint_status("agent-a", "session-1")["head"] == "cp2"
+    assert not restored.exists()
+
+
+def test_pinned_checkpoint_requires_force_to_delete(store):
+    store.create_session("agent-a", "session-1")
+    store.create_checkpoint("agent-a", "session-1", "cp1", pinned=True)
+
+    with pytest.raises(WorkspaceError, match="pinned"):
+        store.delete_checkpoint("agent-a", "session-1", "cp1")
+
+    result = store.delete_checkpoint("agent-a", "session-1", "cp1", force=True)
+    assert result["deleted"] is True
+
+
 @pytest.mark.parametrize("bad_id", ["", "../escape", "/absolute", "has space", "x" * 65])
 def test_rejects_unsafe_ids(store, bad_id):
     with pytest.raises(WorkspaceError):
