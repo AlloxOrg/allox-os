@@ -103,6 +103,48 @@ allox workspace rollback agent-a session-1 clean
 allox workspace rollback agent-a session-1 --num-ancestors 2
 ```
 
+## Optional per-turn checkpoints
+
+Allox includes a framework-neutral Agent lifecycle adapter distilled from
+ANOLISA's plugin policy. It is disabled by default:
+
+```toml
+[workspace]
+auto_checkpoint_turns = true
+```
+
+The environment override is
+`ALLOX_WORKSPACE_AUTO_CHECKPOINT_TURNS=true|false`. An Agent runtime owns one
+`TurnCheckpointLifecycle` instance per Agent/Session and wires its native hooks
+to Allox:
+
+```python
+from allox.turn_lifecycle import TurnCheckpointLifecycle
+
+lifecycle = TurnCheckpointLifecycle.from_resolved_config(
+    workspace_client,
+    agent_id,
+    session_id,
+    resolved_config,
+)
+lifecycle.on_session_start(runtime_session_id=thread_id)
+
+with lifecycle.turn(user_message, turn_id=turn_id):
+    result = agent.invoke(user_message)
+```
+
+When enabled, session start creates a turn-0 baseline and each completed Agent
+turn creates one checkpoint after tool execution has stopped. Checkpoint
+metadata records the lifecycle event, turn number, timestamp, success state,
+and optional runtime turn/session IDs. Lifecycle checkpoint failures are
+non-blocking. A rollback performed through `lifecycle.rollback(...)` suppresses
+the immediately following automatic checkpoint so the restored state is not
+saved again as a new turn.
+
+This is a runtime hook, not a per-command policy. The existing
+`workspace run --checkpoint-on-success` option remains independent and should
+normally stay off when per-turn checkpoints are enabled.
+
 The Allox VM must mount the same store at the configured `workspace.vm_root`:
 
 ```bash

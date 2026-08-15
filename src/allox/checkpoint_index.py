@@ -57,6 +57,7 @@ class CheckpointIndex:
         origin: str,
         message: str | None,
         pinned: bool,
+        metadata: dict[str, Any] | None = None,
     ) -> None:
         if checkpoint_id in self.checkpoints:
             raise CheckpointIndexError(f"checkpoint already indexed: {checkpoint_id}")
@@ -70,6 +71,7 @@ class CheckpointIndex:
             "origin": origin,
             "message": message,
             "pinned": pinned,
+            "metadata": metadata,
             "missing": False,
             "parent_id": self.head,
             "child_ids": [LIVE_CHILD],
@@ -85,6 +87,7 @@ class CheckpointIndex:
                 "origin": "filesystem-recovery",
                 "message": None,
                 "pinned": False,
+                "metadata": None,
                 "missing": False,
                 "parent_id": None,
                 "child_ids": [],

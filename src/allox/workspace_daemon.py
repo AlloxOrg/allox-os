@@ -118,6 +118,9 @@ class WorkspaceService:
                     message = params.get("message")
                     if message is not None and not isinstance(message, str):
                         raise WorkspaceError("message must be a string")
+                    metadata = params.get("metadata")
+                    if metadata is not None and not isinstance(metadata, dict):
+                        raise WorkspaceError("metadata must be an object")
                     return self.store.create_checkpoint(
                         agent_id,
                         session_id,
@@ -125,6 +128,7 @@ class WorkspaceService:
                         origin=origin,
                         message=message,
                         pinned=self._boolean(params, "pinned", False),
+                        metadata=metadata,
                     )
                 if action == "checkpoint.delete":
                     checkpoint_id = self._required(params, "checkpoint_id")

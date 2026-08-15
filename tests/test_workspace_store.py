@@ -93,6 +93,7 @@ def test_checkpoint_metadata_and_ancestor_rollback(store):
         origin="agent-loop",
         message="before retry",
         pinned=True,
+        metadata={"event": "turn_end", "turn": 1},
     )
     (current / "state.txt").write_text("v2", encoding="utf-8")
     second = store.create_checkpoint("agent-a", "session-1", "cp2")
@@ -108,6 +109,7 @@ def test_checkpoint_metadata_and_ancestor_rollback(store):
     assert status["head"] == "cp1"
     assert status["checkpoints"][0]["message"] == "before retry"
     assert status["checkpoints"][0]["pinned"] is True
+    assert status["checkpoints"][0]["metadata"] == {"event": "turn_end", "turn": 1}
 
 
 def test_initialize_finishes_interrupted_rollback(store):

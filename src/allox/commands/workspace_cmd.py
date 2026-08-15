@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import posixpath
 import shlex
 import sys
@@ -105,6 +106,7 @@ def workspace_get(
 @click.argument("session_id")
 @click.option("--name", "checkpoint_id", default=None)
 @click.option("--message", default=None, help="Human-readable checkpoint message.")
+@click.option("--metadata", default=None, help="JSON object stored with the checkpoint.")
 @click.option("--pin", "pinned", is_flag=True, help="Mark this checkpoint as pinned.")
 @output_option("table", "json", "yaml")
 @click.pass_obj
@@ -115,11 +117,20 @@ def workspace_checkpoint(
     session_id: str,
     checkpoint_id: str | None,
     message: str | None,
+    metadata: str | None,
     pinned: bool,
     output_format: str | None,
 ) -> None:
     """Checkpoint only the selected Session workspace."""
     prepare_output(obj, output_format, allowed=("table", "json", "yaml", "raw"))
+    parsed_metadata = None
+    if metadata is not None:
+        try:
+            parsed_metadata = json.loads(metadata)
+        except json.JSONDecodeError as exc:
+            raise WorkspaceError(f"metadata must be valid JSON: {exc.msg}") from exc
+        if not isinstance(parsed_metadata, dict):
+            raise WorkspaceError("metadata must be a JSON object")
     result = _client(obj).rpc(
         "checkpoint.create",
         agent_id=agent_id,
@@ -128,6 +139,7 @@ def workspace_checkpoint(
         origin="allox-cli",
         message=message,
         pinned=pinned,
+        metadata=parsed_metadata,
     )
     _emit_result(obj, result, "Session Checkpoint Created")
 
@@ -160,6 +172,7 @@ def workspace_checkpoint_list(
                 "parent_id": item.get("parent_id"),
                 "message": item.get("message"),
                 "pinned": item.get("pinned", False),
+                "metadata": item.get("metadata"),
             }
         )
     obj.output.print_rows(
@@ -172,6 +185,7 @@ def workspace_checkpoint_list(
             "parent_id",
             "message",
             "pinned",
+            "metadata",
         ],
         title="Session Checkpoints",
     )

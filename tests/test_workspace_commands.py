@@ -63,6 +63,43 @@ def test_workspace_checkpoint_is_scoped_by_agent_and_session(runner):
         origin="allox-cli",
         message="before retry",
         pinned=True,
+        metadata=None,
+    )
+
+
+def test_workspace_checkpoint_accepts_metadata(runner):
+    client = MagicMock()
+    client.rpc.return_value = {
+        "agent_id": "agent-a",
+        "session_id": "session-1",
+        "checkpoint_id": "cp1",
+    }
+    with patch("allox.context.ClientContext.get_workspace_client", return_value=client):
+        result = runner(
+            [
+                "workspace",
+                "checkpoint",
+                "agent-a",
+                "session-1",
+                "--name",
+                "cp1",
+                "--metadata",
+                '{"event":"turn_end","turn":1}',
+                "-o",
+                "json",
+            ]
+        )
+
+    assert result.exit_code == 0, result.output
+    client.rpc.assert_called_once_with(
+        "checkpoint.create",
+        agent_id="agent-a",
+        session_id="session-1",
+        checkpoint_id="cp1",
+        origin="allox-cli",
+        message=None,
+        pinned=False,
+        metadata={"event": "turn_end", "turn": 1},
     )
 
 

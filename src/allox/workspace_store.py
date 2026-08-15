@@ -420,6 +420,7 @@ class WorkspaceStore:
         origin: str = "unknown",
         message: str | None = None,
         pinned: bool = False,
+        metadata: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
         checkpoint_id = validate_id(
             "checkpoint", checkpoint_id or f"cp-{time.time_ns()}"
@@ -440,6 +441,7 @@ class WorkspaceStore:
                     origin=origin,
                     message=message,
                     pinned=pinned,
+                    metadata=metadata,
                 )
             except CheckpointIndexError as exc:
                 raise WorkspaceError(str(exc)) from exc
@@ -452,6 +454,7 @@ class WorkspaceStore:
                     "origin": origin,
                     "message": message,
                     "pinned": pinned,
+                    "metadata": metadata,
                 },
                 agent_id,
                 session_id,
@@ -461,6 +464,7 @@ class WorkspaceStore:
             "session_id": session_id,
             "checkpoint_id": checkpoint_id,
             "parent_id": index.checkpoints[checkpoint_id]["parent_id"],
+            "metadata": metadata,
         }
 
     def list_checkpoints(self, agent_id: str, session_id: str) -> list[str]:

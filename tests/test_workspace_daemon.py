@@ -56,6 +56,7 @@ def test_service_forwards_checkpoint_metadata_and_ancestor_rollback():
             "message": "before retry",
             "pinned": True,
             "origin": "agent-loop",
+            "metadata": {"event": "turn_end", "turn": 1},
         },
     )
     service.dispatch(
@@ -74,6 +75,7 @@ def test_service_forwards_checkpoint_metadata_and_ancestor_rollback():
         origin="agent-loop",
         message="before retry",
         pinned=True,
+        metadata={"event": "turn_end", "turn": 1},
     )
     store.rollback.assert_called_once_with(
         "agent-a",
