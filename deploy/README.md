@@ -1,14 +1,16 @@
 # Deployment boundary
 
-Allox 2.0 requires OpenSandbox to launch the outer workload with the named
-Kata runtime. The OCI image supplies the guest userspace; Kata supplies the
-VM, guest kernel, and host isolation boundary.
+Allox OS is the Guest OS of a Kata VM. This directory describes the host-side
+deployment boundary: the Kata runtime launches the Guest Kernel and Rootfs
+produced by this repository. OpenSandbox, execd and AIO are not Allox OS
+dependencies and are not part of the target deployment.
 
-`opensandbox-kata.toml.example` is a starting point, not a universal production
-configuration. In particular, restrict `allowed_host_paths`, pin image tags,
-enable API authentication, and configure networking for the deployment.
+The host launcher must provide an explicit Kata configuration, VM resources,
+network policy and the Allox OS Guest Kernel/Rootfs artifacts. Inside the VM,
+`alloxd` uses a Btrfs-backed data disk at `/var/lib/allox/workspaces`; do not
+place that store on a VirtioFS/9p host share because Session rollback needs
+Btrfs subvolume operations inside the guest.
 
-Inside each Allox VM, run `allox-workspace-daemon` against a Btrfs-backed data
-disk mounted at `/var/lib/allox/workspaces`. Do not point the daemon at a
-VirtioFS/9p host share: Session checkpoint and rollback require Btrfs subvolume
-operations inside the guest.
+`opensandbox-kata.toml.example` is a migration-era artifact. It does not
+describe the Allox OS target architecture and must not be used as the basis for
+a new deployment.

@@ -29,13 +29,11 @@ Allox OS organizes workspace state in two levels:
                         └── <checkpoint_id>/  # read-only snapshot
 ```
 
-`agent-create` creates the level-1 workspace and its `shared/` area.
-`session-create` creates a level-2 workspace inside that Agent Workspace.
-Session commands use `current/` as `cwd`, `HOME`, and `TMPDIR` scope.
-They receive `ALLOX_AGENT_WORKSPACE` as the level-1 workspace path and
-`ALLOX_AGENT_SHARED` as its `shared/` area. Bubblewrap mode mounts that shared
-area and the selected Session Workspace while keeping sibling Session
-Workspaces outside the mount namespace.
+`alloxd` creates the level-1 workspace and its `shared/` area, then creates a
+level-2 workspace inside that Agent Workspace for each Session. The Session
+namespace binds `current/` as its working-directory and `HOME` scope. A private
+temporary directory below `current/` is bound as `/tmp`; sibling Session
+Workspaces are not mounted in that namespace.
 
 ## Checkpoint
 
@@ -53,7 +51,7 @@ Session Workspace rollback is a durable transaction:
 
 1. acquire the Session mutation lock;
 2. fence the Session execution registry;
-3. interrupt registered Session background executions;
+3. terminate the Session cgroup, including all descendant processes;
 4. create a writable snapshot from the selected checkpoint;
 5. move the previous `current/` aside and install the restored subvolume;
 6. reconcile the checkpoint index and commit the transaction;
@@ -64,36 +62,36 @@ serves workspace operations.
 
 ## Process and socket semantics
 
-- `managed` mode runs commands in the persistent Kata VM with the Session
-  Workspace as `cwd`, `HOME`, and `TMPDIR`.
-- Registered background executions belong to the Session runtime registry and
-  are stopped before rollback.
-- Absolute `/tmp` belongs to the Kata VM. `$TMPDIR` points to the Session-owned
-  `.allox-tmp/` directory.
-- Restored socket and FIFO entries below `.allox-tmp/` are scrubbed during
-  rollback.
-- `ephemeral` mode adds a Bubblewrap PID/mount namespace and private `/tmp` for
-  each command.
+- Every Session owns a cgroup and PID/mount/user/network namespace. Children
+  inherit the Session cgroup, which provides stable Agent/Session attribution.
+- The trusted `alloxd` is the only component allowed to create, move or destroy
+  those cgroups and namespaces.
+- A private Session temporary directory is mounted as `/tmp`. No Session uses
+  the Allox OS global `/tmp` for agent-controlled runtime state.
+- Rollback first terminates the Session cgroup, so a discarded branch cannot
+  retain a live listener, socket or child process after its workspace state is
+  restored.
 
 ## Turn lifecycle
 
-With `workspace.auto_checkpoint_turns = true`, the lifecycle adapter creates a
-Session baseline at runtime-session start and a checkpoint after each completed
-Agent turn. Each checkpoint records the turn number, result, timestamp, and
-external runtime identifiers.
+When enabled for an Agent or Session, the lifecycle adapter creates a Session
+baseline at runtime-session start and a checkpoint after each completed Agent
+turn. Each checkpoint records the turn number, result, timestamp and external
+runtime identifiers.
 
 ## API examples
 
 ```bash
 # Level 1: Agent Workspace
-allox workspace agent-create agent-a
+alloxd agent create agent-a
 
 # Level 2: Session Workspace below agent-a
-allox workspace session-create agent-a session-1
-allox workspace checkpoint agent-a session-1 --name clean
-allox workspace run agent-a session-1 -- sh -c 'echo v2 > state.txt'
-allox workspace rollback agent-a session-1 clean
+alloxd session create agent-a session-1
+alloxd checkpoint create agent-a session-1 --name clean
+alloxd session exec agent-a session-1 -- sh -c 'echo v2 > state.txt'
+alloxd checkpoint rollback agent-a session-1 clean
 ```
 
-The daemon binds to loopback by default. An OpenSandbox endpoint can expose it
-to the owning control plane with bearer-token authentication.
+The daemon binds to an in-guest control socket by default. Any host-facing
+control channel is an Allox OS interface (for example vsock) and must be
+authenticated; OpenSandbox is not part of this channel.
