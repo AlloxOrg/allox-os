@@ -1,0 +1,64 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "allox-cli"
+version = "0.1.0"
+description = "Allox CLI — OpenSandbox lifecycle + AIO sandbox agent tools"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "Apache-2.0" }
+authors = [{ name = "Allox" }]
+keywords = ["sandbox", "aio", "agent", "opensandbox", "cli"]
+dependencies = [
+    "opensandbox>=0.1.9,<0.2.0",
+    "agent-sandbox>=0.0.18",
+    "click>=8.1.0,<9.0",
+    "rich>=13.0.0,<14.0",
+    "httpx>=0.27.0",
+    "tomli>=2.0.0; python_version < '3.11'",
+    "pyyaml>=6.0.0",
+]
+
+[project.scripts]
+allox = "allox.main:cli"
+allox-workspace-daemon = "allox.workspace_daemon:main"
+
+[project.entry-points."allox.plugins"]
+langchain-turn-checkpoint = "allox.plugins.langchain:LangChainTurnCheckpointPlugin"
+
+[project.urls]
+Repository = "https://github.com/your-org/allox-cli"
+
+# 项目名 allox-cli，包目录 src/allox → 需显式声明（否则 hatch 找不到包）
+[tool.hatch.build.targets.wheel]
+packages = ["src/allox"]
+
+# editable 安装时从 src/ 加载，避免改代码后 .venv 仍跑旧 wheel
+[tool.hatch.build.targets.editable]
+dev-mode-dirs = ["src"]
+
+[tool.uv]
+package = true
+
+# 使用本地 OpenSandbox SDK，避免 PyPI wheel 在部分环境下 adapter/converter 缺 .py 文件
+[tool.uv.sources]
+opensandbox = { path = "OpenSandbox/sdks/sandbox/python", editable = false }
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0.0",
+    "ruff>=0.14.0",
+]
+
+[tool.ruff]
+target-version = "py310"
+line-length = 100
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+markers = [
+    "integration: requires OpenSandbox server, Docker, and AIO image",
+]

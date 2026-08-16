@@ -1,0 +1,14 @@
+# Code Interpreter sandbox profile (no AIO /v1 API)
+# Usage: cp to ~/.allox/code.toml && allox --profile code sandbox create
+#
+# Agent 业务请用 AIO 镜像 + allox aio *；本 profile 仅用于轻量代码执行。
+
+[connection]
+domain = "localhost:8080"
+protocol = "http"
+
+[defaults]
+image = "opensandbox/code-interpreter:latest"
+entrypoint = ["/opt/opensandbox/code-interpreter.sh"]
+timeout = "30m"
+skip_health_check = true

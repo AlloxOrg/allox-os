@@ -1,0 +1,15 @@
+# Allox custom AIO image profile
+# Usage: allox --config ~/.allox/custom.toml sandbox create
+# Or copy to ~/.allox/custom.toml and use --profile custom
+
+[connection]
+domain = "localhost:8080"
+protocol = "http"
+
+[defaults]
+image = "allox/aio-custom:v1"
+entrypoint = ["/opt/gem/run.sh"]
+timeout = "30m"
+aio_port = 8080
+aio_health_path = "/v1/shell/sessions"
+ready_timeout = "60s"
