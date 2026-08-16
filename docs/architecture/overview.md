@@ -13,26 +13,26 @@ Agent.
 
 ```text
 Host
-└── Allox OS (Kata runtime)
+└── Allox OS
+    ├── Kata runtime (current implementation)
     ├── Allox guest kernel + root filesystem
     ├── alloxd / init
     ├── cgroup, namespace and audit services
     └── Btrfs workspace store
-            └── Agent Workspace (level 1)
-                ├── shared/
-                └── Session Workspace (level 2)
-                    ├── current/
-                    └── checkpoints/
+        └── Agent Workspace (level 1)
+            ├── shared/
+            └── Session Workspace (level 2)
+                ├── current/
+                └── checkpoints/
 ```
 
 ## Runtime boundaries
 
-### Host and runtime backend
+### Allox OS runtime backend
 
-The host launches and manages Allox OS through a runtime backend. Kata is the
-current implementation; it is not an in-guest Allox OS component or a fixed
-part of the Allox OS abstraction. OpenSandbox and Allox CLI are not part of
-this boundary.
+Allox OS owns the runtime-backend boundary. Kata is its current implementation
+and sits below Allox OS as a replaceable component. OpenSandbox and Allox CLI
+are not part of this boundary.
 
 ### Allox OS
 

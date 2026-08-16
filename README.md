@@ -25,7 +25,8 @@ Allox OS 的目标架构不依赖 Allox CLI、OpenSandbox、execd 或 AIO Runtim
 
 ```text
 Host
-└── Allox OS（Kata runtime）          # 用户/信任域级强隔离边界
+└── Allox OS                         # 用户/信任域级强隔离边界
+    ├── Kata runtime                 # 当前可替换的 VM runtime 实现
     ├── Guest Kernel + Rootfs         # 本仓库构建的运行时
     ├── alloxd / init                 # 可信控制服务
     ├── cgroup / namespace / audit
