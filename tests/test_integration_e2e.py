@@ -20,6 +20,7 @@ def require_server(require_opensandbox_server):
     if shutil.which("docker") and subprocess.run(
         ["docker", "info"],
         capture_output=True,
+        check=False,
         timeout=10,
     ).returncode != 0:
         pytest.skip("Docker daemon not running")

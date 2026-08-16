@@ -1,5 +1,5 @@
-# Allox custom AIO image profile
-# Usage: allox --config ~/.allox/custom.toml sandbox create
+# Allox 2.0 in-VM Runtime image profile
+# Usage: allox --config ~/.allox/custom.toml vm create
 # Or copy to ~/.allox/custom.toml and use --profile custom
 
 [connection]
@@ -7,9 +7,13 @@ domain = "localhost:8080"
 protocol = "http"
 
 [defaults]
-image = "allox/aio-custom:v1"
+image = "allox/aio-runtime:v2"
 entrypoint = ["/opt/gem/run.sh"]
 timeout = "30m"
 aio_port = 8080
 aio_health_path = "/v1/shell/sessions"
 ready_timeout = "60s"
+
+[workspace]
+vm_root = "/var/lib/allox/workspaces"
+execution_mode = "managed"

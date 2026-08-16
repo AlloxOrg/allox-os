@@ -7,30 +7,30 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from allox.commands.workspace_cmd import (
+from allox.cli.commands.workspace import (
     _workspace_path,
-    build_anolisa_workspace_argv,
     build_bwrap_argv,
+    build_managed_workspace_argv,
 )
-from allox.workspace_store import WorkspaceError
+from allox.workspace.store import WorkspaceError
 
 
 def test_bwrap_maps_only_selected_session_and_tmp_inside_workspace():
-    source = "/var/lib/allox-store/agents/a/workspace/sessions/s1/current"
+    source = "/var/lib/allox/workspaces/agents/a/workspace/sessions/s1/current"
     argv = build_bwrap_argv(source, "a", "s1", ("sh", "-c", "pwd"))
 
     bind_index = argv.index("--bind")
     assert argv[bind_index + 1 : bind_index + 3] == [source, "/workspace"]
     tmp_index = argv.index("/tmp")
     assert argv[tmp_index - 1 : tmp_index + 1] == ["--tmpfs", "/tmp"]
-    assert "/var/lib/allox-store/agents" not in argv
+    assert "/var/lib/allox/workspaces/agents" not in argv
     assert argv[-3:] == ["sh", "-c", "pwd"]
     assert "-type s" in argv[-5]
 
 
-def test_anolisa_mode_uses_managed_workspace_as_cwd_without_pid_namespace():
-    source = "/var/lib/allox-store/agents/a/workspace/sessions/s1/current"
-    argv = build_anolisa_workspace_argv(
+def test_managed_mode_uses_session_workspace_as_cwd_without_pid_namespace():
+    source = "/var/lib/allox/workspaces/agents/a/workspace/sessions/s1/current"
+    argv = build_managed_workspace_argv(
         source, "a", "s1", ("sh", "-c", "sleep 60 &"), (("MODEL", "test"),)
     )
 
@@ -44,7 +44,7 @@ def test_anolisa_mode_uses_managed_workspace_as_cwd_without_pid_namespace():
 
 def test_workspace_path_rejects_daemon_escape():
     with pytest.raises(WorkspaceError, match="unsafe"):
-        _workspace_path("/var/lib/allox-store", "../agent-b/current")
+        _workspace_path("/var/lib/allox/workspaces", "../agent-b/current")
 
 
 def test_workspace_checkpoint_is_scoped_by_agent_and_session(runner):
@@ -54,7 +54,7 @@ def test_workspace_checkpoint_is_scoped_by_agent_and_session(runner):
         "session_id": "session-1",
         "checkpoint_id": "cp1",
     }
-    with patch("allox.context.ClientContext.get_workspace_client", return_value=client):
+    with patch("allox.cli.context.ClientContext.get_workspace_client", return_value=client):
         result = runner(
             [
                 "workspace",
@@ -92,7 +92,7 @@ def test_workspace_checkpoint_accepts_metadata(runner):
         "session_id": "session-1",
         "checkpoint_id": "cp1",
     }
-    with patch("allox.context.ClientContext.get_workspace_client", return_value=client):
+    with patch("allox.cli.context.ClientContext.get_workspace_client", return_value=client):
         result = runner(
             [
                 "workspace",
@@ -128,7 +128,7 @@ def test_workspace_rollback_accepts_ancestor_depth(runner):
         {"agent_id": "agent-a", "session_id": "session-1", "checkpoint_id": "cp1"},
         {"completed": True, "success": True},
     ]
-    with patch("allox.context.ClientContext.get_workspace_client", return_value=client):
+    with patch("allox.cli.context.ClientContext.get_workspace_client", return_value=client):
         result = runner(
             [
                 "workspace",

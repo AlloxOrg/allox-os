@@ -19,7 +19,7 @@ def test_file_upload_streams_binary_file(runner, tmp_path):
         assert kwargs == {"mode": 600}
 
     sandbox.files.write_file.side_effect = capture_upload
-    with patch("allox.context.ClientContext.connect_sandbox", return_value=sandbox):
+    with patch("allox.cli.context.ClientContext.connect_sandbox", return_value=sandbox):
         result = runner(
             [
                 "file",
@@ -43,7 +43,7 @@ def test_file_upload_streams_binary_file(runner, tmp_path):
 
 def test_file_upload_rejects_missing_local_file_before_connect(runner, tmp_path):
     connect = MagicMock()
-    with patch("allox.context.ClientContext.connect_sandbox", connect):
+    with patch("allox.cli.context.ClientContext.connect_sandbox", connect):
         result = runner(
             ["file", "upload", "sbx-upload", str(tmp_path / "missing"), "/tmp/file"]
         )
@@ -58,7 +58,7 @@ def test_file_download_streams_to_local_file(runner, tmp_path):
     sandbox = MagicMock()
     sandbox.files.read_bytes_stream.return_value = iter([b"\x00all", b"ox\xff"])
 
-    with patch("allox.context.ClientContext.connect_sandbox", return_value=sandbox):
+    with patch("allox.cli.context.ClientContext.connect_sandbox", return_value=sandbox):
         result = runner(
             ["file", "download", "sbx-download", "/tmp/source.bin", str(target), "-o", "json"]
         )
@@ -76,7 +76,7 @@ def test_file_download_refuses_overwrite_without_force(runner, tmp_path):
     target = tmp_path / "existing.bin"
     target.write_bytes(b"keep")
     connect = MagicMock()
-    with patch("allox.context.ClientContext.connect_sandbox", connect):
+    with patch("allox.cli.context.ClientContext.connect_sandbox", connect):
         result = runner(
             ["file", "download", "sbx-download", "/tmp/source.bin", str(target)]
         )
@@ -93,9 +93,9 @@ def test_file_download_force_overwrites_and_uses_session(runner, tmp_path, monke
     sandbox = MagicMock()
     sandbox.files.read_bytes_stream.return_value = iter([b"new"])
     session = SimpleNamespace(sandbox_id="session-sbx", aio_url="")
-    monkeypatch.setattr("allox.context.get_current_session", lambda: session)
+    monkeypatch.setattr("allox.cli.context.get_current_session", lambda: session)
 
-    with patch("allox.context.ClientContext.connect_sandbox", return_value=sandbox) as connect:
+    with patch("allox.cli.context.ClientContext.connect_sandbox", return_value=sandbox) as connect:
         result = runner(
             ["file", "download", "--force", "/tmp/source.bin", str(target)]
         )
@@ -114,7 +114,7 @@ def test_file_download_failure_removes_partial_file(runner, tmp_path):
         raise RuntimeError("connection lost")
 
     sandbox.files.read_bytes_stream.side_effect = failing_stream
-    with patch("allox.context.ClientContext.connect_sandbox", return_value=sandbox):
+    with patch("allox.cli.context.ClientContext.connect_sandbox", return_value=sandbox):
         result = runner(
             ["file", "download", "sbx-download", "/tmp/source.bin", str(target)]
         )
@@ -143,7 +143,7 @@ def test_recursive_upload_preserves_tree_and_empty_directories(runner, tmp_path)
         uploaded[path] = stream.read()
 
     sandbox.files.write_file.side_effect = capture_upload
-    with patch("allox.context.ClientContext.connect_sandbox", return_value=sandbox):
+    with patch("allox.cli.context.ClientContext.connect_sandbox", return_value=sandbox):
         result = runner(
             [
                 "file",
@@ -187,7 +187,7 @@ def test_upload_accepts_octal_mode_spellings(runner, tmp_path):
     source.write_bytes(b"data")
     for spelling in ("644", "0644", "0o644"):
         sandbox = MagicMock()
-        with patch("allox.context.ClientContext.connect_sandbox", return_value=sandbox):
+        with patch("allox.cli.context.ClientContext.connect_sandbox", return_value=sandbox):
             result = runner(
                 [
                     "file",
@@ -207,7 +207,7 @@ def test_upload_rejects_invalid_octal_mode(runner, tmp_path):
     source = tmp_path / "source.bin"
     source.write_bytes(b"data")
     connect = MagicMock()
-    with patch("allox.context.ClientContext.connect_sandbox", connect):
+    with patch("allox.cli.context.ClientContext.connect_sandbox", connect):
         result = runner(
             [
                 "file",
@@ -251,7 +251,7 @@ def test_recursive_download_preserves_tree_and_empty_directories(runner, tmp_pat
         lambda path, **kwargs: iter(payloads[path])
     )
 
-    with patch("allox.context.ClientContext.connect_sandbox", return_value=sandbox):
+    with patch("allox.cli.context.ClientContext.connect_sandbox", return_value=sandbox):
         result = runner(
             [
                 "file",
@@ -284,7 +284,7 @@ def test_recursive_download_rejects_remote_symlink_and_cleans_staging(runner, tm
         SimpleNamespace(path="/workspace/tree/link", entry_type="symlink")
     ]
 
-    with patch("allox.context.ClientContext.connect_sandbox", return_value=sandbox):
+    with patch("allox.cli.context.ClientContext.connect_sandbox", return_value=sandbox):
         result = runner(
             [
                 "file",
@@ -311,7 +311,7 @@ def test_recursive_download_rejects_path_escape(runner, tmp_path):
         SimpleNamespace(path="/workspace/escape.bin", entry_type="file")
     ]
 
-    with patch("allox.context.ClientContext.connect_sandbox", return_value=sandbox):
+    with patch("allox.cli.context.ClientContext.connect_sandbox", return_value=sandbox):
         result = runner(
             [
                 "file",

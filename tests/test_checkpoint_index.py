@@ -1,10 +1,10 @@
-"""Tests for the distilled ANOLISA-style checkpoint lineage."""
+"""Tests for the Allox 2.0 Session checkpoint lineage."""
 
 from __future__ import annotations
 
 import pytest
 
-from allox.checkpoint_index import LIVE_CHILD, CheckpointIndex, CheckpointIndexError
+from allox.workspace.checkpoint_index import LIVE_CHILD, CheckpointIndex, CheckpointIndexError
 
 
 def _add(index: CheckpointIndex, checkpoint_id: str, created_at_ns: int) -> None:

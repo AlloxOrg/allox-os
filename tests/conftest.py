@@ -6,7 +6,7 @@ import httpx
 import pytest
 from click.testing import CliRunner
 
-from allox.main import cli
+from allox.cli.main import cli
 
 _MINIMAL_CONFIG = """\
 [connection]
@@ -19,13 +19,13 @@ def opensandbox_server_reachable(domain: str = "localhost:8080") -> bool:
     """True when OpenSandbox lifecycle API is available (not bare AIO on :8080)."""
     try:
         r = httpx.get(f"http://{domain}/health", timeout=2.0)
-    except Exception:
+    except httpx.HTTPError:
         return False
     if r.status_code != 200:
         return False
     try:
         data = r.json()
-    except Exception:
+    except ValueError:
         return False
     return data.get("status") == "healthy"
 

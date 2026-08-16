@@ -6,8 +6,8 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from allox.workspace_daemon import ExecutionRegistry, WorkspaceService
-from allox.workspace_store import WorkspaceError
+from allox.workspace.daemon import ExecutionRegistry, WorkspaceService
+from allox.workspace.store import WorkspaceError
 
 
 def test_mutation_rejects_active_session_execution():

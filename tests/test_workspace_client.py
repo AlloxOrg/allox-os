@@ -6,7 +6,7 @@ import click
 import httpx
 import pytest
 
-from allox.workspace_client import WorkspaceClient
+from allox.workspace.client import WorkspaceClient
 
 
 def test_rpc_returns_result():

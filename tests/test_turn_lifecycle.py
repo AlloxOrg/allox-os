@@ -6,7 +6,7 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from allox.turn_lifecycle import MESSAGE_LIMIT, TurnCheckpointLifecycle
+from allox.workspace.lifecycle import MESSAGE_LIMIT, TurnCheckpointLifecycle
 
 
 def lifecycle(client=None, *, enabled=True):

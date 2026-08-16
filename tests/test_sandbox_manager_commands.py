@@ -32,7 +32,7 @@ def test_sandbox_list_uses_current_sdk_and_reads_all_pages(runner):
         _page([_sandbox_info("sbx-2", "stopped")], page=2, has_next_page=False),
     ]
 
-    with patch("allox.context.ClientContext.get_manager", return_value=manager):
+    with patch("allox.cli.context.ClientContext.get_manager", return_value=manager):
         result = runner(["sandbox", "list", "-o", "json"])
 
     assert result.exit_code == 0, result.output
@@ -47,7 +47,7 @@ def test_sandbox_get_uses_current_sdk_and_serializes_image(runner):
     manager = create_autospec(SandboxManagerSync, instance=True)
     manager.get_sandbox_info.return_value = _sandbox_info("sbx-get")
 
-    with patch("allox.context.ClientContext.get_manager", return_value=manager):
+    with patch("allox.cli.context.ClientContext.get_manager", return_value=manager):
         result = runner(["sandbox", "get", "sbx-get", "-o", "json"])
 
     assert result.exit_code == 0, result.output
@@ -63,8 +63,8 @@ def test_sandbox_kill_uses_current_sdk(runner):
     manager = create_autospec(SandboxManagerSync, instance=True)
 
     with (
-        patch("allox.context.ClientContext.get_manager", return_value=manager),
-        patch("allox.commands.sandbox.get_current_session", return_value=None),
+        patch("allox.cli.context.ClientContext.get_manager", return_value=manager),
+        patch("allox.cli.commands.vm.get_current_session", return_value=None),
     ):
         result = runner(["sandbox", "kill", "sbx-kill", "-o", "json"])
 
@@ -75,7 +75,7 @@ def test_sandbox_kill_uses_current_sdk(runner):
 
 def test_sandbox_pause_and_resume_use_current_sdk(runner):
     manager = create_autospec(SandboxManagerSync, instance=True)
-    with patch("allox.context.ClientContext.get_manager", return_value=manager):
+    with patch("allox.cli.context.ClientContext.get_manager", return_value=manager):
         paused = runner(["sandbox", "pause", "sbx-state", "-o", "json"])
         resumed = runner(["sandbox", "resume", "sbx-state", "-o", "json"])
     assert paused.exit_code == 0, paused.output

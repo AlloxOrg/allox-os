@@ -2,323 +2,228 @@
 
 <img src="./assets/allox-logo.png" alt="Allox logo" width="128" />
 
-# Allox CLI
+# Allox OS 2.0
 
-> Allox 2.0 development: per-Agent/per-Session workspace isolation and
-> rollback are documented in [docs/ALLOX_2_WORKSPACES.md](docs/ALLOX_2_WORKSPACES.md).
+**一个 Kata VM，内部按 Agent / Session 隔离和回退 workspace**
 
-**面向 AI Agent 的可恢复执行工作区**
-
-从环境创建、任务执行到断点恢复，用一套 CLI 完成完整 Agent 工作流。
-
-[![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/)
-[![License](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
-
-[Features](#features) · [Quick Start](#quick-start) · [Demo](#demo-end-to-end-agent-workflows) · [Tests](#tests-validation-and-quality) · [Documentation](#documentation)
+[架构](#架构) · [状态边界](#状态边界) · [快速开始](#快速开始) · [目录结构](#目录结构) · [开发](#开发)
 
 </div>
 
-Allox 将隔离环境、Agent 工具、文件传输、当前会话和 Checkpoint 恢复统一到一个命令入口。它既适合开发者在终端交互使用，也提供稳定的结构化输出供 Agent、脚本和 CI 调用。
+Allox 2.0 不再把“为每次 Agent 任务创建一个独立容器”作为核心模型。它先为一个用户或信任域创建一个长期存在的 **Kata VM**，再在 VM 内通过 workspace 服务管理多个 Agent 和 Session。
 
-## Features
+Kata VM 提供 Guest Kernel 级强隔离；workspace 层提供低成本的 Session 文件隔离、checkpoint、rollback 和执行租约。两者解决的是不同问题，不能互相替代。
 
-- **可恢复工作区**：支持手动、定时和操作成功后的 Checkpoint，可恢复 `latest` 或指定版本。
-- **Stateful Session**：创建或恢复后自动选中当前环境；后续命令可以省略 ID，销毁后自动清理。
-- **Agent-ready 工具集**：统一使用 Shell、File、Browser、Jupyter、Screenshot 和 MCP 能力。
-- **Runtime Readiness**：等待 Agent 服务真正可用，而不只是等待容器启动，并报告就绪耗时。
-- **可靠文件传输**：支持二进制流式与递归传输；下载使用临时 staging，并拒绝符号链接和路径逃逸。
-- **MCP 原生入口**：发现 MCP Server、列出工具并直接调用。
-- **多环境配置**：通过 Profile 切换 dev、staging、prod、自定义镜像或轻量执行环境。
-- **自动化友好**：按场景提供 `table`、`json`、`yaml` 和 `raw` 输出。
+## 架构
 
-## Quick Start
+```text
+Host
+├── Allox CLI / OpenSandbox control plane
+└── Kata VM                         # 用户/信任域级强隔离边界
+    ├── allox-workspace-daemon      # VM 内可信控制服务
+    ├── Agent Runtime / AIO / MCP
+    └── Btrfs workspace store
+        └── agents/
+            └── <agent_id>/
+                └── workspace/sessions/
+                    └── <session_id>/
+                        ├── current/       # 当前可写 Session
+                        └── checkpoints/   # 只读 COW snapshots
+```
 
-### Install
+核心层次：
 
-当前版本从源码安装：
+| 层次 | 生命周期 | 负责内容 |
+|---|---|---|
+| Kata VM | 用户或信任域级 | Guest Kernel、VM 内进程、网络、系统 `/tmp`、设备与根文件系统 |
+| Agent | VM 内逻辑身份 | Agent 名称空间及其 Session 集合 |
+| Session | Agent 任务/线程级 | `current` workspace、checkpoint DAG、执行租约和注册的后台任务 |
+| Turn | 单次 Agent 交互 | 可选的 turn-end 自动 checkpoint |
+
+详细设计见 [架构总览](docs/architecture/overview.md) 和 [Workspace 模型](docs/architecture/workspaces.md)。
+
+## 状态边界
+
+### Workspace rollback 会做什么
+
+- 只回退指定 `agent_id + session_id` 的 Btrfs workspace。
+- 回退前终止该 Session 已登记的后台执行。
+- 保留其他 Agent、其他 Session 和 Kata VM 本身。
+- checkpoint 索引、审计事件与事务日志保存在 rollback 范围外。
+
+### Workspace rollback 不会做什么
+
+- 不恢复整台 Kata VM 的 CPU、RAM、Guest Kernel 或设备状态。
+- 不回退 VM 级 `/tmp`、系统服务或未登记的 VM 内进程。
+- 不等同于 OpenSandbox 的整 VM snapshot/replace。
+
+Allox 默认把 Session 的 `HOME` 指向 `current/`，把 `TMPDIR` 指向 `current/.allox-tmp/`。Agent 使用 `$TMPDIR` 创建的普通临时文件可进入 Session checkpoint；显式写 `/tmp` 属于 VM 级状态。
+
+## 执行模式
+
+```toml
+[workspace]
+vm_root = "/var/lib/allox/workspaces"
+execution_mode = "managed"
+auto_checkpoint_turns = false
+```
+
+- `managed`：默认模式。命令在同一 Kata VM 内执行，使用对应 Session 作为 `cwd/HOME/TMPDIR`；后台命令必须登记，rollback 前由 daemon 终止。
+- `ephemeral`：每次命令额外进入 Bubblewrap PID/mount namespace；适合不需要跨命令进程状态的场景。
+
+这里的 Bubblewrap 是 VM 内第二层轻量隔离，不替代外层 Kata VM。
+
+## 快速开始
+
+### 1. 安装开发环境
 
 ```bash
-git clone https://github.com/AlloxOrg/allox-cli.git
-cd allox-cli
+git clone https://github.com/AlloxOrg/allox-os.git
+cd allox-os
 
-# 当前项目从本地路径加载 OpenSandbox Python SDK
+# 当前开发版本从本地路径加载 OpenSandbox Python SDK
 git clone --depth 1 https://github.com/opensandbox-group/OpenSandbox.git OpenSandbox
-
 uv sync --no-editable
 ```
 
-激活虚拟环境：
+验证：
 
 ```bash
-# Linux / macOS
-source .venv/bin/activate
-
-# Windows PowerShell
-.venv\Scripts\Activate.ps1
+uv run --no-editable allox --version
+uv run --no-editable allox --help
 ```
 
-验证安装：
+### 2. 配置 OpenSandbox + Kata
+
+宿主机必须先安装并注册 Kata runtime。参考配置位于 [deploy/opensandbox-kata.toml.example](deploy/opensandbox-kata.toml.example)：
 
 ```bash
-allox --version
-allox --help
-```
-
-不激活虚拟环境时，可使用 `uv run --no-editable allox ...`。开发中修改 `src/allox` 后，执行：
-
-```bash
-uv sync --reinstall-package allox-cli
-```
-
-> 不建议直接执行 `uv run allox`：它可能将项目切换为 editable 安装，覆盖当前安装方式。
-
-### Configure
-
-Allox 当前使用 [OpenSandbox](https://github.com/opensandbox-group/OpenSandbox) 管理环境生命周期，默认使用 [AIO Sandbox](https://github.com/agent-infra/sandbox) 提供 Agent Runtime。两者都需要在本机准备，但不需要手动运行它们的源码：OpenSandbox Server 通过 Python 包安装并作为本地服务启动，AIO Sandbox 通过 Docker 拉取并由 Server 按需创建。开始前请确认 Docker 已运行。
-
-#### Start the Server
-
-```bash
-# 安装到当前 uv 虚拟环境
-uv pip install opensandbox-server
-
-# 生成本地 Server 配置并启动
-opensandbox-server init-config ~/.sandbox.toml --example docker
+cp deploy/opensandbox-kata.toml.example ~/.sandbox.toml
 opensandbox-server
 ```
 
-在另一个终端验证：
+该配置中的 `[secure_runtime]` 必须指向 Kata；使用普通 runc 只能获得容器隔离，不符合 Allox 2.0 的默认强隔离模型。
+
+### 3. 准备 VM 内 Runtime 镜像
 
 ```bash
-curl http://127.0.0.1:8080/health
-# {"status":"healthy"}
+cd images/aio-runtime
+./build.sh
+cd ../..
 ```
 
-生产环境应在 `~/.sandbox.toml` 中配置 API Key。仅限本地开发且明确接受无鉴权风险时，可设置 `OPENSANDBOX_INSECURE_SERVER=YES`。
+镜像提供 AIO、Shell、File、Browser、Jupyter 和 MCP 等 VM 内服务。它是 Guest userspace，不是隔离边界；隔离边界由 Kata 提供。
 
-#### Pull the Default Image
-
-```bash
-# 下载默认 Agent Runtime 到本机 Docker
-docker pull ghcr.io/agent-infra/sandbox:latest
-```
-
-生产环境应固定具体 tag，避免使用 `latest`。
-
-#### Initialize Allox
+### 4. 初始化 CLI
 
 ```bash
 allox config init
 allox config set connection.domain localhost:8080
 allox config set connection.protocol http
-allox config show
+allox config set defaults.image allox/aio-runtime:v2
 ```
 
-如果服务端开启了鉴权：
+### 5. 创建外层 VM
+
+`vm` 是 Allox 2.0 的主命令名；`sandbox` 作为兼容别名保留：
 
 ```bash
-allox config set connection.api_key YOUR_API_KEY
+allox vm create --timeout 30m -o json
+allox vm list -o json
 ```
 
-Allox 会依次读取命令行选项、环境变量、本地配置文件和内置默认配置，位置靠前的设置会覆盖后面的设置。需要在不同环境间切换时，可通过 `--profile dev|staging|prod|custom|code` 选择对应的 `~/.allox/<profile>.toml` 配置文件。
+### 6. 在 VM 内创建 Agent / Session
 
-## Demo: End-to-End Agent Workflows
-
-以下示例默认已经完成安装与配置。先确认 Docker、服务端和 Allox 配置可用：
+`allox-workspace-daemon` 应运行在 Kata VM 内，并使用 VM 内 Btrfs 数据盘，例如 `/var/lib/allox/workspaces`。开发环境可将其端口通过受控 endpoint 暴露给 CLI：
 
 ```bash
-docker info
-curl http://127.0.0.1:8080/health
-allox config show
+allox workspace init
+allox workspace agent-create agent-a
+allox workspace session-create agent-a session-1
+
+allox workspace checkpoint agent-a session-1 \
+  --name clean --message "before task"
+
+allox workspace run agent-a session-1 -- \
+  sh -c 'printf changed > state.txt'
+
+allox workspace rollback agent-a session-1 clean
 ```
 
-### 1. Complete Agent Workflow
-
-创建环境后，Allox 会自动将其记录为当前 session。下面的操作均不需要重复传入 `sandbox_id`：
+后台任务必须通过受管入口启动：
 
 ```bash
-# 创建环境并等待 Runtime 就绪
-allox sandbox create --timeout 30m -o json
-allox session current -o json
-
-# Shell
-allox aio exec -- python3 -c "print('hello from allox')"
-
-# Jupyter；结果应包含 status: ok 和输出 4
-allox aio jupyter run -c "print(2 + 2)" -o json
-
-# Browser；输出 CDP/VNC 地址，并保存截图到本地
-allox aio browser info -o json
-allox aio screenshot -f allox-demo.png -o json
-
-# 单文件上传、读取和下载
-allox file upload ./README.md /tmp/allox-README.md -o json
-allox aio read /tmp/allox-README.md
-allox file download /tmp/allox-README.md ./README.from-allox.md -o json
-
-# 递归目录传输
-mkdir -p .allox-demo/nested
-printf "hello\n" > .allox-demo/nested/result.txt
-allox file upload --recursive ./.allox-demo /tmp/allox-demo -o json
-allox file download --recursive /tmp/allox-demo ./allox-demo-output -o json
-
-# 销毁当前环境；current session 会被自动清除
-allox sandbox kill -o json
-
-# 预期提示不存在当前 session
-allox session current
-
-# 本地生成：allox-demo.png、README.from-allox.md、.allox-demo/、allox-demo-output/
-# 确认结果后可自行删除
+allox workspace run agent-a session-1 --background -- python worker.py
 ```
 
-### 2. Checkpoint and Restore
+daemon 会在 rollback 前中断该 Session 登记的后台任务；存在活动前台租约时，checkpoint/rollback 会被拒绝。
 
-下面的 Bash 示例使用 [`jq`](https://jqlang.github.io/jq/) 从 JSON 输出中读取 ID，完整演示“保存 V1 → 修改为 V2 → 恢复 V1 → 验证 → 清理”：
+## CLI 边界
 
-```bash
-# 创建源环境并记录 ID
-SOURCE_ID=$(allox sandbox create --timeout 30m -o json | jq -r '.id')
+| 命令 | 所属层次 | 用途 |
+|---|---|---|
+| `allox vm ...` | Kata VM | 创建、查询、续期、暂停、恢复、销毁外层 VM |
+| `allox sandbox ...` | Kata VM | `vm` 的兼容别名 |
+| `allox workspace ...` | Agent/Session | 创建 workspace、执行、checkpoint、rollback |
+| `allox aio ...` | VM 内 Runtime | Shell、Jupyter、Browser、Screenshot、MCP |
+| `allox file ...` | VM 内 Runtime | 文件读写与上传下载 |
+| `allox checkpoint ...` | 整 VM/旧接口 | OpenSandbox image snapshot；不要与 Session rollback 混用 |
 
-# 写入 V1 并保存 Checkpoint
-allox aio exec -- sh -c "echo v1 > /home/gem/version.txt"
-CHECKPOINT_ID=$(allox checkpoint create --name v1 -o json | jq -r '.id')
-
-# 将当前工作区修改为 V2
-allox aio exec -- sh -c "echo v2 > /home/gem/version.txt"
-allox checkpoint list -o json
-
-# 从 V1 Checkpoint 创建新环境，并自动切换 current session
-RESTORED_ID=$(allox checkpoint restore "$CHECKPOINT_ID" --timeout 30m -o json | jq -r '.id')
-
-# 预期输出 v1
-allox aio exec -- cat /home/gem/version.txt
-
-# 恢复会创建新环境，不会覆盖或销毁源环境
-# 因此需要删除 Checkpoint，并显式清理恢复环境和源环境
-allox checkpoint delete "$CHECKPOINT_ID" -o json
-allox sandbox kill "$RESTORED_ID" -o json
-allox sandbox kill "$SOURCE_ID" -o json
-```
-
-### 3. Automatic Checkpoint
-
-在 `~/.allox/config.toml` 中启用后，Allox 只在指定操作成功时创建 Checkpoint：
-
-```toml
-# ~/.allox/config.toml
-[checkpoint]
-enabled = true
-on_success = true
-operations = ["run", "file.write", "file.upload", "aio.exec", "aio.jupyter"]
-interval = "5m"
-strict = false
-```
-
-也可以为当前 session 运行前台定时保存：
-
-```bash
-allox checkpoint watch --interval 5m
-```
-
-`strict = false` 表示自动保存失败只产生警告，不改变原操作的成功结果。`watch` 会持续运行，按 `Ctrl+C` 停止。
-
-### 4. MCP Discovery and Call
-
-MCP Server 和工具随运行镜像而变化，调用前应先发现实际能力：
-
-```bash
-# 创建环境（如当前已有 session，可省略）
-allox sandbox create --timeout 30m -o json
-
-# 发现 Server 和完整工具名
-allox aio mcp servers -o json
-allox aio mcp tools browser -o json
-
-# 调用浏览器工具；具体工具名以 tools 输出为准
-allox aio mcp call browser browser_navigate \
-  --args '{"url":"https://example.com"}'
-
-allox sandbox kill -o json
-```
-
-部分镜像没有启用全部 MCP Server，出现 404 不代表环境生命周期异常。Shell 和文件操作可分别回退到 `allox aio exec`、`allox aio read` 或 `allox file *`。
-
-详见 [MCP Server 使用说明](./docs/MCP_SERVERS.md)。
-
-## Command Reference
-
-| 命令 | 用途 |
-|---|---|
-| `allox sandbox create/list/get/endpoint/renew/pause/resume/kill` | 环境生命周期 |
-| `allox session current/use/clear` | 当前工作环境 |
-| `allox aio exec/read/screenshot` | Shell、文件读取与截图 |
-| `allox aio jupyter run` | Jupyter 代码执行 |
-| `allox aio browser info` | 获取 CDP/VNC 信息 |
-| `allox aio mcp servers/tools/call` | MCP 发现与调用 |
-| `allox checkpoint create/list/restore/delete/watch` | 工作区保存与恢复 |
-| `allox run` | 通用命令执行 |
-| `allox file cat/write/upload/download` | 文件操作与传输 |
-| `allox config init/show/set/path` | 本地配置 |
-
-使用 `allox <command> --help` 查看完整参数。
-
-## Tests: Validation and Quality
-
-### Unit Tests
-
-无需 Docker 或正在运行的服务端：
-
-```bash
-uv run pytest -m "not integration" -q
-uv run ruff check src tests
-```
-
-### End-to-End
-
-准备完整运行环境后执行：
-
-```bash
-uv run pytest -m integration tests/test_integration_e2e.py -v
-```
-
-覆盖流程：
+## 目录结构
 
 ```text
-create → exec → screenshot → Jupyter → browser info
-       → file upload/download → recursive transfer → kill
+allox-os/
+├── src/allox/
+│   ├── cli/                 # VM 外 CLI、命令和输出
+│   ├── vm/                  # 外层 OpenSandbox + Kata 生命周期
+│   ├── workspace/           # VM 内 Agent/Session/checkpoint/rollback
+│   ├── runtime/             # VM 内 AIO/MCP/健康检查
+│   ├── integrations/        # LangChain 等 Agent turn 适配
+│   └── config.py            # 跨层配置解析
+├── images/aio-runtime/      # Kata VM 内 Runtime OCI 镜像
+├── deploy/                  # OpenSandbox + Kata 部署配置
+├── docs/
+│   ├── architecture/        # 当前 2.0 架构与状态语义
+│   ├── guides/              # Runtime、MCP、镜像使用指南
+│   └── development/         # 设计选择与历史测试记录
+├── examples/                # 配置示例
+└── tests/                   # 单元与集成测试
 ```
 
-其他集成测试：
+这套目录直接对应运行边界：`vm/` 不包含 Session rollback 实现，`workspace/` 不管理 Kata 生命周期，`runtime/` 不拥有 checkpoint 元数据。
+
+## Agent turn checkpoint
+
+可选启用：
+
+```toml
+[workspace]
+auto_checkpoint_turns = true
+```
+
+框架适配器位于 `allox.integrations` entry-point group。当前内置 LangChain 适配器；它只发布 Session/Turn 生命周期事件，真正的 checkpoint 与 rollback 仍由 workspace daemon 执行。
+
+## 开发
 
 ```bash
-# MCP
-uv run pytest -m integration tests/test_integration_mcp.py -v
+# 单元测试
+uv run pytest -m "not integration" -q
 
-# 自定义 Runtime image；先执行 docker/build.sh
-uv run pytest -m integration tests/test_integration_custom_image.py -v
+# 静态检查
+uv run ruff check src tests
+
+# 完整集成测试需要 OpenSandbox、Kata 和 Runtime image
+uv run pytest -m integration -v
 ```
 
-## Documentation
+## 文档
 
-[MCP Server 使用说明](./docs/MCP_SERVERS.md)介绍 MCP Server 发现、工具列表与调用流程。
-
-[自定义镜像指南](./docs/CUSTOM_IMAGE.md)说明如何构建和验证自定义 Runtime image；[Code Interpreter 指南](./docs/CODE_INTERPRETER.md)介绍轻量 Code Interpreter 镜像的配置与使用方式。
-
-测试与验收记录按阶段整理：[Phase 1](./docs/PHASE1_TESTING.md)覆盖基础生命周期与工具能力，[Phase 2](./docs/PHASE2_TESTING.md)覆盖 Session、Profile、MCP 与脚本化能力，[Phase 3](./docs/PHASE3_TESTING.md)覆盖自定义镜像。
-
-## Built With
-
-- [Python 3.10+](https://www.python.org/) — 主要开发语言。
-- [Click](https://click.palletsprojects.com/) — CLI 命令、参数解析与上下文管理。
-- [Rich](https://github.com/Textualize/rich) — 终端表格、状态面板和交互输出。
-- [HTTPX](https://www.python-httpx.org/) — Runtime 健康检查与 HTTP 通信。
-- [OpenSandbox](https://github.com/opensandbox-group/OpenSandbox) — 环境生命周期、endpoint、execd、snapshot 与隔离能力。
-- [AIO Sandbox](https://github.com/agent-infra/sandbox) — Shell、File、Browser、Jupyter、MCP 与 VSCode Agent Runtime。
-- [Docker](https://www.docker.com/) — 本地容器运行环境。
-- [uv](https://github.com/astral-sh/uv) 与 [Hatchling](https://hatch.pypa.io/latest/) — 依赖管理、虚拟环境和 Python 包构建。
-- [pytest](https://docs.pytest.org/) 与 [Ruff](https://docs.astral.sh/ruff/) — 自动化测试、Lint 和代码质量检查。
+- [架构总览](docs/architecture/overview.md)
+- [Agent/Session Workspace 模型](docs/architecture/workspaces.md)
+- [Runtime 镜像](docs/guides/runtime-image.md)
+- [MCP](docs/guides/mcp.md)
+- [部署边界](deploy/README.md)
 
 ## License
 
-Apache-2.0。完整许可证文本见 [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0)。
+Apache-2.0。

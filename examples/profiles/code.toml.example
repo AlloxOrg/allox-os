@@ -1,5 +1,5 @@
-# Code Interpreter sandbox profile (no AIO /v1 API)
-# Usage: cp to ~/.allox/code.toml && allox --profile code sandbox create
+# Code Interpreter Runtime profile (no AIO /v1 API)
+# Usage: cp to ~/.allox/code.toml && allox --profile code vm create
 #
 # Agent 业务请用 AIO 镜像 + allox aio *；本 profile 仅用于轻量代码执行。
 

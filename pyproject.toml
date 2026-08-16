@@ -5,12 +5,12 @@ build-backend = "hatchling.build"
 [project]
 name = "allox-cli"
 version = "0.1.0"
-description = "Allox CLI — OpenSandbox lifecycle + AIO sandbox agent tools"
+description = "Allox 2.0 — one Kata VM with isolated Agent/Session workspaces"
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "Apache-2.0" }
 authors = [{ name = "Allox" }]
-keywords = ["sandbox", "aio", "agent", "opensandbox", "cli"]
+keywords = ["agent", "kata", "sandbox", "workspace", "checkpoint", "opensandbox"]
 dependencies = [
     "opensandbox>=0.1.9,<0.2.0",
     "agent-sandbox>=0.0.18",
@@ -22,14 +22,14 @@ dependencies = [
 ]
 
 [project.scripts]
-allox = "allox.main:cli"
-allox-workspace-daemon = "allox.workspace_daemon:main"
+allox = "allox.cli.main:cli"
+allox-workspace-daemon = "allox.workspace.daemon:main"
 
-[project.entry-points."allox.plugins"]
-langchain-turn-checkpoint = "allox.plugins.langchain:LangChainTurnCheckpointPlugin"
+[project.entry-points."allox.integrations"]
+langchain-turn-checkpoint = "allox.integrations.langchain:LangChainTurnCheckpointPlugin"
 
 [project.urls]
-Repository = "https://github.com/your-org/allox-cli"
+Repository = "https://github.com/AlloxOrg/allox-os"
 
 # 项目名 allox-cli，包目录 src/allox → 需显式声明（否则 hatch 找不到包）
 [tool.hatch.build.targets.wheel]

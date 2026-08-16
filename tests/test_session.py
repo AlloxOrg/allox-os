@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import json
 
-from allox.session import (
+from allox.vm.selection import (
     clear_current_session,
     get_current_session,
     load_sessions,

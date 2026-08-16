@@ -7,8 +7,8 @@ from datetime import datetime, timezone
 from types import SimpleNamespace
 from unittest.mock import MagicMock, patch
 
-from allox.checkpoint import checkpoint_after_success, latest_ready_snapshot
-from allox.context import ClientContext
+from allox.cli.context import ClientContext
+from allox.vm.checkpoints import checkpoint_after_success, latest_ready_snapshot
 
 
 def _snapshot(snapshot_id: str, sandbox_id: str, state: str, minute: int = 0):
@@ -28,8 +28,8 @@ def test_checkpoint_create_uses_current_sandbox(runner):
     manager.create_snapshot.return_value = _snapshot("snap-1", "sbx-1", "ready")
     session = SimpleNamespace(sandbox_id="sbx-1", aio_url="", created_at="now")
     with (
-        patch("allox.context.ClientContext.get_manager", return_value=manager),
-        patch("allox.context.get_current_session", return_value=session),
+        patch("allox.cli.context.ClientContext.get_manager", return_value=manager),
+        patch("allox.cli.context.get_current_session", return_value=session),
     ):
         result = runner(["checkpoint", "create", "--name", "good", "-o", "json"])
     assert result.exit_code == 0, result.output
@@ -54,9 +54,9 @@ def test_restore_specific_checkpoint_updates_current_session(runner):
     restored = MagicMock(id="sbx-new")
     restored.get_endpoint.return_value = SimpleNamespace(endpoint="127.0.0.1:4567")
     with (
-        patch("allox.context.ClientContext.get_manager", return_value=manager),
-        patch("allox.commands.checkpoint_cmd.SandboxSync.create", return_value=restored) as create,
-        patch("allox.commands.checkpoint_cmd.set_current_session") as set_session,
+        patch("allox.cli.context.ClientContext.get_manager", return_value=manager),
+        patch("allox.cli.commands.vm_checkpoint.SandboxSync.create", return_value=restored) as create,
+        patch("allox.cli.commands.vm_checkpoint.set_current_session") as set_session,
     ):
         result = runner(["checkpoint", "restore", "snap-1", "-o", "json"])
     assert result.exit_code == 0, result.output
@@ -81,7 +81,7 @@ def test_auto_checkpoint_only_for_configured_operation(tmp_path):
 
 
 def test_create_checkpoint_waits_until_ready(tmp_path):
-    from allox.checkpoint import create_checkpoint
+    from allox.vm.checkpoints import create_checkpoint
 
     obj = ClientContext({"color": False, "checkpoint_create_timeout": 5}, tmp_path / "config.toml")
     manager = MagicMock()

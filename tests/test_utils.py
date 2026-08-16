@@ -2,7 +2,7 @@
 
 from agent_sandbox.core.api_error import ApiError
 
-from allox.utils import format_api_error, parse_duration, parse_nullable_duration
+from allox.cli.utils import format_api_error, parse_duration, parse_nullable_duration
 
 
 def test_parse_duration_minutes():

@@ -6,13 +6,13 @@ import json
 from types import SimpleNamespace
 from unittest.mock import MagicMock, patch
 
-from allox.commands.sandbox import _needs_windows_browser_no_sandbox
-from allox.session import get_current_session
+from allox.cli.commands.vm import _needs_windows_browser_no_sandbox
+from allox.vm.selection import get_current_session
 
 
-@patch("allox.commands.sandbox.SandboxSync.create")
+@patch("allox.cli.commands.vm.SandboxSync.create")
 def test_sandbox_create_writes_session(mock_create, runner, tmp_path, monkeypatch):
-    monkeypatch.setattr("allox.session.DEFAULT_SESSIONS_PATH", tmp_path / "sessions.json")
+    monkeypatch.setattr("allox.vm.selection.DEFAULT_SESSIONS_PATH", tmp_path / "sessions.json")
 
     mock_sandbox = MagicMock()
     mock_sandbox.id = "sbx-test-123"
@@ -37,9 +37,9 @@ def test_sandbox_create_writes_session(mock_create, runner, tmp_path, monkeypatc
     mock_sandbox.close.assert_called_once()
 
 
-@patch("allox.commands.sandbox.SandboxSync.create")
+@patch("allox.cli.commands.vm.SandboxSync.create")
 def test_sandbox_create_writes_session_without_aio_url(mock_create, runner, tmp_path, monkeypatch):
-    monkeypatch.setattr("allox.session.DEFAULT_SESSIONS_PATH", tmp_path / "sessions.json")
+    monkeypatch.setattr("allox.vm.selection.DEFAULT_SESSIONS_PATH", tmp_path / "sessions.json")
 
     mock_sandbox = MagicMock()
     mock_sandbox.id = "sbx-no-endpoint"
@@ -55,10 +55,10 @@ def test_sandbox_create_writes_session_without_aio_url(mock_create, runner, tmp_
     assert session.aio_url == ""
 
 
-@patch("allox.commands.sandbox.SandboxSync.create")
+@patch("allox.cli.commands.vm.SandboxSync.create")
 def test_sandbox_create_passes_ready_timeout(mock_create, runner, tmp_path, monkeypatch):
-    monkeypatch.setattr("allox.session.DEFAULT_SESSIONS_PATH", tmp_path / "sessions.json")
-    monkeypatch.setattr("allox.commands.sandbox.sys.platform", "linux")
+    monkeypatch.setattr("allox.vm.selection.DEFAULT_SESSIONS_PATH", tmp_path / "sessions.json")
+    monkeypatch.setattr("allox.cli.commands.vm.sys.platform", "linux")
     mock_sandbox = MagicMock(id="sbx-ready-timeout")
     mock_sandbox.get_endpoint.return_value = MagicMock(endpoint="127.0.0.1:54321")
     mock_create.return_value = mock_sandbox
@@ -69,12 +69,12 @@ def test_sandbox_create_passes_ready_timeout(mock_create, runner, tmp_path, monk
     assert mock_create.call_args.kwargs["ready_timeout"].total_seconds() == 180
 
 
-@patch("allox.commands.sandbox.SandboxSync.create")
+@patch("allox.cli.commands.vm.SandboxSync.create")
 def test_sandbox_create_adds_no_sandbox_for_local_windows_aio(
     mock_create, runner, tmp_path, monkeypatch
 ):
-    monkeypatch.setattr("allox.session.DEFAULT_SESSIONS_PATH", tmp_path / "sessions.json")
-    monkeypatch.setattr("allox.commands.sandbox.sys.platform", "win32")
+    monkeypatch.setattr("allox.vm.selection.DEFAULT_SESSIONS_PATH", tmp_path / "sessions.json")
+    monkeypatch.setattr("allox.cli.commands.vm.sys.platform", "win32")
     mock_sandbox = MagicMock(id="sbx-windows-browser")
     mock_sandbox.get_endpoint.return_value = MagicMock(endpoint="127.0.0.1:54321")
     mock_create.return_value = mock_sandbox
@@ -85,12 +85,12 @@ def test_sandbox_create_adds_no_sandbox_for_local_windows_aio(
     assert mock_create.call_args.kwargs["env"]["BROWSER_NO_SANDBOX"] == "--no-sandbox"
 
 
-@patch("allox.commands.sandbox.SandboxSync.create")
+@patch("allox.cli.commands.vm.SandboxSync.create")
 def test_sandbox_create_preserves_explicit_browser_sandbox_env(
     mock_create, runner, tmp_path, monkeypatch
 ):
-    monkeypatch.setattr("allox.session.DEFAULT_SESSIONS_PATH", tmp_path / "sessions.json")
-    monkeypatch.setattr("allox.commands.sandbox.sys.platform", "win32")
+    monkeypatch.setattr("allox.vm.selection.DEFAULT_SESSIONS_PATH", tmp_path / "sessions.json")
+    monkeypatch.setattr("allox.cli.commands.vm.sys.platform", "win32")
     mock_sandbox = MagicMock(id="sbx-explicit-browser-env")
     mock_sandbox.get_endpoint.return_value = MagicMock(endpoint="127.0.0.1:54321")
     mock_create.return_value = mock_sandbox
@@ -113,7 +113,7 @@ def test_sandbox_create_preserves_explicit_browser_sandbox_env(
 
 
 def test_windows_browser_no_sandbox_is_not_enabled_for_remote_server(monkeypatch):
-    monkeypatch.setattr("allox.commands.sandbox.sys.platform", "win32")
+    monkeypatch.setattr("allox.cli.commands.vm.sys.platform", "win32")
     obj = SimpleNamespace(resolved_config={"domain": "sandbox.example.com:8080"})
 
     assert not _needs_windows_browser_no_sandbox(
@@ -121,11 +121,11 @@ def test_windows_browser_no_sandbox_is_not_enabled_for_remote_server(monkeypatch
     )
 
 
-@patch("allox.commands.sandbox.SandboxSync.create")
+@patch("allox.cli.commands.vm.SandboxSync.create")
 def test_sandbox_create_passes_workspace_host_volume(
     mock_create, runner, tmp_path, monkeypatch
 ):
-    monkeypatch.setattr("allox.session.DEFAULT_SESSIONS_PATH", tmp_path / "sessions.json")
+    monkeypatch.setattr("allox.vm.selection.DEFAULT_SESSIONS_PATH", tmp_path / "sessions.json")
     sandbox = MagicMock(id="allox-vm")
     sandbox.get_endpoint.side_effect = RuntimeError("no endpoint")
     mock_create.return_value = sandbox
@@ -137,7 +137,7 @@ def test_sandbox_create_passes_workspace_host_volume(
             "--skip-health-check",
             "--host-volume",
             "/data/allox/user-1",
-            "/var/lib/allox-store",
+            "/var/lib/allox/workspaces",
             "-o",
             "json",
         ]
@@ -146,4 +146,4 @@ def test_sandbox_create_passes_workspace_host_volume(
     assert result.exit_code == 0, result.output
     volume = mock_create.call_args.kwargs["volumes"][0]
     assert volume.host.path == "/data/allox/user-1"
-    assert volume.mount_path == "/var/lib/allox-store"
+    assert volume.mount_path == "/var/lib/allox/workspaces"

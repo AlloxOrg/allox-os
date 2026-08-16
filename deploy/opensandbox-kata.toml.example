@@ -1,0 +1,51 @@
+# OpenSandbox control plane for the Allox 2.0 outer VM.
+# The Docker daemon must already expose a named `kata` runtime.
+
+[server]
+host = "127.0.0.1"
+port = 8080
+max_sandbox_timeout_seconds = 86400
+
+[runtime]
+type = "docker"
+execd_image = "opensandbox/execd:v1.0.21"
+
+[secure_runtime]
+type = "kata"
+docker_runtime = "kata"
+
+[storage]
+# Narrow this to the directory that holds per-VM persistent data.
+allowed_host_paths = ["/var/lib/allox"]
+volume_default_size = "20Gi"
+
+[store]
+type = "sqlite"
+path = "/var/lib/allox/control-plane.db"
+
+[docker]
+network_mode = "bridge"
+drop_capabilities = [
+  "AUDIT_WRITE",
+  "MKNOD",
+  "NET_ADMIN",
+  "NET_RAW",
+  "SYS_ADMIN",
+  "SYS_MODULE",
+  "SYS_PTRACE",
+  "SYS_TIME",
+  "SYS_TTY_CONFIG",
+]
+no_new_privileges = true
+pids_limit = 4096
+
+[ingress]
+mode = "direct"
+
+[egress]
+image = "opensandbox/egress:v1.1.4"
+mode = "dns"
+
+[renew_intent]
+enabled = false
+min_interval_seconds = 60

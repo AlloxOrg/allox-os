@@ -4,14 +4,14 @@ from __future__ import annotations
 
 from unittest.mock import MagicMock, patch
 
-from allox.session import Session
+from allox.vm.selection import Session
 
 
-@patch("allox.context.ClientContext.aio_client")
+@patch("allox.cli.context.ClientContext.aio_client")
 def test_aio_exec_ls_dash_la_with_session(mock_aio_client, runner, monkeypatch):
     session = Session("sbx-1", "http://127.0.0.1:1", "2026-01-01T00:00:00+00:00")
-    monkeypatch.setattr("allox.commands.aio.get_current_session", lambda: session)
-    monkeypatch.setattr("allox.context.get_current_session", lambda: session)
+    monkeypatch.setattr("allox.cli.commands.runtime.get_current_session", lambda: session)
+    monkeypatch.setattr("allox.cli.context.get_current_session", lambda: session)
     mock_client = MagicMock()
     mock_client.shell.exec_command.return_value = MagicMock(
         data=MagicMock(output="total 0\n", exit_code=0)
@@ -25,7 +25,7 @@ def test_aio_exec_ls_dash_la_with_session(mock_aio_client, runner, monkeypatch):
 
 
 def test_aio_exec_split_args_uuid():
-    from allox.utils import split_exec_args
+    from allox.cli.utils import split_exec_args
 
     sid = "29613df6-106f-4d3d-b194-e931171ecbe0"
     sandbox_id, cmd = split_exec_args((sid, "ls", "-la"), has_current_session=True)

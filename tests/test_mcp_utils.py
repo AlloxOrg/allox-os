@@ -3,7 +3,7 @@
 import click
 import pytest
 
-from allox.mcp_utils import build_mcp_request, parse_mcp_target
+from allox.runtime.mcp import build_mcp_request, parse_mcp_target
 
 _SAMPLE_ID = "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"
 

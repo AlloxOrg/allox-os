@@ -3,12 +3,13 @@
 from __future__ import annotations
 
 import asyncio
+from typing import ClassVar
 from unittest.mock import MagicMock
 
 import pytest
 
-from allox.plugins import builtin_registry
-from allox.plugins.langchain import extract_user_message
+from allox.integrations import builtin_registry
+from allox.integrations.langchain import extract_user_message
 
 
 class FakeRunnable:
@@ -88,6 +89,6 @@ def test_plugin_rollback_suppresses_following_turn_checkpoint():
 def test_message_extractor_supports_langchain_style_human_messages():
     class HumanMessage:
         type = "human"
-        content = [{"type": "text", "text": "keep this"}]
+        content: ClassVar[list[dict[str, str]]] = [{"type": "text", "text": "keep this"}]
 
     assert extract_user_message({"messages": [HumanMessage()]}) == "keep this"

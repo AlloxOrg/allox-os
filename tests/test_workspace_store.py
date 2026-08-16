@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pytest
 
-from allox.workspace_store import WorkspaceError, WorkspaceStore
+from allox.workspace.store import WorkspaceError, WorkspaceStore
 
 
 class DirectorySnapshotBackend:

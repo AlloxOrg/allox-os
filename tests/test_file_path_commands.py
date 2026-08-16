@@ -13,8 +13,8 @@ def _session():
 def test_file_write_single_path_uses_current_session(runner):
     sandbox = MagicMock()
     with (
-        patch("allox.context.get_current_session", return_value=_session()),
-        patch("allox.context.ClientContext.connect_sandbox", return_value=sandbox) as connect,
+        patch("allox.cli.context.get_current_session", return_value=_session()),
+        patch("allox.cli.context.ClientContext.connect_sandbox", return_value=sandbox) as connect,
     ):
         result = runner(["file", "write", "/workspace/a.txt", "--content", "hello", "-o", "json"])
     assert result.exit_code == 0, result.output
@@ -26,8 +26,8 @@ def test_file_cat_single_path_uses_current_session(runner):
     sandbox = MagicMock()
     sandbox.files.read_file.return_value = "hello"
     with (
-        patch("allox.context.get_current_session", return_value=_session()),
-        patch("allox.context.ClientContext.connect_sandbox", return_value=sandbox) as connect,
+        patch("allox.cli.context.get_current_session", return_value=_session()),
+        patch("allox.cli.context.ClientContext.connect_sandbox", return_value=sandbox) as connect,
     ):
         result = runner(["file", "cat", "/workspace/a.txt"])
     assert result.exit_code == 0, result.output
@@ -37,7 +37,7 @@ def test_file_cat_single_path_uses_current_session(runner):
 
 def test_file_write_explicit_sandbox_id(runner):
     sandbox = MagicMock()
-    with patch("allox.context.ClientContext.connect_sandbox", return_value=sandbox) as connect:
+    with patch("allox.cli.context.ClientContext.connect_sandbox", return_value=sandbox) as connect:
         result = runner(["file", "write", "explicit-sbx", "/tmp/a.txt", "--content", "x"])
     assert result.exit_code == 0, result.output
     connect.assert_called_once_with("explicit-sbx")
