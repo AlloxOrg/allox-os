@@ -53,6 +53,7 @@ DEFAULT_CONFIG_TEMPLATE = """\
 # daemon_url = "http://127.0.0.1:8092"
 # request_timeout = 30
 # vm_root = "/var/lib/allox-store"
+# execution_mode = "anolisa"  # anolisa: persistent VM processes; ephemeral: per-command Bubblewrap
 # auto_checkpoint_turns = false  # session baseline + one checkpoint per Agent turn
 # token is read from ALLOX_WORKSPACE_TOKEN; do not store it in this file
 """
@@ -162,6 +163,7 @@ def resolve_config(
         "workspace_token": _env("ALLOX_WORKSPACE_TOKEN") or "",
         "workspace_request_timeout": int(workspace.get("request_timeout", 30)),
         "workspace_vm_root": workspace.get("vm_root", "/var/lib/allox-store"),
+        "workspace_execution_mode": str(workspace.get("execution_mode", "anolisa")).lower(),
         "workspace_auto_checkpoint_turns": _env_bool(
             "ALLOX_WORKSPACE_AUTO_CHECKPOINT_TURNS",
             bool(workspace.get("auto_checkpoint_turns", False)),

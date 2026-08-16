@@ -352,6 +352,45 @@ exit "$status"
     return argv
 
 
+def build_anolisa_workspace_argv(
+    workspace_path: str,
+    agent_id: str,
+    session_id: str,
+    command: tuple[str, ...],
+    environment: tuple[tuple[str, str], ...] = (),
+) -> list[str]:
+    """Run a command in a persistent Allox 1.0 Sandbox workspace.
+
+    This mirrors ANOLISA ws-ckpt's boundary: Btrfs controls the workspace
+    directory and its checkpoints, while the outer Sandbox owns process
+    lifetime.  A detached child may therefore survive a tool call and is not
+    claimed to be rollbackable.
+    """
+    validate_id("agent", agent_id)
+    validate_id("session", session_id)
+    if not command:
+        raise WorkspaceError("workspace run requires a command after --")
+    env = [
+        "env",
+        "-i",
+        "PATH=/usr/local/bin:/usr/bin:/bin",
+        f"HOME={workspace_path}",
+        f"TMPDIR={posixpath.join(workspace_path, '.allox-tmp')}",
+        f"ALLOX_AGENT_ID={agent_id}",
+        f"ALLOX_SESSION_ID={session_id}",
+    ]
+    env.extend(f"{key}={value}" for key, value in environment)
+    return [
+        *env,
+        "sh",
+        "-c",
+        'cd -- "$1" && shift && exec "$@"',
+        "allox-workspace",
+        workspace_path,
+        *command,
+    ]
+
+
 @workspace_group.command(
     "run",
     context_settings={"allow_interspersed_args": False},
@@ -361,6 +400,11 @@ exit "$status"
 @click.option("--sandbox", "sandbox_id", default=None, help="Allox VM sandbox ID.")
 @click.option("--timeout", default=None, help="Command timeout, e.g. 30s or 5m.")
 @click.option("--env", "environment", multiple=True, type=KEY_VALUE)
+@click.option(
+    "--background",
+    is_flag=True,
+    help="Start a persistent outer-Sandbox execution (ANOLISA mode only).",
+)
 @click.option("--checkpoint-on-success", is_flag=True)
 @output_option("raw", "json")
 @click.argument("command", nargs=-1, type=click.UNPROCESSED)
@@ -373,11 +417,12 @@ def workspace_run(
     sandbox_id: str | None,
     timeout: str | None,
     environment: tuple[tuple[str, str], ...],
+    background: bool,
     checkpoint_on_success: bool,
     output_format: str | None,
     command: tuple[str, ...],
 ) -> None:
-    """Run a command inside one isolated Session workspace."""
+    """Run a command in one Session workspace; use --background for long ANOLISA jobs."""
     prepare_output(obj, output_format, allowed=("raw", "json"), fallback="raw")
     if command and command[0] == "--":
         command = command[1:]
@@ -390,10 +435,22 @@ def workspace_run(
         str(obj.resolved_config.get("workspace_vm_root", "/var/lib/allox-store")),
         description["relative_workspace"],
     )
-    bwrap_argv = build_bwrap_argv(
-        workspace_path, agent_id, session_id, command, environment
-    )
-    command_string = shlex.join(bwrap_argv)
+    execution_mode = str(obj.resolved_config.get("workspace_execution_mode", "anolisa")).lower()
+    if execution_mode == "anolisa":
+        execution_argv = build_anolisa_workspace_argv(
+            workspace_path, agent_id, session_id, command, environment
+        )
+    elif execution_mode == "ephemeral":
+        if background:
+            raise WorkspaceError("--background is only available in anolisa execution mode")
+        execution_argv = build_bwrap_argv(
+            workspace_path, agent_id, session_id, command, environment
+        )
+    else:
+        raise WorkspaceError(
+            "workspace.execution_mode must be 'anolisa' or 'ephemeral'"
+        )
+    command_string = shlex.join(execution_argv)
     lease = client.rpc(
         "execution.acquire",
         agent_id=agent_id,
@@ -401,7 +458,8 @@ def workspace_run(
     )
     sandbox = None
     execution = None
-    succeeded = False
+    execution_accepted = False
+    completed_successfully = False
     try:
         sandbox = obj.connect_sandbox(resolved_sandbox)
         handlers = ExecutionHandlersSync(
@@ -411,12 +469,17 @@ def workspace_run(
         execution = sandbox.commands.run(
             command_string,
             opts=RunCommandOpts(
-                background=False,
+                background=background,
                 timeout=parse_duration(timeout) if timeout else None,
             ),
             handlers=handlers,
         )
-        succeeded = not execution.error and getattr(execution, "exit_code", 0) in (0, None)
+        execution_accepted = not execution.error and (
+            background or getattr(execution, "exit_code", 0) in (0, None)
+        )
+        completed_successfully = (
+            not background and execution_accepted
+        )
     finally:
         if sandbox is not None:
             sandbox.close()
@@ -426,7 +489,7 @@ def workspace_run(
             click.echo(f"Warning: failed to release workspace execution lease: {exc}", err=True)
 
     checkpoint = None
-    if succeeded and checkpoint_on_success:
+    if completed_successfully and checkpoint_on_success:
         checkpoint = client.rpc(
             "checkpoint.create",
             agent_id=agent_id,
@@ -444,6 +507,7 @@ def workspace_run(
                 "agent_id": agent_id,
                 "session_id": session_id,
                 "execution_id": getattr(execution, "id", None),
+                "background": background,
                 "exit_code": getattr(execution, "exit_code", None),
                 "checkpoint_id": checkpoint.get("checkpoint_id") if checkpoint else None,
                 "error": (
@@ -453,5 +517,5 @@ def workspace_run(
                 ),
             }
         )
-    if not succeeded:
+    if not execution_accepted:
         raise SystemExit(1)

@@ -7,7 +7,11 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from allox.commands.workspace_cmd import _workspace_path, build_bwrap_argv
+from allox.commands.workspace_cmd import (
+    _workspace_path,
+    build_anolisa_workspace_argv,
+    build_bwrap_argv,
+)
 from allox.workspace_store import WorkspaceError
 
 
@@ -22,6 +26,20 @@ def test_bwrap_maps_only_selected_session_and_tmp_inside_workspace():
     assert "/var/lib/allox-store/agents" not in argv
     assert argv[-3:] == ["sh", "-c", "pwd"]
     assert "-type s" in argv[-5]
+
+
+def test_anolisa_mode_uses_managed_workspace_as_cwd_without_pid_namespace():
+    source = "/var/lib/allox-store/agents/a/workspace/sessions/s1/current"
+    argv = build_anolisa_workspace_argv(
+        source, "a", "s1", ("sh", "-c", "sleep 60 &"), (("MODEL", "test"),)
+    )
+
+    assert argv[:2] == ["env", "-i"]
+    assert f"HOME={source}" in argv
+    assert f"TMPDIR={source}/.allox-tmp" in argv
+    assert "MODEL=test" in argv
+    assert "bwrap" not in argv
+    assert argv[-5:] == ["allox-workspace", source, "sh", "-c", "sleep 60 &"]
 
 
 def test_workspace_path_rejects_daemon_escape():

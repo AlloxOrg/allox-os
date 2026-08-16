@@ -14,6 +14,29 @@ The OpenSandbox `sandbox` and legacy top-level `checkpoint` commands continue
 to manage the whole VM. The new `workspace` commands are scoped by
 `agent_id + session_id`; they never restore or replace the Allox VM.
 
+## Execution model
+
+The default `workspace.execution_mode = "anolisa"` follows ANOLISA's `ws-ckpt`
+split: the workspace daemon owns Btrfs directory state while the outer Allox
+1.0 Sandbox owns process lifetime. `workspace run` enters the selected Session
+directory as its working directory and sets `HOME` and `TMPDIR` to that
+workspace. Background processes may survive across Agent turns.
+
+Use `allox workspace run --background ...` for an intentional long-running
+Session job. It maps to Allox 1.0 / OpenSandbox background execution and
+returns an execution id; it must not be combined with automatic checkpointing.
+
+This is **logical workspace isolation inside one user trust domain**, not a
+per-command process sandbox. A workspace rollback restores files only; it does
+not restore, stop, or otherwise synchronize long-lived process and socket
+state. Agent code must not be given a path to another user's Allox VM.
+
+Set `workspace.execution_mode = "ephemeral"` only for the stricter legacy
+Bubblewrap launcher. It creates a fresh PID and mount namespace for each tool
+call, so background tasks do not survive a turn. In either mode, use `TMPDIR`
+for rollbackable per-Session temporary files; an explicit absolute `/tmp` is
+outer-Sandbox runtime state and is not workspace-managed in ANOLISA mode.
+
 ## Trust boundary
 
 `allox-workspace-daemon` runs on the trusted host and is the only component
@@ -66,28 +89,34 @@ that match the Agent/Session storage model:
   `committed` phases. Daemon startup either finishes or safely aborts an
   interrupted workspace swap before serving requests.
 
-Allox deliberately keeps its execution lease instead of ANOLISA's inotify
-quiescence heuristic: commands for a Session are launched through the Allox
-control plane, so checkpoint and rollback can be rejected while an exact
-execution lease is active. ANOLISA's directory-to-symlink migration,
+Allox keeps a lightweight execution lease for foreground commands instead of
+ANOLISA's inotify quiescence heuristic: checkpoint and rollback can be
+rejected while that exact command is active. An explicit ANOLISA-mode
+background execution is outer-Sandbox runtime state and releases this lease;
+it must be treated as potentially concurrent with workspace writes. ANOLISA's
+directory-to-symlink migration,
 loop-backed Btrfs image, systemd integration, Agent plugins, diff/preview, and
 retention scheduler are not part of this minimal core.
 
 ## Session execution
 
-`allox workspace run` acquires an execution lease and enters the selected
-Session through Bubblewrap. The new mount namespace starts with an empty root,
-exposes system files read-only, and binds only the selected Session as
-`/workspace`.
+By default, `allox workspace run` runs in the outer Allox 1.0 Sandbox with the
+selected Session as its working directory. This is ANOLISA-compatible managed
+workspace behavior: the process may survive across turns when started with
+`--background`, but workspace rollback does not restore its OS state.
+
+`workspace.execution_mode = "ephemeral"` instead enters the selected Session
+through Bubblewrap. The new mount namespace starts with an empty root, exposes
+system files read-only, and binds only the selected Session as `/workspace`.
 
 Kata's container and host-shared filesystems do not reliably support Unix
-socket nodes. Bubblewrap therefore mounts a private tmpfs as `/tmp`. A trusted
-wrapper in the same mount namespace copies ordinary temporary files from
-`/workspace/.allox-tmp` before the command and synchronizes them back before
-the namespace exits. Socket, FIFO, and device nodes work while the command is
-active but are deliberately excluded from synchronization. This preserves
-rollback for regular `/tmp` files without pretending that live socket state is
-restorable.
+socket nodes. In ephemeral mode, Bubblewrap mounts a private tmpfs as `/tmp`.
+A trusted wrapper copies ordinary temporary files from `/workspace/.allox-tmp`
+before the command and synchronizes them back before the namespace exits.
+Socket, FIFO, and device nodes work while the command is active but are
+deliberately excluded from synchronization. In the default ANOLISA mode,
+`TMPDIR` points to `.allox-tmp`, while absolute `/tmp` and other outer runtime
+paths are not checkpoint-managed.
 
 ## Example
 
