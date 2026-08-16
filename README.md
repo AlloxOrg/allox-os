@@ -221,6 +221,7 @@ uv run pytest -m integration -v
 
 ## 文档
 
+- [文档索引](docs/README.md)
 - [架构总览](docs/architecture/overview.md)
 - [Agent/Session Workspace 模型](docs/architecture/workspaces.md)
 - [Runtime 镜像](docs/guides/runtime-image.md)
