@@ -25,11 +25,15 @@ workspace. Background processes may survive across Agent turns.
 Use `allox workspace run --background ...` for an intentional long-running
 Session job. It maps to Allox 1.0 / OpenSandbox background execution and
 returns an execution id; it must not be combined with automatic checkpointing.
+The execution ID is registered outside the workspace. On `workspace rollback`,
+Allox interrupts all registered Session executions before swapping the Btrfs
+subvolume.
 
 This is **logical workspace isolation inside one user trust domain**, not a
-per-command process sandbox. A workspace rollback restores files only; it does
-not restore, stop, or otherwise synchronize long-lived process and socket
-state. Agent code must not be given a path to another user's Allox VM.
+per-command process sandbox. Rollback resets the Session runtime (terminates
+registered background jobs) and restores files; it does not restore process
+memory or revive a live socket. Agent code must not be given a path to another
+user's Allox VM.
 
 Set `workspace.execution_mode = "ephemeral"` only for the stricter legacy
 Bubblewrap launcher. It creates a fresh PID and mount namespace for each tool
@@ -92,8 +96,9 @@ that match the Agent/Session storage model:
 Allox keeps a lightweight execution lease for foreground commands instead of
 ANOLISA's inotify quiescence heuristic: checkpoint and rollback can be
 rejected while that exact command is active. An explicit ANOLISA-mode
-background execution is outer-Sandbox runtime state and releases this lease;
-it must be treated as potentially concurrent with workspace writes. ANOLISA's
+background execution is registered as Session runtime state. Raw
+`session.rollback` is rejected until the trusted rollback path interrupts that
+runtime. ANOLISA's
 directory-to-symlink migration,
 loop-backed Btrfs image, systemd integration, Agent plugins, diff/preview, and
 retention scheduler are not part of this minimal core.
@@ -103,7 +108,8 @@ retention scheduler are not part of this minimal core.
 By default, `allox workspace run` runs in the outer Allox 1.0 Sandbox with the
 selected Session as its working directory. This is ANOLISA-compatible managed
 workspace behavior: the process may survive across turns when started with
-`--background`, but workspace rollback does not restore its OS state.
+`--background`. Workspace rollback terminates registered background executions
+before restoring files; it does not restore their OS state.
 
 `workspace.execution_mode = "ephemeral"` instead enters the selected Session
 through Bubblewrap. The new mount namespace starts with an empty root, exposes

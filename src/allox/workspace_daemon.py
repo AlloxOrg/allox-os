@@ -23,6 +23,8 @@ class ExecutionRegistry:
         self._lock = threading.Lock()
         self._leases: dict[str, tuple[str, str]] = {}
         self._mutating: set[tuple[str, str]] = set()
+        self._background: dict[tuple[str, str], dict[str, dict[str, str]]] = {}
+        self._resets: dict[str, tuple[str, str]] = {}
 
     def acquire(self, agent_id: str, session_id: str) -> dict[str, Any]:
         key = (validate_id("agent", agent_id), validate_id("session", session_id))
@@ -40,6 +42,51 @@ class ExecutionRegistry:
             released = self._leases.pop(token, None) is not None
         return {"released": released}
 
+    def register_background(
+        self, agent_id: str, session_id: str, sandbox_id: str, execution_id: str
+    ) -> dict[str, Any]:
+        key = (validate_id("agent", agent_id), validate_id("session", session_id))
+        if not sandbox_id or not execution_id:
+            raise WorkspaceError("background execution requires sandbox_id and execution_id")
+        with self._lock:
+            if key in self._mutating:
+                raise WorkspaceError(f"session is being restored: {agent_id}/{session_id}")
+            records = self._background.setdefault(key, {})
+            records[execution_id] = {"sandbox_id": sandbox_id, "execution_id": execution_id}
+        return {"registered": True, "execution_id": execution_id}
+
+    def begin_runtime_reset(self, agent_id: str, session_id: str) -> dict[str, Any]:
+        """Fence a Session and return its persistent executions for termination."""
+        key = (validate_id("agent", agent_id), validate_id("session", session_id))
+        with self._lock:
+            if key in self._mutating:
+                raise WorkspaceError(f"session mutation already in progress: {agent_id}/{session_id}")
+            if key in self._leases.values():
+                raise WorkspaceError(f"session has active executions: {agent_id}/{session_id}")
+            self._mutating.add(key)
+            token = uuid.uuid4().hex
+            self._resets[token] = key
+            executions = list(self._background.get(key, {}).values())
+        return {"reset_token": token, "executions": executions}
+
+    def complete_runtime_reset(self, token: str, *, success: bool) -> dict[str, Any]:
+        with self._lock:
+            key = self._resets.pop(token, None)
+            if key is None:
+                raise WorkspaceError("unknown runtime reset token")
+            if success:
+                self._background.pop(key, None)
+            self._mutating.discard(key)
+        return {"completed": True, "success": success}
+
+    @contextmanager
+    def reset_mutation(self, token: str, agent_id: str, session_id: str) -> Iterator[None]:
+        key = (validate_id("agent", agent_id), validate_id("session", session_id))
+        with self._lock:
+            if self._resets.get(token) != key or key not in self._mutating:
+                raise WorkspaceError("invalid runtime reset token for session")
+        yield
+
     @contextmanager
     def mutation(self, agent_id: str, session_id: str) -> Iterator[None]:
         key = (validate_id("agent", agent_id), validate_id("session", session_id))
@@ -48,6 +95,11 @@ class ExecutionRegistry:
                 raise WorkspaceError(f"session mutation already in progress: {agent_id}/{session_id}")
             if key in self._leases.values():
                 raise WorkspaceError(f"session has active executions: {agent_id}/{session_id}")
+            if self._background.get(key):
+                raise WorkspaceError(
+                    f"session has persistent runtime executions: {agent_id}/{session_id}; "
+                    "use runtime reset before rollback"
+                )
             self._mutating.add(key)
         try:
             yield
@@ -106,11 +158,39 @@ class WorkspaceService:
             )
         if action == "execution.release":
             return self.executions.release(self._required(params, "lease_token"))
+        if action == "runtime.register_background":
+            return self.executions.register_background(
+                self._required(params, "agent_id"),
+                self._required(params, "session_id"),
+                self._required(params, "sandbox_id"),
+                self._required(params, "execution_id"),
+            )
+        if action == "runtime.begin_reset":
+            return self.executions.begin_runtime_reset(
+                self._required(params, "agent_id"), self._required(params, "session_id")
+            )
+        if action == "runtime.complete_reset":
+            return self.executions.complete_runtime_reset(
+                self._required(params, "reset_token"),
+                success=self._boolean(params, "success", False),
+            )
 
-        if action in {"checkpoint.create", "checkpoint.delete", "session.rollback"}:
+        if action in {
+            "checkpoint.create",
+            "checkpoint.delete",
+            "session.rollback",
+            "session.rollback_after_runtime_reset",
+        }:
             agent_id = self._required(params, "agent_id")
             session_id = self._required(params, "session_id")
-            with self.executions.mutation(agent_id, session_id):
+            reset_token = params.get("reset_token")
+            if action == "session.rollback_after_runtime_reset":
+                if not isinstance(reset_token, str):
+                    raise WorkspaceError("rollback after runtime reset requires reset_token")
+                mutation = self.executions.reset_mutation(reset_token, agent_id, session_id)
+            else:
+                mutation = self.executions.mutation(agent_id, session_id)
+            with mutation:
                 if action == "checkpoint.create":
                     checkpoint_id = params.get("checkpoint_id")
                     if checkpoint_id is not None and not isinstance(checkpoint_id, str):

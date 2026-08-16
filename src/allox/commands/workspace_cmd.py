@@ -6,6 +6,7 @@ import json
 import posixpath
 import shlex
 import sys
+import time
 from pathlib import PurePosixPath
 from typing import Any
 
@@ -248,17 +249,45 @@ def workspace_rollback(
     scrub_runtime: bool,
     output_format: str | None,
 ) -> None:
-    """Rollback only the selected Session, in the same Allox VM."""
+    """Terminate Session background executions, then rollback its workspace."""
     prepare_output(obj, output_format, allowed=("table", "json", "yaml", "raw"))
-    result = _client(obj).rpc(
-        "session.rollback",
-        agent_id=agent_id,
-        session_id=session_id,
-        checkpoint_id=checkpoint_id,
-        num_ancestors=num_ancestors,
-        scrub_runtime=scrub_runtime,
-        origin="allox-cli",
-    )
+    client = _client(obj)
+    reset = client.rpc("runtime.begin_reset", agent_id=agent_id, session_id=session_id)
+    reset_succeeded = False
+    try:
+        for execution in reset["executions"]:
+            sandbox = obj.connect_sandbox(execution["sandbox_id"])
+            try:
+                sandbox.commands.interrupt(execution["execution_id"])
+                deadline = time.monotonic() + 15
+                while True:
+                    status = sandbox.commands.get_command_status(execution["execution_id"])
+                    state = str(getattr(status, "state", "")).lower()
+                    if state not in {"running", "pending"}:
+                        break
+                    if time.monotonic() >= deadline:
+                        raise WorkspaceError(
+                            f"timed out terminating session execution {execution['execution_id']}"
+                        )
+                    time.sleep(0.1)
+            finally:
+                sandbox.close()
+        result = client.rpc(
+            "session.rollback_after_runtime_reset",
+            agent_id=agent_id,
+            session_id=session_id,
+            checkpoint_id=checkpoint_id,
+            num_ancestors=num_ancestors,
+            scrub_runtime=scrub_runtime,
+            origin="allox-cli",
+            reset_token=reset["reset_token"],
+        )
+        result["runtime_reset"] = {
+            "terminated_execution_ids": [item["execution_id"] for item in reset["executions"]]
+        }
+        reset_succeeded = True
+    finally:
+        client.rpc("runtime.complete_reset", reset_token=reset["reset_token"], success=reset_succeeded)
     _emit_result(obj, result, "Session Rolled Back")
 
 
@@ -480,6 +509,18 @@ def workspace_run(
         completed_successfully = (
             not background and execution_accepted
         )
+        if background and execution_accepted:
+            try:
+                client.rpc(
+                    "runtime.register_background",
+                    agent_id=agent_id,
+                    session_id=session_id,
+                    sandbox_id=resolved_sandbox,
+                    execution_id=execution.id,
+                )
+            except Exception:
+                sandbox.commands.interrupt(execution.id)
+                raise
     finally:
         if sandbox is not None:
             sandbox.close()

@@ -123,11 +123,11 @@ def test_workspace_checkpoint_accepts_metadata(runner):
 
 def test_workspace_rollback_accepts_ancestor_depth(runner):
     client = MagicMock()
-    client.rpc.return_value = {
-        "agent_id": "agent-a",
-        "session_id": "session-1",
-        "checkpoint_id": "cp1",
-    }
+    client.rpc.side_effect = [
+        {"reset_token": "reset-1", "executions": []},
+        {"agent_id": "agent-a", "session_id": "session-1", "checkpoint_id": "cp1"},
+        {"completed": True, "success": True},
+    ]
     with patch("allox.context.ClientContext.get_workspace_client", return_value=client):
         result = runner(
             [
@@ -143,12 +143,15 @@ def test_workspace_rollback_accepts_ancestor_depth(runner):
         )
 
     assert result.exit_code == 0, result.output
-    client.rpc.assert_called_once_with(
-        "session.rollback",
-        agent_id="agent-a",
-        session_id="session-1",
-        checkpoint_id=None,
-        num_ancestors=2,
-        scrub_runtime=True,
-        origin="allox-cli",
-    )
+    assert client.rpc.call_args_list[0].args == ("runtime.begin_reset",)
+    assert client.rpc.call_args_list[1].kwargs == {
+        "agent_id": "agent-a",
+        "session_id": "session-1",
+        "checkpoint_id": None,
+        "num_ancestors": 2,
+        "scrub_runtime": True,
+        "origin": "allox-cli",
+        "reset_token": "reset-1",
+    }
+    assert client.rpc.call_args_list[1].args == ("session.rollback_after_runtime_reset",)
+    assert client.rpc.call_args_list[2].args == ("runtime.complete_reset",)
