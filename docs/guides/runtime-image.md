@@ -90,7 +90,7 @@ RUN rm -f /opt/gem/supervisord/supervisord.code_server.conf \
 
 ## 验证清单
 
-构建完成后按 [阶段 3 测试记录](../development/testing/phase-3.md) 执行验收。
+构建完成后运行仓库中的 Runtime image 集成测试进行验收。
 
 核心步骤：
 

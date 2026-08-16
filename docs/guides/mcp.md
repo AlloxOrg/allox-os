@@ -82,7 +82,7 @@ for s in browser file shell markitdown; do
 done
 ```
 
-将结果与本文对照；有差异时更新本文并同步 [阶段 2 测试记录](../development/testing/phase-2.md)。
+将结果与本文对照；有差异时更新本文并同步相关集成测试。
 
 ## 参考
 

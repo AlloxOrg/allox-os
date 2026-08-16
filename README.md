@@ -173,19 +173,20 @@ daemon 会在 rollback 前中断该 Session 登记的后台任务；存在活动
 
 ```text
 allox-os/
-├── src/allox/
-│   ├── cli/                 # VM 外 CLI、命令和输出
-│   ├── vm/                  # 外层 OpenSandbox + Kata 生命周期
-│   ├── workspace/           # VM 内 Agent/Session/checkpoint/rollback
-│   ├── runtime/             # VM 内 AIO/MCP/健康检查
-│   ├── integrations/        # LangChain 等 Agent turn 适配
-│   └── config.py            # 跨层配置解析
+├── src/                     # 主源码目录
+│   └── allox/               # Python 包（import allox）
+│       ├── cli/             # VM 外 CLI、命令和输出
+│       ├── vm/              # 外层 OpenSandbox + Kata 生命周期
+│       ├── workspace/       # VM 内 Agent/Session/checkpoint/rollback
+│       ├── runtime/         # VM 内 AIO/MCP/健康检查
+│       ├── integrations/    # LangChain 等 Agent turn 适配
+│       └── config.py        # 跨层配置解析
 ├── images/aio-runtime/      # Kata VM 内 Runtime OCI 镜像
 ├── deploy/                  # OpenSandbox + Kata 部署配置
 ├── docs/
 │   ├── architecture/        # 当前 2.0 架构与状态语义
 │   ├── guides/              # Runtime、MCP、镜像使用指南
-│   └── development/         # 设计选择与历史测试记录
+│   └── development/         # 当前开发设计选择
 ├── examples/                # 配置示例
 └── tests/                   # 单元与集成测试
 ```
