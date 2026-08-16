@@ -25,10 +25,12 @@ Host
     └── Btrfs workspace store
         └── agents/
             └── <agent_id>/
-                └── workspace/sessions/
-                    └── <session_id>/
-                        ├── current/       # 当前可写 Session
-                        └── checkpoints/   # 只读 COW snapshots
+                └── workspace/                     # 一级 Agent Workspace
+                    ├── shared/                     # Agent 共享文件
+                    └── sessions/
+                        └── <session_id>/            # 二级 Session Workspace
+                            ├── current/             # 当前可写执行状态
+                            └── checkpoints/         # 只读 COW snapshots
 ```
 
 核心层次：
@@ -36,15 +38,15 @@ Host
 | 层次 | 生命周期 | 负责内容 |
 |---|---|---|
 | Kata VM | 用户或信任域级 | Guest Kernel、VM 内进程、网络、系统 `/tmp`、设备与根文件系统 |
-| Agent | VM 内逻辑身份 | Agent 名称空间及其 Session 集合 |
-| Session | Agent 任务/线程级 | `current` workspace、checkpoint DAG、执行租约和注册的后台任务 |
+| Agent Workspace（一级） | Agent 生命周期 | Agent 共享文件、身份配置及其 Session Workspace 集合 |
+| Session Workspace（二级） | Session 生命周期 | `current`、checkpoint DAG、执行租约和注册的后台任务 |
 | Turn | 单次 Agent 交互 | 可选的 turn-end 自动 checkpoint |
 
 详细设计见 [架构总览](docs/architecture/overview.md) 和 [Workspace 模型](docs/architecture/workspaces.md)。
 
 ## 状态边界
 
-### Workspace rollback 会做什么
+### Session Workspace rollback 会做什么
 
 - 只回退指定 `agent_id + session_id` 的 Btrfs workspace。
 - 回退前终止该 Session 已登记的后台执行。
@@ -58,6 +60,10 @@ Host
 - OpenSandbox snapshot/replace 用于整 VM 状态恢复。
 
 Allox 默认把 Session 的 `HOME` 指向 `current/`，把 `TMPDIR` 指向 `current/.allox-tmp/`。Agent 使用 `$TMPDIR` 创建的普通临时文件可进入 Session checkpoint；显式写 `/tmp` 属于 VM 级状态。
+
+Session 通过 `ALLOX_AGENT_WORKSPACE` 定位一级 workspace，通过
+`ALLOX_AGENT_SHARED` 访问其中的 `shared/`；`HOME` 和工作目录指向当前二级
+Session Workspace。
 
 ## 执行模式
 

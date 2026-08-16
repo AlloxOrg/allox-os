@@ -302,12 +302,13 @@ def _workspace_path(vm_root: str, relative_workspace: str) -> str:
 
 def build_bwrap_argv(
     workspace_path: str,
+    agent_shared_path: str,
     agent_id: str,
     session_id: str,
     command: tuple[str, ...],
     environment: tuple[tuple[str, str], ...] = (),
 ) -> list[str]:
-    """Build a mount namespace that exposes only one Session as /workspace."""
+    """Expose one Agent shared area and one child Session workspace."""
     validate_id("agent", agent_id)
     validate_id("session", session_id)
     if not command:
@@ -343,6 +344,11 @@ def build_bwrap_argv(
         "--bind",
         workspace_path,
         "/workspace",
+        "--dir",
+        "/agent",
+        "--bind",
+        agent_shared_path,
+        "/agent/shared",
         "--tmpfs",
         "/tmp",
         "--clearenv",
@@ -358,6 +364,12 @@ def build_bwrap_argv(
         "--setenv",
         "ALLOX_AGENT_ID",
         agent_id,
+        "--setenv",
+        "ALLOX_AGENT_WORKSPACE",
+        "/agent",
+        "--setenv",
+        "ALLOX_AGENT_SHARED",
+        "/agent/shared",
         "--setenv",
         "ALLOX_SESSION_ID",
         session_id,
@@ -383,6 +395,7 @@ exit "$status"
 
 def build_managed_workspace_argv(
     workspace_path: str,
+    agent_shared_path: str,
     agent_id: str,
     session_id: str,
     command: tuple[str, ...],
@@ -405,6 +418,8 @@ def build_managed_workspace_argv(
         f"HOME={workspace_path}",
         f"TMPDIR={posixpath.join(workspace_path, '.allox-tmp')}",
         f"ALLOX_AGENT_ID={agent_id}",
+        f"ALLOX_AGENT_WORKSPACE={posixpath.dirname(agent_shared_path)}",
+        f"ALLOX_AGENT_SHARED={agent_shared_path}",
         f"ALLOX_SESSION_ID={session_id}",
     ]
     env.extend(f"{key}={value}" for key, value in environment)
@@ -463,16 +478,30 @@ def workspace_run(
         str(obj.resolved_config.get("workspace_vm_root", "/var/lib/allox/workspaces")),
         description["relative_workspace"],
     )
+    agent_shared_path = _workspace_path(
+        str(obj.resolved_config.get("workspace_vm_root", "/var/lib/allox/workspaces")),
+        description["relative_agent_shared"],
+    )
     execution_mode = str(obj.resolved_config.get("workspace_execution_mode", "managed")).lower()
     if execution_mode in {"managed", "anolisa"}:
         execution_argv = build_managed_workspace_argv(
-            workspace_path, agent_id, session_id, command, environment
+            workspace_path,
+            agent_shared_path,
+            agent_id,
+            session_id,
+            command,
+            environment,
         )
     elif execution_mode == "ephemeral":
         if background:
             raise WorkspaceError("--background is only available in managed execution mode")
         execution_argv = build_bwrap_argv(
-            workspace_path, agent_id, session_id, command, environment
+            workspace_path,
+            agent_shared_path,
+            agent_id,
+            session_id,
+            command,
+            environment,
         )
     else:
         raise WorkspaceError(

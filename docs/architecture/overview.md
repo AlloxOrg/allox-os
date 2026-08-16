@@ -1,11 +1,12 @@
-# Allox 2.0 architecture
+# Allox OS architecture
 
-## Design sentence
+## Architecture sentence
 
-Allox 2.0 uses one Kata VM as the user/trust-domain isolation boundary and
-manages Agent and Session state inside that VM through rollbackable workspaces.
+Allox OS uses one Kata VM as the user/trust-domain isolation boundary. Inside
+the VM, every Agent owns a first-level workspace and every Session owns a
+second-level workspace below its Agent.
 
-## Components
+## Hierarchy
 
 ```text
 Host control plane
@@ -15,71 +16,76 @@ Host control plane
         └── Allox VM
             ├── execd / AIO runtime
             ├── allox-workspace-daemon
-            └── Btrfs workspace data disk
+            └── Btrfs workspace store
+                └── Agent Workspace (level 1)
+                    ├── shared/
+                    └── Session Workspace (level 2)
+                        ├── current/
+                        └── checkpoints/
 ```
+
+## Runtime boundaries
 
 ### Host control plane
 
-The host side creates, discovers, renews, pauses, resumes, and destroys the
-outer VM. It does not implement Agent/Session rollback.
+The host creates, discovers, renews, pauses, resumes, and destroys the Kata VM.
 
 ### Kata VM
 
-The VM owns a guest kernel and forms the strong boundary from the host and
-other Allox VMs. VM processes, the guest `/tmp`, devices, and network state are
-VM-scoped.
+The Kata VM owns the guest kernel, VM processes, guest `/tmp`, devices, network,
+and root filesystem. It forms the strong isolation boundary for one user or
+trust domain.
 
 ### Workspace daemon
 
-The daemon is a trusted in-VM service. Agent processes do not receive Btrfs
-administration rights. The daemon validates identifiers, serializes mutation,
-holds checkpoint metadata outside rollback scope, and controls Session
-execution leases.
+The trusted in-VM daemon creates both workspace levels, validates identifiers,
+serializes mutations, controls execution leases, and maintains checkpoint
+metadata and audit events.
 
-### Agent and Session
+### Agent Workspace (level 1)
 
-An Agent is a namespace. A Session is the unit of writable state and rollback.
-Different Sessions may share the same Kata VM but never the same `current`
-subvolume.
+An Agent Workspace is the long-lived ownership and isolation boundary for one
+Agent. It owns the Agent's shared files and its collection of child Session
+Workspaces.
+
+### Session Workspace (level 2)
+
+A Session Workspace is the execution and filesystem rollback boundary below an
+Agent Workspace. Its `current/` path is a writable Btrfs subvolume;
+`checkpoints/` stores immutable snapshots of that subvolume.
 
 ## State ownership
 
-| State | Owner | Workspace rollback |
+| State | Owner | Lifecycle operation |
 |---|---|---|
-| Guest kernel, memory, devices | Kata VM | unchanged |
-| VM root filesystem and `/tmp` | Kata VM | unchanged |
-| Agent identity and Session list | workspace daemon | unchanged except explicit management |
-| Session `current/` files | Session | restored |
-| Session `.allox-tmp/` ordinary files | Session | restored |
-| Registered Session background execution | Session runtime registry | terminated before rollback |
-| Unregistered VM process | Kata VM | not guaranteed to change |
-| Checkpoint DAG and audit log | daemon metadata | preserved |
+| Guest kernel, memory, devices and root filesystem | Kata VM | VM lifecycle or snapshot restore |
+| Agent shared files and Session collection | Agent Workspace (level 1) | Agent lifecycle |
+| Session files, `$HOME`, `$TMPDIR` | Session Workspace `current/` | Session checkpoint and rollback |
+| Registered Session background execution | Session runtime registry | Session runtime reset |
+| Checkpoint DAG and audit log | workspace daemon metadata | daemon transaction lifecycle |
 
-## Two different restore operations
+## Restore operations
 
-### Session rollback
+### Session Workspace rollback
 
-`allox workspace rollback` swaps one Session's Btrfs `current` subvolume. It is
-fast and leaves the VM and other Sessions running.
+`allox workspace rollback` replaces one Session Workspace's `current/`
+subvolume from a selected checkpoint. Other Session Workspaces and the Kata VM
+continue with their current state.
 
-### VM replacement or snapshot restore
+### Kata VM restore
 
-OpenSandbox/Kata lifecycle operations replace or restore the whole execution
-environment. They are slower and have a different failure domain. Allox 2.0
-does not silently translate Session rollback into VM replacement.
+OpenSandbox/Kata lifecycle operations restore the complete execution
+environment, including VM-scoped kernel and userspace state covered by the
+selected backend.
 
 ## Security assumptions
 
-- OpenSandbox must select the Kata runtime, not plain runc, for the default
-  production profile.
-- The Btrfs data disk must be available inside the guest. A VirtioFS/9p host
-  share is not a substitute for a Btrfs subvolume store.
-- Agent commands cannot access the workspace daemon's token, metadata
-  directory, or Btrfs administration interface.
-- Host volumes are explicit exceptions to the VM snapshot/rollback boundary
-  and must be narrow and documented.
-- Agent code should use the Session-provided `$HOME` and `$TMPDIR`; absolute
-  guest paths are VM-scoped.
+- OpenSandbox selects the Kata runtime for the production profile.
+- The Btrfs data disk is available inside the guest.
+- The workspace daemon owns its token, metadata directory, and Btrfs
+  administration interface.
+- Host volumes use explicit, documented mount boundaries.
+- Agent commands use the Session-provided `$HOME` and `$TMPDIR`.
 
 ## Source layout mapping
 
@@ -87,10 +93,9 @@ does not silently translate Session rollback into VM replacement.
 |---|---|
 | `allox.cli` | operator/client-side command surface |
 | `allox.vm` | outer OpenSandbox/Kata lifecycle |
-| `allox.workspace` | in-VM Agent/Session storage and rollback |
+| `allox.workspace` | first-level Agent and second-level Session workspace management |
 | `allox.runtime` | in-VM AIO/MCP service access |
 | `allox.integrations` | Agent-framework lifecycle adapters |
 
-The direction of dependency should remain `cli -> vm/workspace/runtime` and
-`integrations -> workspace`. The workspace core must not import CLI commands or
-OpenSandbox VM lifecycle code.
+The dependency direction is `cli -> vm/workspace/runtime` and
+`integrations -> workspace`.

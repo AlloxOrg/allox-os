@@ -1,4 +1,4 @@
-"""Allox 2.0 workspace CLI and Bubblewrap launcher tests."""
+"""Two-level workspace CLI and Bubblewrap launcher tests."""
 
 from __future__ import annotations
 
@@ -17,10 +17,15 @@ from allox.workspace.store import WorkspaceError
 
 def test_bwrap_maps_only_selected_session_and_tmp_inside_workspace():
     source = "/var/lib/allox/workspaces/agents/a/workspace/sessions/s1/current"
-    argv = build_bwrap_argv(source, "a", "s1", ("sh", "-c", "pwd"))
+    shared = "/var/lib/allox/workspaces/agents/a/workspace/shared"
+    argv = build_bwrap_argv(source, shared, "a", "s1", ("sh", "-c", "pwd"))
 
     bind_index = argv.index("--bind")
     assert argv[bind_index + 1 : bind_index + 3] == [source, "/workspace"]
+    shared_bind_index = argv.index(shared)
+    assert argv[shared_bind_index : shared_bind_index + 2] == [shared, "/agent/shared"]
+    assert argv[argv.index("ALLOX_AGENT_WORKSPACE") + 1] == "/agent"
+    assert argv[argv.index("ALLOX_AGENT_SHARED") + 1] == "/agent/shared"
     tmp_index = argv.index("/tmp")
     assert argv[tmp_index - 1 : tmp_index + 1] == ["--tmpfs", "/tmp"]
     assert "/var/lib/allox/workspaces/agents" not in argv
@@ -30,13 +35,21 @@ def test_bwrap_maps_only_selected_session_and_tmp_inside_workspace():
 
 def test_managed_mode_uses_session_workspace_as_cwd_without_pid_namespace():
     source = "/var/lib/allox/workspaces/agents/a/workspace/sessions/s1/current"
+    shared = "/var/lib/allox/workspaces/agents/a/workspace/shared"
     argv = build_managed_workspace_argv(
-        source, "a", "s1", ("sh", "-c", "sleep 60 &"), (("MODEL", "test"),)
+        source,
+        shared,
+        "a",
+        "s1",
+        ("sh", "-c", "sleep 60 &"),
+        (("MODEL", "test"),),
     )
 
     assert argv[:2] == ["env", "-i"]
     assert f"HOME={source}" in argv
     assert f"TMPDIR={source}/.allox-tmp" in argv
+    assert "ALLOX_AGENT_WORKSPACE=/var/lib/allox/workspaces/agents/a/workspace" in argv
+    assert f"ALLOX_AGENT_SHARED={shared}" in argv
     assert "MODEL=test" in argv
     assert "bwrap" not in argv
     assert argv[-5:] == ["allox-workspace", source, "sh", "-c", "sleep 60 &"]

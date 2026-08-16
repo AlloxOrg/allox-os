@@ -1,4 +1,4 @@
-"""Allox 2.0 per-Agent/per-Session workspace tests."""
+"""Two-level Agent/Session workspace tests."""
 
 from __future__ import annotations
 
@@ -41,6 +41,12 @@ def test_agent_and_session_paths_are_distinct(store):
     assert first["relative_workspace"] == (
         "agents/agent-a/workspace/sessions/session-1/current"
     )
+    assert first["relative_agent_workspace"] == "agents/agent-a/workspace"
+    assert first["relative_agent_shared"] == "agents/agent-a/workspace/shared"
+    assert first["relative_session_workspace"] == (
+        "agents/agent-a/workspace/sessions/session-1"
+    )
+    assert first["workspace_level"] == "session"
     assert len(
         {
             first["relative_workspace"],
@@ -48,6 +54,19 @@ def test_agent_and_session_paths_are_distinct(store):
             third["relative_workspace"],
         }
     ) == 3
+
+
+def test_agent_workspace_is_first_level_and_owns_shared_area(store):
+    result = store.create_agent("agent-a")
+
+    assert result == {
+        "agent_id": "agent-a",
+        "workspace_level": "agent",
+        "relative_workspace": "agents/agent-a/workspace",
+        "relative_shared": "agents/agent-a/workspace/shared",
+    }
+    assert store.agent_shared("agent-a").is_dir()
+    assert store.sessions_dir("agent-a").is_dir()
 
 
 def test_checkpoint_rolls_back_only_selected_session_and_tmp(store):

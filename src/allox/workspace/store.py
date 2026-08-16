@@ -1,9 +1,10 @@
-"""Trusted Agent/Session workspace storage inside one Allox Kata VM.
+"""Trusted two-level workspace storage inside one Allox Kata VM.
 
 The daemon and store live inside the Kata VM but outside untrusted Agent
-processes. Each Session's ``current`` directory is a writable Btrfs subvolume;
-checkpoints are read-only snapshots of that subvolume. Rollback replaces only
-the selected Session and never restores the whole VM.
+processes. An Agent workspace is the first-level ownership boundary and contains
+shared Agent files plus child Session workspaces. Each Session workspace is a
+second-level execution and rollback boundary whose ``current`` directory is a
+writable Btrfs subvolume.
 """
 
 from __future__ import annotations
@@ -78,7 +79,7 @@ class BtrfsBackend:
 
 
 class WorkspaceStore:
-    """Hierarchical ``Allox VM -> Agent -> Session`` workspace manager."""
+    """Hierarchical ``Kata VM -> Agent workspace -> Session workspace`` manager."""
 
     def __init__(self, root: Path | str, backend: SnapshotBackend | None = None):
         self.root = Path(root).resolve()
@@ -100,9 +101,18 @@ class WorkspaceStore:
     def agent_dir(self, agent_id: str) -> Path:
         return self.root / "agents" / validate_id("agent", agent_id)
 
+    def agent_workspace(self, agent_id: str) -> Path:
+        return self.agent_dir(agent_id) / "workspace"
+
+    def agent_shared(self, agent_id: str) -> Path:
+        return self.agent_workspace(agent_id) / "shared"
+
+    def sessions_dir(self, agent_id: str) -> Path:
+        return self.agent_workspace(agent_id) / "sessions"
+
     def session_dir(self, agent_id: str, session_id: str) -> Path:
         validate_id("session", session_id)
-        return self.agent_dir(agent_id) / "workspace" / "sessions" / session_id
+        return self.sessions_dir(agent_id) / session_id
 
     def current(self, agent_id: str, session_id: str) -> Path:
         return self.session_dir(agent_id, session_id) / "current"
@@ -319,6 +329,15 @@ class WorkspaceStore:
     def relative_current(self, agent_id: str, session_id: str) -> str:
         return self.current(agent_id, session_id).relative_to(self.root).as_posix()
 
+    def relative_agent_workspace(self, agent_id: str) -> str:
+        return self.agent_workspace(agent_id).relative_to(self.root).as_posix()
+
+    def relative_agent_shared(self, agent_id: str) -> str:
+        return self.agent_shared(agent_id).relative_to(self.root).as_posix()
+
+    def relative_session_workspace(self, agent_id: str, session_id: str) -> str:
+        return self.session_dir(agent_id, session_id).relative_to(self.root).as_posix()
+
     def _event_path(self, agent_id: str | None, session_id: str | None) -> Path:
         base = self.root / ".allox" / "events"
         if agent_id is None:
@@ -371,10 +390,16 @@ class WorkspaceStore:
                         fcntl.flock(stream.fileno(), fcntl.LOCK_UN)
 
     def create_agent(self, agent_id: str, *, origin: str = "unknown") -> dict[str, Any]:
-        target = self.agent_dir(agent_id)
-        (target / "workspace" / "sessions").mkdir(parents=True, exist_ok=True)
+        workspace = self.agent_workspace(agent_id)
+        self.agent_shared(agent_id).mkdir(parents=True, exist_ok=True)
+        self.sessions_dir(agent_id).mkdir(parents=True, exist_ok=True)
         self._append_event({"op": "agent.create", "origin": origin}, agent_id)
-        return {"agent_id": agent_id}
+        return {
+            "agent_id": agent_id,
+            "workspace_level": "agent",
+            "relative_workspace": workspace.relative_to(self.root).as_posix(),
+            "relative_shared": self.relative_agent_shared(agent_id),
+        }
 
     def create_session(
         self,
@@ -406,6 +431,12 @@ class WorkspaceStore:
         return {
             "agent_id": agent_id,
             "session_id": session_id,
+            "workspace_level": "session",
+            "relative_agent_workspace": self.relative_agent_workspace(agent_id),
+            "relative_agent_shared": self.relative_agent_shared(agent_id),
+            "relative_session_workspace": self.relative_session_workspace(
+                agent_id, session_id
+            ),
             "relative_workspace": self.relative_current(agent_id, session_id),
             "checkpoint_ids": self.list_checkpoints(agent_id, session_id),
             "checkpoint_head": self._load_index(agent_id, session_id).head,

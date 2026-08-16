@@ -1,101 +1,99 @@
-# Agent/Session workspace model
+# Two-level workspace model
 
-## Scope
+## Workspace hierarchy
 
-A workspace is the rollback unit inside one Allox Kata VM. Its identity is the
-pair `agent_id + session_id`; a VM sandbox ID is not a workspace identity.
+Allox OS organizes workspace state in two levels:
 
-## Storage layout
+1. **Agent Workspace (level 1)** — identified by `agent_id`; owns Agent-shared
+   files and the collection of Session Workspaces.
+2. **Session Workspace (level 2)** — identified by `agent_id + session_id`;
+   owns writable execution state, checkpoints, and rollback history for one
+   Session.
 
 ```text
 /var/lib/allox/workspaces/
 ├── .allox/
-│   ├── events/                 # append-only audit, outside rollback
-│   ├── indexes/                # checkpoint DAG, outside rollback
-│   ├── locks/                  # mutation serialization
-│   └── transactions/           # crash-recovery records
+│   ├── events/                         # append-only audit
+│   ├── indexes/                        # checkpoint DAG
+│   ├── locks/                          # mutation serialization
+│   └── transactions/                   # crash-recovery records
 └── agents/
     └── <agent_id>/
-        └── workspace/sessions/
-            └── <session_id>/
-                ├── current/    # writable Btrfs subvolume
-                │   └── .allox-tmp/
-                └── checkpoints/
-                    └── <checkpoint_id>/  # read-only snapshot
+        └── workspace/                  # level 1: Agent Workspace
+            ├── shared/                 # Agent-shared files
+            └── sessions/
+                └── <session_id>/       # level 2: Session Workspace
+                    ├── current/         # writable Btrfs subvolume
+                    │   └── .allox-tmp/
+                    └── checkpoints/
+                        └── <checkpoint_id>/  # read-only snapshot
 ```
 
-All identifiers are validated before being converted to paths. The trusted
-daemon is the only component allowed to create, swap, or delete subvolumes.
+`agent-create` creates the level-1 workspace and its `shared/` area.
+`session-create` creates a level-2 workspace inside that Agent Workspace.
+Session commands use `current/` as `cwd`, `HOME`, and `TMPDIR` scope.
+They receive `ALLOX_AGENT_WORKSPACE` as the level-1 workspace path and
+`ALLOX_AGENT_SHARED` as its `shared/` area. Bubblewrap mode mounts that shared
+area and the selected Session Workspace while keeping sibling Session
+Workspaces outside the mount namespace.
 
 ## Checkpoint
 
-Creating a checkpoint makes a read-only COW snapshot of `current/` and then
-atomically persists its DAG entry. Metadata includes parent/child links,
-message, pin status, timestamps, and optional lifecycle information.
+Creating a checkpoint makes a read-only COW snapshot of the selected Session
+Workspace's `current/` subvolume and atomically persists its DAG entry. Metadata
+includes parent/child links, message, pin status, timestamps, and lifecycle
+information.
 
 Checkpoint IDs support exact and unique-prefix lookup. Ancestor rollback uses
-the current DAG head; it does not infer history from directory timestamps.
+the current DAG head.
 
 ## Rollback
 
-Rollback is a durable transaction:
+Session Workspace rollback is a durable transaction:
 
 1. acquire the Session mutation lock;
-2. reject while a foreground execution lease is active;
+2. fence the Session execution registry;
 3. interrupt registered Session background executions;
 4. create a writable snapshot from the selected checkpoint;
-5. move the old `current` aside and install the restored subvolume;
+5. move the previous `current/` aside and install the restored subvolume;
 6. reconcile the checkpoint index and commit the transaction;
-7. remove the old subvolume after the stable path is valid.
+7. release the previous subvolume.
 
-Startup recovers incomplete swaps before serving requests. Transaction state
-is outside the Session subvolume, so rollback cannot erase its own recovery
-record.
+Startup recovery completes or aborts an interrupted swap before the daemon
+serves workspace operations.
 
 ## Process and socket semantics
 
-Workspace snapshots are filesystem snapshots, not kernel snapshots.
-
-- `managed` mode runs commands in the persistent Kata VM with the Session as
-  `cwd`, `HOME`, and `TMPDIR`.
-- Registered background executions are Session runtime state and are stopped
-  before rollback.
-- A process started outside the managed execution path is VM state and is not
-  guaranteed to stop.
-- Unix socket/FIFO/device nodes cannot restore their live kernel endpoints from
-  a filesystem snapshot. Restored special nodes below `.allox-tmp` are removed.
-- Absolute `/tmp` is VM-level state. `$TMPDIR` points to the Session-owned
-  `.allox-tmp` directory.
-
-`ephemeral` mode optionally adds Bubblewrap inside the Kata VM. It creates a
-fresh PID/mount namespace and private `/tmp` for each command. Ordinary temp
-files are synchronized through `.allox-tmp`; socket, FIFO, and device nodes are
-excluded.
+- `managed` mode runs commands in the persistent Kata VM with the Session
+  Workspace as `cwd`, `HOME`, and `TMPDIR`.
+- Registered background executions belong to the Session runtime registry and
+  are stopped before rollback.
+- Absolute `/tmp` belongs to the Kata VM. `$TMPDIR` points to the Session-owned
+  `.allox-tmp/` directory.
+- Restored socket and FIFO entries below `.allox-tmp/` are scrubbed during
+  rollback.
+- `ephemeral` mode adds a Bubblewrap PID/mount namespace and private `/tmp` for
+  each command.
 
 ## Turn lifecycle
 
-When `workspace.auto_checkpoint_turns = true`, the lifecycle adapter creates:
-
-- a Session baseline at runtime-session start;
-- one checkpoint after each completed Agent turn;
-- metadata containing turn number, success, timestamp, and optional external
-  runtime IDs.
-
-The adapter is policy only. It does not hold Btrfs privileges and it does not
-change rollback scope. A rollback suppresses the immediately following
-automatic checkpoint so the restored state is not immediately re-saved.
+With `workspace.auto_checkpoint_turns = true`, the lifecycle adapter creates a
+Session baseline at runtime-session start and a checkpoint after each completed
+Agent turn. Each checkpoint records the turn number, result, timestamp, and
+external runtime identifiers.
 
 ## API examples
 
 ```bash
+# Level 1: Agent Workspace
 allox workspace agent-create agent-a
+
+# Level 2: Session Workspace below agent-a
 allox workspace session-create agent-a session-1
 allox workspace checkpoint agent-a session-1 --name clean
 allox workspace run agent-a session-1 -- sh -c 'echo v2 > state.txt'
 allox workspace rollback agent-a session-1 clean
-allox workspace rollback agent-a session-1 --num-ancestors 2
 ```
 
-The daemon defaults to loopback. If exposed through an OpenSandbox endpoint, a
-bearer token is mandatory and the endpoint must remain scoped to the owning
-VM/control plane.
+The daemon binds to loopback by default. An OpenSandbox endpoint can expose it
+to the owning control plane with bearer-token authentication.
