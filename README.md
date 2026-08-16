@@ -173,7 +173,7 @@ daemon 会在 rollback 前中断该 Session 登记的后台任务；存在活动
 
 ```text
 allox-os/
-├── src/                     # 主源码目录
+├── src/                     # 主源码目录，详见 src/README.md
 │   └── allox/               # Python 包（import allox）
 │       ├── cli/             # VM 外 CLI、命令和输出
 │       ├── vm/              # 外层 OpenSandbox + Kata 生命周期
@@ -192,6 +192,8 @@ allox-os/
 ```
 
 这套目录直接对应运行边界：`vm/` 管理 Kata 生命周期，`workspace/` 管理 Session rollback，`runtime/` 管理 VM 内服务，checkpoint 元数据由 workspace 层维护。
+
+`src/` 与 Python 包的目录关系见 [源码目录说明](src/README.md)。
 
 ## Agent turn checkpoint
 
