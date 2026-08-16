@@ -25,6 +25,9 @@ dependencies = [
 allox = "allox.main:cli"
 allox-workspace-daemon = "allox.workspace_daemon:main"
 
+[project.entry-points."allox.plugins"]
+langchain-turn-checkpoint = "allox.plugins.langchain:LangChainTurnCheckpointPlugin"
+
 [project.urls]
 Repository = "https://github.com/your-org/allox-cli"
 

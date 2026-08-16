@@ -114,9 +114,33 @@ auto_checkpoint_turns = true
 ```
 
 The environment override is
-`ALLOX_WORKSPACE_AUTO_CHECKPOINT_TURNS=true|false`. An Agent runtime owns one
-`TurnCheckpointLifecycle` instance per Agent/Session and wires its native hooks
-to Allox:
+`ALLOX_WORKSPACE_AUTO_CHECKPOINT_TURNS=true|false`. The core can be manually
+wired by any runtime, but Allox also ships a pluggable LangChain adapter. The
+adapter is a thin lifecycle policy layer: checkpoints, rollback, lease checks,
+and isolation remain daemon operations.
+
+```python
+from allox.plugins import builtin_registry
+
+plugin = builtin_registry().create(
+    "langchain-turn-checkpoint",
+    workspace_client,
+    agent_id,
+    session_id,
+    resolved_config=resolved_config,
+)
+agent = plugin.wrap(agent, runtime_session_id=thread_id)
+
+# This automatically emits session_start, message_received and turn_end.
+result = agent.invoke(
+    {"messages": [{"role": "user", "content": user_message}]},
+    config={"metadata": {"allox_turn_id": turn_id}},
+)
+```
+
+External runtimes can publish an adapter through the Python entry-point group
+`allox.plugins`; the entry-point name is its plugin name. A direct manual
+integration remains available:
 
 ```python
 from allox.turn_lifecycle import TurnCheckpointLifecycle
