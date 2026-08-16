@@ -10,7 +10,7 @@
 
 </div>
 
-Allox OS 就是一个用户或信任域专属的 **Allox VM Guest OS**。宿主机使用 Kata
+Allox OS 就是一个用户或信任域专属的 **Guest OS**。宿主机使用 Kata
 启动该 VM；本仓库构建 Guest Kernel、Rootfs 以及 VM 内的可信服务。Allox OS 在
 VM 内管理多个 Agent 和 Session。
 
@@ -25,7 +25,7 @@ Allox OS 的目标架构不依赖 Allox CLI、OpenSandbox、execd 或 AIO Runtim
 ```text
 Host
 └── Kata runtime
-    └── Allox OS VM                 # 用户/信任域级强隔离边界
+    └── Allox OS                    # 用户/信任域级强隔离边界
         ├── Guest Kernel + Rootfs    # 本仓库构建的 VM OS
         ├── alloxd / init            # VM 内可信控制服务
         ├── cgroup / namespace / audit
@@ -44,7 +44,7 @@ Host
 
 | 层次 | 生命周期 | 负责内容 |
 |---|---|---|
-| Allox OS VM | 用户或信任域级 | Guest Kernel、VM 内进程、网络、系统 `/tmp`、设备与根文件系统 |
+| Allox OS | 用户或信任域级 | Guest Kernel、VM 内进程、网络、系统 `/tmp`、设备与根文件系统 |
 | Agent Workspace（一级） | Agent 生命周期 | Agent 共享文件、身份配置及其 Session Workspace 集合 |
 | Session Workspace（二级） | Session 生命周期 | `current`、checkpoint DAG、执行租约和注册的后台任务 |
 | Turn | 单次 Agent 交互 | 可选的 turn-end 自动 checkpoint |
@@ -60,7 +60,7 @@ Host
 - 保留其他 Agent、其他 Session 和 Kata VM 本身。
 - checkpoint 索引、审计事件与事务日志保存在 rollback 范围外。
 
-### Allox OS VM 级状态
+### Allox OS 级状态
 
 - 宿主机的 Kata backend 管理 VM 的 CPU、RAM、Guest Kernel、设备和根文件系统。
 - VM 级 `/tmp`、系统服务和 VM 内进程由 VM 生命周期管理。

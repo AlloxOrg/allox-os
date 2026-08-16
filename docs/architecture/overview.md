@@ -12,7 +12,7 @@ workspace and every Session owns a second-level workspace below its Agent.
 ```text
 Host
 └── Kata runtime
-    └── Allox OS VM
+    └── Allox OS
         ├── Allox guest kernel + root filesystem
         ├── alloxd / init
         ├── cgroup, namespace and audit services
@@ -28,13 +28,13 @@ Host
 
 ### Host and Kata runtime
 
-The host launches and manages the Allox OS VM through Kata. Kata is a VM
+The host launches and manages Allox OS through Kata. Kata is a VM
 backend, not an in-guest Allox OS component. OpenSandbox and Allox CLI are not
 part of this boundary.
 
-### Allox OS VM
+### Allox OS
 
-The Allox OS VM owns the guest kernel, VM processes, guest `/tmp`, devices,
+Allox OS owns the guest kernel, VM processes, guest `/tmp`, devices,
 network and root filesystem. It forms the strong isolation boundary for one
 user or trust domain.
 
@@ -60,7 +60,7 @@ Agent Workspace. Its `current/` path is a writable Btrfs subvolume;
 
 | State | Owner | Lifecycle operation |
 |---|---|---|
-| Guest kernel, memory, devices and root filesystem | Allox OS VM | Kata backend lifecycle or VM snapshot restore |
+| Guest kernel, memory, devices and root filesystem | Allox OS | Kata backend lifecycle or VM snapshot restore |
 | Agent shared files and Session collection | Agent Workspace (level 1) | Agent lifecycle |
 | Session files, `$HOME`, `$TMPDIR` | Session Workspace `current/` | Session checkpoint and rollback |
 | Registered Session background execution | Session runtime registry | Session runtime reset |
@@ -71,10 +71,10 @@ Agent Workspace. Its `current/` path is a writable Btrfs subvolume;
 ### Session Workspace rollback
 
 `allox workspace rollback` replaces one Session Workspace's `current/`
-subvolume from a selected checkpoint. Other Session Workspaces and the Allox OS VM
+subvolume from a selected checkpoint. Other Session Workspaces and Allox OS
 continue with their current state.
 
-### Allox OS VM restore
+### Allox OS restore
 
 The host-side Kata backend restores the complete execution environment,
 including VM-scoped kernel and userspace state covered by the selected VM
@@ -98,7 +98,7 @@ snapshot mechanism.
 | Rootfs and init | boot, service supervision and privileged in-guest setup |
 | `alloxd` | Agent/Session lifecycle, process identity and workspace operations |
 | Workspace service | Btrfs checkpoint/rollback and audit metadata |
-| Host Kata launcher | Allox OS VM lifecycle only |
+| Host Kata launcher | Allox OS lifecycle only |
 
 The guest services never depend on OpenSandbox or Allox CLI. The current Python
 prototype is transitional and must be replaced or refactored to these component
