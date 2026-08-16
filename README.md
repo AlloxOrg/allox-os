@@ -2,7 +2,7 @@
 
 <img src="./assets/allox-logo.png" alt="Allox logo" width="128" />
 
-# Allox OS 2.0
+# Allox OS
 
 **一个 Kata VM，内部按 Agent / Session 隔离和回退 workspace**
 
@@ -10,9 +10,9 @@
 
 </div>
 
-Allox 2.0 不再把“为每次 Agent 任务创建一个独立容器”作为核心模型。它先为一个用户或信任域创建一个长期存在的 **Kata VM**，再在 VM 内通过 workspace 服务管理多个 Agent 和 Session。
+Allox OS 为一个用户或信任域创建长期运行的 **Kata VM**，并在 VM 内通过 workspace 服务管理多个 Agent 和 Session。
 
-Kata VM 提供 Guest Kernel 级强隔离；workspace 层提供低成本的 Session 文件隔离、checkpoint、rollback 和执行租约。两者解决的是不同问题，不能互相替代。
+Kata VM 提供 Guest Kernel 级强隔离；workspace 层提供低成本的 Session 文件隔离、checkpoint、rollback 和执行租约。两层共同组成 Agent 的可信执行环境。
 
 ## 架构
 
@@ -51,11 +51,11 @@ Host
 - 保留其他 Agent、其他 Session 和 Kata VM 本身。
 - checkpoint 索引、审计事件与事务日志保存在 rollback 范围外。
 
-### Workspace rollback 不会做什么
+### VM 级状态
 
-- 不恢复整台 Kata VM 的 CPU、RAM、Guest Kernel 或设备状态。
-- 不回退 VM 级 `/tmp`、系统服务或未登记的 VM 内进程。
-- 不等同于 OpenSandbox 的整 VM snapshot/replace。
+- Kata VM 生命周期操作管理 CPU、RAM、Guest Kernel、设备和根文件系统。
+- VM 级 `/tmp`、系统服务和 VM 内进程由 VM 生命周期管理。
+- OpenSandbox snapshot/replace 用于整 VM 状态恢复。
 
 Allox 默认把 Session 的 `HOME` 指向 `current/`，把 `TMPDIR` 指向 `current/.allox-tmp/`。Agent 使用 `$TMPDIR` 创建的普通临时文件可进入 Session checkpoint；显式写 `/tmp` 属于 VM 级状态。
 
@@ -69,9 +69,9 @@ auto_checkpoint_turns = false
 ```
 
 - `managed`：默认模式。命令在同一 Kata VM 内执行，使用对应 Session 作为 `cwd/HOME/TMPDIR`；后台命令必须登记，rollback 前由 daemon 终止。
-- `ephemeral`：每次命令额外进入 Bubblewrap PID/mount namespace；适合不需要跨命令进程状态的场景。
+- `ephemeral`：每次命令额外进入 Bubblewrap PID/mount namespace；适合单命令执行场景。
 
-这里的 Bubblewrap 是 VM 内第二层轻量隔离，不替代外层 Kata VM。
+Bubblewrap 在 Kata VM 内提供第二层 PID/mount namespace 隔离。
 
 ## 快速开始
 
@@ -102,7 +102,7 @@ cp deploy/opensandbox-kata.toml.example ~/.sandbox.toml
 opensandbox-server
 ```
 
-该配置中的 `[secure_runtime]` 必须指向 Kata；使用普通 runc 只能获得容器隔离，不符合 Allox 2.0 的默认强隔离模型。
+该配置中的 `[secure_runtime]` 指向 Kata，为 Allox OS 提供 Guest Kernel 级隔离。
 
 ### 3. 准备 VM 内 Runtime 镜像
 
@@ -112,7 +112,7 @@ cd images/aio-runtime
 cd ../..
 ```
 
-镜像提供 AIO、Shell、File、Browser、Jupyter 和 MCP 等 VM 内服务。它是 Guest userspace，不是隔离边界；隔离边界由 Kata 提供。
+镜像提供 AIO、Shell、File、Browser、Jupyter 和 MCP 等 Guest userspace 服务；Kata 提供 VM 隔离边界。
 
 ### 4. 初始化 CLI
 
@@ -125,7 +125,7 @@ allox config set defaults.image allox/aio-runtime:v2
 
 ### 5. 创建外层 VM
 
-`vm` 是 Allox 2.0 的主命令名；`sandbox` 作为兼容别名保留：
+`vm` 管理外层 Kata VM；`sandbox` 提供同一组命令：
 
 ```bash
 allox vm create --timeout 30m -o json
@@ -163,11 +163,11 @@ daemon 会在 rollback 前中断该 Session 登记的后台任务；存在活动
 | 命令 | 所属层次 | 用途 |
 |---|---|---|
 | `allox vm ...` | Kata VM | 创建、查询、续期、暂停、恢复、销毁外层 VM |
-| `allox sandbox ...` | Kata VM | `vm` 的兼容别名 |
+| `allox sandbox ...` | Kata VM | 提供与 `vm` 相同的命令入口 |
 | `allox workspace ...` | Agent/Session | 创建 workspace、执行、checkpoint、rollback |
 | `allox aio ...` | VM 内 Runtime | Shell、Jupyter、Browser、Screenshot、MCP |
 | `allox file ...` | VM 内 Runtime | 文件读写与上传下载 |
-| `allox checkpoint ...` | 整 VM/旧接口 | OpenSandbox image snapshot；不要与 Session rollback 混用 |
+| `allox checkpoint ...` | 整 VM | 创建和管理 OpenSandbox image snapshot |
 
 ## 目录结构
 
@@ -184,14 +184,14 @@ allox-os/
 ├── images/aio-runtime/      # Kata VM 内 Runtime OCI 镜像
 ├── deploy/                  # OpenSandbox + Kata 部署配置
 ├── docs/
-│   ├── architecture/        # 当前 2.0 架构与状态语义
+│   ├── architecture/        # 当前架构与状态语义
 │   ├── guides/              # Runtime、MCP、镜像使用指南
 │   └── development/         # 当前开发设计选择
 ├── examples/                # 配置示例
 └── tests/                   # 单元与集成测试
 ```
 
-这套目录直接对应运行边界：`vm/` 不包含 Session rollback 实现，`workspace/` 不管理 Kata 生命周期，`runtime/` 不拥有 checkpoint 元数据。
+这套目录直接对应运行边界：`vm/` 管理 Kata 生命周期，`workspace/` 管理 Session rollback，`runtime/` 管理 VM 内服务，checkpoint 元数据由 workspace 层维护。
 
 ## Agent turn checkpoint
 
@@ -202,7 +202,7 @@ allox-os/
 auto_checkpoint_turns = true
 ```
 
-框架适配器位于 `allox.integrations` entry-point group。当前内置 LangChain 适配器；它只发布 Session/Turn 生命周期事件，真正的 checkpoint 与 rollback 仍由 workspace daemon 执行。
+框架适配器位于 `allox.integrations` entry-point group。当前内置 LangChain 适配器，用于发布 Session/Turn 生命周期事件；workspace daemon 执行 checkpoint 与 rollback。
 
 ## 开发
 
