@@ -4,18 +4,19 @@
 
 # Allox OS
 
-**运行在 Kata VM 中的 Agent OS：按 Agent / Session 隔离、观测与回退**
+**Allox OS（当前实现：Kata runtime）：按 Agent / Session 隔离、观测与回退**
 
 [架构](#架构) · [状态边界](#状态边界) · [快速开始](#快速开始) · [目录结构](#目录结构) · [开发](#开发)
 
 </div>
 
-Allox OS 就是一个用户或信任域专属的 **Guest OS**。宿主机使用 Kata
-启动该 VM；本仓库构建 Guest Kernel、Rootfs 以及 VM 内的可信服务。Allox OS 在
-VM 内管理多个 Agent 和 Session。
+Allox OS 是一个用户或信任域专属的 Agent runtime。当前具体实现使用 Kata；本
+仓库构建 Guest Kernel、Rootfs 以及可信服务，并在该运行时内管理多个 Agent 和
+Session。Kata 是当前后端实现，而不是 Allox OS 不可替换的架构定义。
 
-Kata 提供 Guest Kernel 级的宿主机隔离；Allox OS 提供 VM 内的进程归属、workspace
-隔离、checkpoint、rollback 与观测能力。两层共同组成 Agent 的可信执行环境。
+当前 Kata backend 提供 Guest Kernel 级的宿主机隔离；Allox OS 提供运行时内的
+进程归属、workspace 隔离、checkpoint、rollback 与观测能力。两层共同组成 Agent
+的可信执行环境。
 
 Allox OS 的目标架构不依赖 Allox CLI、OpenSandbox、execd 或 AIO Runtime；它们不
 属于 Allox OS 的运行时边界。
@@ -24,20 +25,19 @@ Allox OS 的目标架构不依赖 Allox CLI、OpenSandbox、execd 或 AIO Runtim
 
 ```text
 Host
-└── Kata runtime
-    └── Allox OS                    # 用户/信任域级强隔离边界
-        ├── Guest Kernel + Rootfs    # 本仓库构建的 VM OS
-        ├── alloxd / init            # VM 内可信控制服务
-        ├── cgroup / namespace / audit
-        └── Btrfs workspace store
-            └── agents/
-                └── <agent_id>/
-                    └── workspace/                  # 一级 Agent Workspace
-                        ├── shared/                  # Agent 共享文件
-                        └── sessions/
-                            └── <session_id>/         # 二级 Session Workspace
-                                ├── current/          # 当前可写执行状态
-                                └── checkpoints/      # 只读 COW snapshots
+└── Allox OS（Kata runtime）          # 用户/信任域级强隔离边界
+    ├── Guest Kernel + Rootfs         # 本仓库构建的运行时
+    ├── alloxd / init                 # 可信控制服务
+    ├── cgroup / namespace / audit
+    └── Btrfs workspace store
+        └── agents/
+            └── <agent_id>/
+                └── workspace/                       # 一级 Agent Workspace
+                    ├── shared/                       # Agent 共享文件
+                    └── sessions/
+                        └── <session_id>/              # 二级 Session Workspace
+                            ├── current/               # 当前可写执行状态
+                            └── checkpoints/           # 只读 COW snapshots
 ```
 
 核心层次：
@@ -57,12 +57,12 @@ Host
 
 - 只回退指定 `agent_id + session_id` 的 Btrfs workspace。
 - 回退前终止该 Session 已登记的后台执行。
-- 保留其他 Agent、其他 Session 和 Kata VM 本身。
+- 保留其他 Agent、其他 Session 和 Allox OS 运行时本身。
 - checkpoint 索引、审计事件与事务日志保存在 rollback 范围外。
 
 ### Allox OS 级状态
 
-- 宿主机的 Kata backend 管理 VM 的 CPU、RAM、Guest Kernel、设备和根文件系统。
+- 当前 Kata backend 管理 CPU、RAM、Guest Kernel、设备和根文件系统。
 - VM 级 `/tmp`、系统服务和 VM 内进程由 VM 生命周期管理。
 - VM 级快照/恢复由 Allox OS 的宿主机 backend 负责；它与 Session Workspace rollback
   是两种独立操作。
@@ -88,7 +88,8 @@ Session 的 `/tmp`。这使普通临时文件、Unix socket 与 Workspace 具有
 ### 当前迁移状态
 
 当前 Python 原型保留了迁移前的控制面适配代码；它不能定义 Allox OS 的目标运行时。
-重构完成后，仓库将直接产出供 Kata 启动的 Guest Kernel、Rootfs 和 VM 内服务。
+重构完成后，仓库将直接产出由当前 Kata runtime 启动的 Guest Kernel、Rootfs 和
+运行时服务；其他 runtime backend 不应改变 Allox OS 的 Agent/Session 语义。
 
 目标 VM 内，`alloxd` 使用 Btrfs 数据盘（例如
 `/var/lib/allox/workspaces`）管理 Agent/Session：
@@ -110,7 +111,7 @@ allox-os/
 ├── kernel/                  # Allox Guest Kernel 的配置与补丁（目标）
 ├── rootfs/                  # Allox OS Rootfs、init 和系统服务（目标）
 ├── services/                # alloxd、观测与 workspace 服务（目标）
-├── deploy/                  # 宿主机如何通过 Kata 启动 Allox OS
+├── deploy/                  # 当前 Kata runtime 的宿主机部署配置
 ├── docs/
 │   ├── architecture/        # 当前架构与状态语义
 │   ├── guides/              # Runtime、MCP、镜像使用指南
