@@ -8,9 +8,10 @@ import secrets
 import threading
 import uuid
 from collections.abc import Iterator
-from contextlib import contextmanager
+from contextlib import contextmanager, nullcontext
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from pathlib import Path
 from typing import Any
 
 from allox.workspace.store import WorkspaceError, WorkspaceStore, validate_id
@@ -109,9 +110,45 @@ class ExecutionRegistry:
 
 
 class WorkspaceService:
-    def __init__(self, store: WorkspaceStore):
+    def __init__(
+        self,
+        store: WorkspaceStore,
+        *,
+        process_tracking: str = "disabled",
+        process_audit_root: Path | None = None,
+        process_tracker_command: str = "/usr/libexec/allox/allox-process-tracker",
+        process_cgroup_root: Path = Path("/sys/fs/cgroup/allox"),
+        kill_session_processes_on_rollback: bool = False,
+        process_service_factory=None,
+    ):
         self.store = store
         self.executions = ExecutionRegistry()
+        self.processes = None
+        self.process_tracking = process_tracking.strip().lower()
+        if not isinstance(kill_session_processes_on_rollback, bool):
+            raise WorkspaceError("kill_session_processes_on_rollback must be a boolean")
+        self.kill_session_processes_on_rollback = kill_session_processes_on_rollback
+        if self.kill_session_processes_on_rollback and self.process_tracking == "disabled":
+            raise WorkspaceError("rollback process termination requires process tracking")
+        if self.process_tracking != "disabled":
+            if process_audit_root is None:
+                raise WorkspaceError("process audit root is required when tracking is enabled")
+            if process_service_factory is None:
+                from allox.runtime.process_tracking import ProcessTrackingService
+
+                process_service_factory = ProcessTrackingService
+            self.processes = process_service_factory(
+                store,
+                self.executions,
+                process_audit_root,
+                provider=self.process_tracking,
+                provider_command=process_tracker_command,
+                cgroup_root=process_cgroup_root,
+            )
+
+    def close(self) -> None:
+        if self.processes is not None:
+            self.processes.close()
 
     @staticmethod
     def _required(params: dict[str, Any], key: str) -> str:
@@ -131,6 +168,34 @@ class WorkspaceService:
         agent_id = params.get("agent_id")
         session_id = params.get("session_id")
         origin = str(params.get("origin", "allox-cli"))
+
+        if action.startswith("process."):
+            if action == "process.status":
+                if self.processes is None:
+                    return {"enabled": False, "backend": "disabled"}
+                return self.processes.status()
+            if self.processes is None:
+                raise WorkspaceError("process tracking is not enabled on this daemon")
+            agent_id = self._required(params, "agent_id")
+            session_id = self._required(params, "session_id")
+            if action == "process.start":
+                return self.processes.start(
+                    agent_id, session_id, params.get("argv"),
+                    env=params.get("env"), timeout=params.get("timeout", 300),
+                )
+            if action == "process.list":
+                return self.processes.list_runs(agent_id, session_id)
+            run_id = self._required(params, "run_id")
+            if action == "process.get":
+                return self.processes.get(agent_id, session_id, run_id)
+            if action == "process.events":
+                return self.processes.events(
+                    agent_id, session_id, run_id,
+                    after=params.get("after", 0), limit=params.get("limit", 100),
+                )
+            if action == "process.stop":
+                return self.processes.stop(agent_id, session_id, run_id)
+            raise WorkspaceError(f"unknown action: {action}")
 
         if action == "store.initialize":
             return self.store.initialize()
@@ -166,9 +231,25 @@ class WorkspaceService:
                 self._required(params, "execution_id"),
             )
         if action == "runtime.begin_reset":
-            return self.executions.begin_runtime_reset(
-                self._required(params, "agent_id"), self._required(params, "session_id")
+            agent_id = self._required(params, "agent_id")
+            session_id = self._required(params, "session_id")
+            terminate = self._boolean(
+                params, "kill_processes", self.kill_session_processes_on_rollback
             )
+            if terminate and self.processes is None:
+                raise WorkspaceError("kill_processes requires process tracking")
+            launch_fence = (
+                self.processes.session_launch_fence(
+                    agent_id, session_id, terminate=True, reason="rollback"
+                )
+                if terminate
+                else nullcontext([])
+            )
+            with launch_fence as stopped:
+                result = self.executions.begin_runtime_reset(agent_id, session_id)
+            if terminate:
+                result["terminated_process_runs"] = stopped
+            return result
         if action == "runtime.complete_reset":
             return self.executions.complete_runtime_reset(
                 self._required(params, "reset_token"),
@@ -190,7 +271,19 @@ class WorkspaceService:
                 mutation = self.executions.reset_mutation(reset_token, agent_id, session_id)
             else:
                 mutation = self.executions.mutation(agent_id, session_id)
-            with mutation:
+            terminate = action.startswith("session.rollback") and self._boolean(
+                params, "kill_processes", self.kill_session_processes_on_rollback
+            )
+            if terminate and self.processes is None:
+                raise WorkspaceError("kill_processes requires process tracking")
+            launch_fence = (
+                self.processes.session_launch_fence(
+                    agent_id, session_id, terminate=True, reason="rollback"
+                )
+                if terminate
+                else nullcontext([])
+            )
+            with launch_fence as stopped, mutation:
                 if action == "checkpoint.create":
                     checkpoint_id = params.get("checkpoint_id")
                     if checkpoint_id is not None and not isinstance(checkpoint_id, str):
@@ -227,7 +320,7 @@ class WorkspaceService:
                     isinstance(num_ancestors, bool) or not isinstance(num_ancestors, int)
                 ):
                     raise WorkspaceError("num_ancestors must be an integer")
-                return self.store.rollback(
+                result = self.store.rollback(
                     agent_id,
                     session_id,
                     checkpoint_id,
@@ -235,6 +328,9 @@ class WorkspaceService:
                     scrub_runtime=self._boolean(params, "scrub_runtime", True),
                     origin=origin,
                 )
+                if terminate:
+                    result["terminated_process_runs"] = stopped
+                return result
 
         raise WorkspaceError(f"unknown action: {action}")
 
@@ -310,6 +406,27 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--root", required=True, help="Btrfs workspace store root")
     parser.add_argument("--listen", default="127.0.0.1:8092")
     parser.add_argument("--token", default="", help="Bearer token (prefer ALLOX_WORKSPACE_TOKEN)")
+    parser.add_argument(
+        "--process-tracking", default="disabled", metavar="PROVIDER",
+        help="Process tracker provider: disabled, ebpf, or an installed plugin name",
+    )
+    parser.add_argument(
+        "--process-audit-root", type=Path, default=None,
+        help="Audit path outside the workspace store; required when tracking is enabled",
+    )
+    parser.add_argument(
+        "--process-tracker-command", default="/usr/libexec/allox/allox-process-tracker",
+        help="Native provider command; independently replaceable from alloxd",
+    )
+    parser.add_argument(
+        "--process-cgroup-root", type=Path, default=Path("/sys/fs/cgroup/allox"),
+        help="Allox-owned cgroup v2 subtree for Agent/Session processes",
+    )
+    parser.add_argument(
+        "--kill-session-processes-on-rollback",
+        action="store_true",
+        help="Kill the tracked Session cgroup before workspace rollback",
+    )
     return parser
 
 
@@ -325,12 +442,21 @@ def main(argv: list[str] | None = None) -> int:
     token = args.token or os.environ.get("ALLOX_WORKSPACE_TOKEN", "")
     store = WorkspaceStore(args.root)
     store.initialize()
-    server = WorkspaceHTTPServer((host, int(port_raw)), WorkspaceService(store), token)
+    service = WorkspaceService(
+        store,
+        process_tracking=args.process_tracking,
+        process_audit_root=args.process_audit_root,
+        process_tracker_command=args.process_tracker_command,
+        process_cgroup_root=args.process_cgroup_root,
+        kill_session_processes_on_rollback=args.kill_session_processes_on_rollback,
+    )
+    server = WorkspaceHTTPServer((host, int(port_raw)), service, token)
     try:
         server.serve_forever()
     except KeyboardInterrupt:
         pass
     finally:
+        service.close()
         server.server_close()
     return 0
 

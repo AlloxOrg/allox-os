@@ -57,7 +57,7 @@ Host
 ### Session Workspace rollback 会做什么
 
 - 只回退指定 `agent_id + session_id` 的 Btrfs workspace。
-- 回退前终止该 Session 已登记的后台执行。
+- 可选在回退前通过 Session cgroup 终止其全部已追踪进程及后代；默认关闭。
 - 保留其他 Agent、其他 Session 和 Allox OS 运行时本身。
 - checkpoint 索引、审计事件与事务日志保存在 rollback 范围外。
 
@@ -76,13 +76,27 @@ Session Workspace。
 
 ## Session 执行边界
 
-`alloxd` 为每个 `agent_id/session_id` 建立独立 cgroup，并在启动时为 Session
-建立 PID、mount、user 与 network namespace。Session 的所有子进程继承该 cgroup
+当前 tracked 执行路径中，`alloxd` 为每个 `agent_id/session_id` 建立独立 cgroup，
+并通过 Bubblewrap 为每次执行建立 PID/mount namespace、最小文件视图和私有 `/tmp`；
+Agent 启动前会丢弃全部 Linux capabilities。Session 的所有子进程继承该 cgroup
 归属；受信控制面可据此追溯进程来源，并在 rollback 前以 cgroup 为单位终止它们。
+user namespace、network namespace 与细粒度出站策略仍是后续工作。
 
 Session Workspace 绑定到进程的工作目录和 `HOME`；私有临时目录绑定为该
 Session 的 `/tmp`。这使普通临时文件、Unix socket 与 Workspace 具有相同的
 所有权边界；回退不依赖全局 `/tmp` 的软链接状态。
+
+### 当前已实现：可插拔 eBPF 进程追踪
+
+Allox OS daemon 提供默认关闭的 process-tracker provider 接口。内置 `ebpf` provider
+通过独立原生 collector，在内核 sched tracepoint 上传播 Agent/Session run 归属并记录
+fork、exec、exit；Session cgroup 是实际成员集合和整树终止边界。collector 与控制层
+使用版本化协议，因此可以独立升级或替换。
+
+这是显式启用的新 OS 服务接口，**迁移期遗留的 run/execd 路径不会自动受到追踪**。
+Allox CLI 对该接口的用户侧适配属于独立的 `allox-cli` 仓库。启用参数、Bubblewrap
+边界、构建方法、API 和限制见
+[进程追踪说明](docs/development/process-tracking.md)。
 
 ## 快速开始
 

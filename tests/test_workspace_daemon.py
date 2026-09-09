@@ -2,12 +2,27 @@
 
 from __future__ import annotations
 
+from contextlib import contextmanager
+from pathlib import Path
 from unittest.mock import MagicMock
 
 import pytest
 
 from allox.workspace.daemon import ExecutionRegistry, WorkspaceService
 from allox.workspace.store import WorkspaceError
+
+
+class FakeProcessService:
+    def __init__(self):
+        self.fences = []
+
+    @contextmanager
+    def session_launch_fence(self, agent_id, session_id, *, terminate, reason):
+        self.fences.append((agent_id, session_id, terminate, reason))
+        yield ["run-1"]
+
+    def close(self):
+        pass
 
 
 def test_mutation_rejects_active_session_execution():
@@ -106,3 +121,75 @@ def test_service_forwards_checkpoint_metadata_and_ancestor_rollback():
         scrub_runtime=True,
         origin="allox-cli",
     )
+
+
+@pytest.mark.parametrize(
+    ("global_setting", "request_setting"),
+    [(False, {"kill_processes": True}), (True, {})],
+)
+def test_rollback_can_request_tracked_session_termination(global_setting, request_setting):
+    store = MagicMock()
+    store.root = Path("/workspace-store")
+    store.rollback.return_value = {"checkpoint_id": "cp1"}
+    processes = FakeProcessService()
+    service = WorkspaceService(
+        store,
+        process_tracking="fake",
+        process_audit_root=Path("/audit"),
+        process_service_factory=lambda *args, **kwargs: processes,
+        kill_session_processes_on_rollback=global_setting,
+    )
+
+    result = service.dispatch(
+        "session.rollback",
+        {
+            "agent_id": "agent-a",
+            "session_id": "session-1",
+            "checkpoint_id": "cp1",
+            **request_setting,
+        },
+    )
+
+    assert result["terminated_process_runs"] == ["run-1"]
+    assert processes.fences == [("agent-a", "session-1", True, "rollback")]
+    store.rollback.assert_called_once()
+
+
+def test_rollback_kill_is_rejected_without_process_tracking():
+    service = WorkspaceService(MagicMock())
+
+    with pytest.raises(WorkspaceError, match="requires process tracking"):
+        service.dispatch(
+            "session.rollback",
+            {
+                "agent_id": "agent-a",
+                "session_id": "session-1",
+                "kill_processes": True,
+            },
+        )
+
+
+def test_request_can_disable_global_rollback_termination():
+    store = MagicMock()
+    store.root = Path("/workspace-store")
+    store.rollback.return_value = {"checkpoint_id": "cp1"}
+    processes = FakeProcessService()
+    service = WorkspaceService(
+        store,
+        process_tracking="fake",
+        process_audit_root=Path("/audit"),
+        process_service_factory=lambda *args, **kwargs: processes,
+        kill_session_processes_on_rollback=True,
+    )
+
+    result = service.dispatch(
+        "session.rollback",
+        {
+            "agent_id": "agent-a",
+            "session_id": "session-1",
+            "kill_processes": False,
+        },
+    )
+
+    assert "terminated_process_runs" not in result
+    assert processes.fences == []
