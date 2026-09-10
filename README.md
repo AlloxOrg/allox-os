@@ -28,7 +28,7 @@ Host
 └── Allox OS                         # 用户/信任域级强隔离边界
     ├── Kata runtime                 # 当前可替换的 VM runtime 实现
     ├── Guest Kernel + Rootfs         # 本仓库构建的运行时
-    ├── alloxd / init                 # 可信控制服务
+    ├── workspace daemon / init       # 可信控制服务
     ├── cgroup / namespace / audit
     └── Btrfs workspace store
         └── agents/
@@ -47,7 +47,7 @@ Host
 |---|---|---|
 | Allox OS | 用户或信任域级 | Guest Kernel、VM 内进程、网络、系统 `/tmp`、设备与根文件系统 |
 | Agent Workspace（一级） | Agent 生命周期 | Agent 共享文件、身份配置及其 Session Workspace 集合 |
-| Session Workspace（二级） | Session 生命周期 | `current`、checkpoint DAG、执行租约和注册的后台任务 |
+| Session Workspace（二级） | Session 生命周期 | `current`、checkpoint DAG、执行租约和受追踪运行记录 |
 | Turn | 单次 Agent 交互 | 可选的 turn-end 自动 checkpoint |
 
 详细设计见 [架构总览](docs/architecture/overview.md) 和 [Workspace 模型](docs/architecture/workspaces.md)。
@@ -68,7 +68,10 @@ Host
 - VM 级快照/恢复由 Allox OS 的宿主机 backend 负责；它与 Session Workspace rollback
   是两种独立操作。
 
-Allox 默认把 Session 的 `HOME` 指向 `current/`，把 `TMPDIR` 指向 `current/.allox-tmp/`。Agent 使用 `$TMPDIR` 创建的普通临时文件可进入 Session checkpoint；显式写 `/tmp` 属于 VM 级状态。
+在 tracked 执行路径中，Session 的 `HOME` 指向 `current/`，Bubblewrap 提供私有
+`/tmp`，并在正常退出时把其中的普通文件同步到 `current/.allox-tmp/`。Unix socket、
+FIFO 和设备节点不进入 checkpoint。迁移期 legacy/managed 路径只把 `TMPDIR` 指向
+`.allox-tmp/`；该路径显式写入的系统 `/tmp` 仍属于 VM 级状态。
 
 Session 通过 `ALLOX_AGENT_WORKSPACE` 定位一级 workspace，通过
 `ALLOX_AGENT_SHARED` 访问其中的 `shared/`；`HOME` 和工作目录指向当前二级
@@ -76,15 +79,16 @@ Session Workspace。
 
 ## Session 执行边界
 
-当前 tracked 执行路径中，`alloxd` 为每个 `agent_id/session_id` 建立独立 cgroup，
+当前 tracked 执行路径中，`allox-workspace-daemon` 为每个
+`agent_id/session_id` 建立独立 cgroup，
 并通过 Bubblewrap 为每次执行建立 PID/mount namespace、最小文件视图和私有 `/tmp`；
 Agent 启动前会丢弃全部 Linux capabilities。Session 的所有子进程继承该 cgroup
 归属；受信控制面可据此追溯进程来源，并在 rollback 前以 cgroup 为单位终止它们。
 user namespace、network namespace 与细粒度出站策略仍是后续工作。
 
-Session Workspace 绑定到进程的工作目录和 `HOME`；私有临时目录绑定为该
-Session 的 `/tmp`。这使普通临时文件、Unix socket 与 Workspace 具有相同的
-所有权边界；回退不依赖全局 `/tmp` 的软链接状态。
+Session Workspace 绑定到进程的工作目录和 `HOME`；私有 `/tmp` 只属于本次
+Bubblewrap 执行。普通临时文件可同步回 Session Workspace，Unix socket 等内核
+运行态则在执行结束或进程树被终止时消失；回退不依赖全局 `/tmp` 的软链接状态。
 
 ### 当前已实现：可插拔 eBPF 进程追踪
 
@@ -106,18 +110,41 @@ Allox CLI 对该接口的用户侧适配属于独立的 `allox-cli` 仓库。启
 重构完成后，仓库将直接产出由当前 Kata runtime 启动的 Guest Kernel、Rootfs 和
 运行时服务；其他 runtime backend 不应改变 Allox OS 的 Agent/Session 语义。
 
-目标 VM 内，`alloxd` 使用 Btrfs 数据盘（例如
-`/var/lib/allox/workspaces`）管理 Agent/Session：
+当前 Guest 内的可执行控制入口是 `allox-workspace-daemon`。Allox OS 通过
+`/v1/rpc` 提供 Agent/Session、checkpoint、rollback 和进程追踪接口；面向用户的
+命令行封装由独立的 `allox-cli` 仓库提供。
 
 ```bash
-alloxd agent create agent-a
-alloxd session create agent-a session-1
-alloxd checkpoint create agent-a session-1 --name clean
-alloxd checkpoint rollback agent-a session-1 clean
+allox-workspace-daemon \
+  --root /var/lib/allox/workspaces \
+  --listen 127.0.0.1:8092
 ```
 
-所有 Agent 命令均由 `alloxd` 放入对应 Agent/Session cgroup 和 namespace；回退前
-先终止该 Session 的进程树，再恢复其 Btrfs 子卷。
+以下请求直接使用当前 RPC 协议：
+
+```bash
+curl -sS http://127.0.0.1:8092/v1/rpc \
+  -H 'Content-Type: application/json' \
+  -d '{"action":"agent.create","params":{"agent_id":"agent-a"}}'
+
+curl -sS http://127.0.0.1:8092/v1/rpc \
+  -H 'Content-Type: application/json' \
+  -d '{"action":"session.create","params":{"agent_id":"agent-a","session_id":"session-1"}}'
+
+curl -sS http://127.0.0.1:8092/v1/rpc \
+  -H 'Content-Type: application/json' \
+  -d '{"action":"checkpoint.create","params":{"agent_id":"agent-a","session_id":"session-1","checkpoint_id":"clean"}}'
+
+curl -sS http://127.0.0.1:8092/v1/rpc \
+  -H 'Content-Type: application/json' \
+  -d '{"action":"session.rollback","params":{"agent_id":"agent-a","session_id":"session-1","checkpoint_id":"clean"}}'
+```
+
+进程追踪显式启用后，单次 `session.rollback` 可传入 `"kill_processes": true`；
+也可用 daemon 参数 `--kill-session-processes-on-rollback` 设置默认策略。开启后，
+Allox OS 先终止目标 Session 的受追踪进程树，再恢复其 Btrfs workspace；其他
+Agent、Session 和 Kata VM 不受影响。Kata VM 级恢复会由 VM 生命周期自然重置
+全部 Guest 进程，不依赖此 Session 钩子。
 
 ## 目录结构
 
@@ -125,7 +152,7 @@ alloxd checkpoint rollback agent-a session-1 clean
 allox-os/
 ├── kernel/                  # Allox Guest Kernel 的配置与补丁（目标）
 ├── rootfs/                  # Allox OS Rootfs、init 和系统服务（目标）
-├── services/                # alloxd、观测与 workspace 服务（目标）
+├── services/                # 可信 daemon、观测与 workspace 服务（目标）
 ├── deploy/                  # 当前 Kata runtime 的宿主机部署配置
 ├── docs/
 │   ├── architecture/        # 当前架构与状态语义
@@ -140,7 +167,7 @@ allox-os/
 ## Agent turn checkpoint
 
 Agent framework 可通过 Allox OS 的 guest 接口发布 Session/Turn 生命周期事件。
-启用后，`alloxd` 在 Session 建立时创建基线 checkpoint，并在每个成功结束的
+启用后，Allox OS daemon 在 Session 建立时创建基线 checkpoint，并在每个成功结束的
 turn 后创建 checkpoint；该策略必须可按 Agent 或 Session 关闭。
 
 ## 开发
