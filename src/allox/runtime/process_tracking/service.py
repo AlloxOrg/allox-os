@@ -38,6 +38,7 @@ class ProcessTrackingService:
         boot_id: str | None = None,
     ) -> None:
         self.store = store
+        self.share_endpoints = None
         self.executions = executions
         self.audit_root = audit_root.resolve()
         if self.audit_root == store.root or store.root in self.audit_root.parents:
@@ -196,6 +197,8 @@ class ProcessTrackingService:
                     session_id,
                     tuple(argv),
                     tuple((env or {}).items()),
+                    share_socket=(self.share_endpoints.endpoint(agent_id, session_id)
+                                  if self.share_endpoints else None),
                 )
                 child_env = {
                     "PATH": "/usr/local/bin:/usr/bin:/bin",

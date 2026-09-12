@@ -25,6 +25,14 @@ class FakeProcessService:
         pass
 
 
+def test_share_tools_require_management_authentication(monkeypatch):
+    from allox.workspace.daemon import main
+
+    monkeypatch.delenv("ALLOX_WORKSPACE_TOKEN", raising=False)
+    with pytest.raises(SystemExit, match="ALLOX_WORKSPACE_TOKEN"):
+        main(["--root", "/unused", "--share-tools", "--process-tracking", "ebpf"])
+
+
 def test_mutation_rejects_active_session_execution():
     registry = ExecutionRegistry()
     lease = registry.acquire("agent-a", "session-1")

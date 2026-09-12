@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from pathlib import Path
+
 from allox.workspace.store import WorkspaceError, validate_id
 
 _TMP_SYNC_WRAPPER = """\
@@ -26,6 +28,8 @@ def build_bwrap_argv(
     session_id: str,
     command: tuple[str, ...],
     environment: tuple[tuple[str, str], ...] = (),
+    *,
+    share_socket: str | None = None,
 ) -> list[str]:
     """Expose only one Agent shared area and one child Session workspace."""
     validate_id("agent", agent_id)
@@ -98,6 +102,12 @@ def build_bwrap_argv(
     ]
     for key, value in environment:
         argv.extend(["--setenv", key, value])
+    if share_socket is not None:
+        argv.extend([
+            "--dir", "/run/allox",
+            "--ro-bind", share_socket, "/run/allox/share.sock",
+            "--ro-bind", str(Path(__file__).with_name("share_tool.py")), "/run/allox/share.py",
+        ])
     argv.extend(
         ["--chdir", "/workspace", "sh", "-c", _TMP_SYNC_WRAPPER, "allox-runtime", *command]
     )

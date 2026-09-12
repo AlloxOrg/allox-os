@@ -102,6 +102,16 @@ Allox CLI 对该接口的用户侧适配属于独立的 `allox-cli` 仓库。启
 边界、构建方法、API 和限制见
 [进程追踪说明](docs/development/process-tracking.md)。
 
+### 可选：通过 Session ID 共享文件
+
+daemon 启用 `--share-tools` 后，tracked Bubblewrap 内可调用
+`python3 /run/allox/share.py`。双方 Session 分别执行 `enable`，即可通过
+`read agent-b/session-1 report.txt` 等命令转发访问，不需要共享密钥。
+默认关闭、默认只读；开启后允许所有其他已开启 share 的 Session 访问自己的共享范围。
+可用 `enable --scope output --permission write` 设置范围和权限，`disable` 立即停止
+接受新请求。目标回退与文件访问互斥，写入要求目标没有活跃执行。
+完整步骤和限制见 [Session 文件共享](docs/development/session-sharing.md)。
+
 ## 快速开始
 
 ### 当前迁移状态

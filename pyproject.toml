@@ -25,6 +25,7 @@ dependencies = [
 allox = "allox.cli.main:cli"
 allox-workspace-daemon = "allox.workspace.daemon:main"
 allox-guest-bootstrap = "allox.runtime.bootstrap:main"
+allox-share = "allox.runtime.share_tool:main"
 
 [project.entry-points."allox.integrations"]
 langchain-turn-checkpoint = "allox.integrations.langchain:LangChainTurnCheckpointPlugin"

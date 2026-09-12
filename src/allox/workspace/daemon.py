@@ -26,6 +26,7 @@ class ExecutionRegistry:
         self._mutating: set[tuple[str, str]] = set()
         self._background: dict[tuple[str, str], dict[str, dict[str, str]]] = {}
         self._resets: dict[str, tuple[str, str]] = {}
+        self._share_readers: dict[tuple[str, str], int] = {}
 
     def acquire(self, agent_id: str, session_id: str) -> dict[str, Any]:
         key = (validate_id("agent", agent_id), validate_id("session", session_id))
@@ -60,6 +61,8 @@ class ExecutionRegistry:
         """Fence a Session and return its persistent executions for termination."""
         key = (validate_id("agent", agent_id), validate_id("session", session_id))
         with self._lock:
+            if self._share_readers.get(key):
+                raise WorkspaceError("session has active share reads")
             if key in self._mutating:
                 raise WorkspaceError(f"session mutation already in progress: {agent_id}/{session_id}")
             if key in self._leases.values():
@@ -92,6 +95,8 @@ class ExecutionRegistry:
     def mutation(self, agent_id: str, session_id: str) -> Iterator[None]:
         key = (validate_id("agent", agent_id), validate_id("session", session_id))
         with self._lock:
+            if self._share_readers.get(key):
+                raise WorkspaceError("session has active share reads")
             if key in self._mutating:
                 raise WorkspaceError(f"session mutation already in progress: {agent_id}/{session_id}")
             if key in self._leases.values():
@@ -108,6 +113,25 @@ class ExecutionRegistry:
             with self._lock:
                 self._mutating.discard(key)
 
+    @contextmanager
+    def share_access(self, agent_id: str, session_id: str, *, write: bool):
+        if write:
+            with self.mutation(agent_id, session_id):
+                yield
+            return
+        key = (validate_id("agent", agent_id), validate_id("session", session_id))
+        with self._lock:
+            if key in self._mutating:
+                raise WorkspaceError("session is being checkpointed or restored")
+            self._share_readers[key] = self._share_readers.get(key, 0) + 1
+        try:
+            yield
+        finally:
+            with self._lock:
+                self._share_readers[key] -= 1
+                if not self._share_readers[key]:
+                    del self._share_readers[key]
+
 
 class WorkspaceService:
     def __init__(
@@ -119,12 +143,20 @@ class WorkspaceService:
         process_tracker_command: str = "/usr/libexec/allox/allox-process-tracker",
         process_cgroup_root: Path = Path("/sys/fs/cgroup/allox"),
         kill_session_processes_on_rollback: bool = False,
+        share_tools: bool = False,
+        share_socket_root: Path = Path("/run/allox-share"),
         process_service_factory=None,
     ):
         self.store = store
         self.executions = ExecutionRegistry()
+        from allox.workspace.sharing import ShareService
+
+        self.shares = ShareService(store, self.executions)
+        self.share_endpoints = None
         self.processes = None
         self.process_tracking = process_tracking.strip().lower()
+        if share_tools and self.process_tracking == "disabled":
+            raise WorkspaceError("share tools require tracked Session execution")
         if not isinstance(kill_session_processes_on_rollback, bool):
             raise WorkspaceError("kill_session_processes_on_rollback must be a boolean")
         self.kill_session_processes_on_rollback = kill_session_processes_on_rollback
@@ -145,10 +177,19 @@ class WorkspaceService:
                 provider_command=process_tracker_command,
                 cgroup_root=process_cgroup_root,
             )
+        if share_tools:
+            from allox.runtime.share_endpoint import SessionShareEndpoints
+
+            self.share_endpoints = SessionShareEndpoints(
+                self.shares, self.processes.cgroups, share_socket_root
+            )
+            self.processes.share_endpoints = self.share_endpoints
 
     def close(self) -> None:
         if self.processes is not None:
             self.processes.close()
+        if self.share_endpoints is not None:
+            self.share_endpoints.close()
 
     @staticmethod
     def _required(params: dict[str, Any], key: str) -> str:
@@ -168,6 +209,13 @@ class WorkspaceService:
         agent_id = params.get("agent_id")
         session_id = params.get("session_id")
         origin = str(params.get("origin", "allox-cli"))
+
+        if action.startswith("share."):
+            # Management RPC is trusted; Agent sockets derive identity from cgroups.
+            return self.shares.dispatch(
+                (self._required(params, "agent_id"), self._required(params, "session_id")),
+                action.removeprefix("share."), params,
+            )
 
         if action.startswith("process."):
             if action == "process.status":
@@ -339,6 +387,8 @@ class WorkspaceHTTPServer(ThreadingHTTPServer):
     daemon_threads = True
 
     def __init__(self, address, service: WorkspaceService, token: str):
+        if service.share_endpoints is not None and not token:
+            raise WorkspaceError("share tools require an authenticated management endpoint")
         super().__init__(address, WorkspaceRequestHandler)
         self.service = service
         self.token = token
@@ -427,6 +477,10 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="Kill the tracked Session cgroup before workspace rollback",
     )
+    parser.add_argument("--share-tools", action="store_true",
+                        help="Mount a Session-bound share tool in tracked Bubblewrap runs")
+    parser.add_argument("--share-socket-root", type=Path, default=Path("/run/allox-share"),
+                        help="Trusted local filesystem for share sockets (not a host share)")
     return parser
 
 
@@ -440,6 +494,8 @@ def main(argv: list[str] | None = None) -> int:
     ):
         raise SystemExit("a bearer token is required when listening beyond loopback")
     token = args.token or os.environ.get("ALLOX_WORKSPACE_TOKEN", "")
+    if args.share_tools and not token:
+        raise SystemExit("--share-tools requires ALLOX_WORKSPACE_TOKEN for the management API")
     store = WorkspaceStore(args.root)
     store.initialize()
     service = WorkspaceService(
@@ -449,6 +505,8 @@ def main(argv: list[str] | None = None) -> int:
         process_tracker_command=args.process_tracker_command,
         process_cgroup_root=args.process_cgroup_root,
         kill_session_processes_on_rollback=args.kill_session_processes_on_rollback,
+        share_tools=args.share_tools,
+        share_socket_root=args.share_socket_root,
     )
     server = WorkspaceHTTPServer((host, int(port_raw)), service, token)
     try:
