@@ -39,6 +39,7 @@ class ProcessTrackingService:
     ) -> None:
         self.store = store
         self.share_endpoints = None
+        self.network = None
         self.executions = executions
         self.audit_root = audit_root.resolve()
         if self.audit_root == store.root or store.root in self.audit_root.parents:
@@ -190,16 +191,30 @@ class ProcessTrackingService:
                 directory.mkdir(mode=0o700)
                 current = self.store.current(agent_id, session_id)
                 shared = self.store.agent_shared(agent_id)
+                network = (
+                    self.network.prepare(agent_id, session_id)
+                    if self.network is not None
+                    else None
+                )
+                execution_environment = dict(env or {})
+                if network is not None:
+                    # Trusted routing variables win over caller-supplied values.
+                    execution_environment.update(dict(network.environment))
                 execution_argv = build_bwrap_argv(
                     str(current),
                     str(shared),
                     agent_id,
                     session_id,
                     tuple(argv),
-                    tuple((env or {}).items()),
+                    tuple(execution_environment.items()),
                     share_socket=(self.share_endpoints.endpoint(agent_id, session_id)
                                   if self.share_endpoints else None),
+                    network_socket=(
+                        network.broker_socket if network is not None else None
+                    ),
                 )
+                if network is not None:
+                    execution_argv = [*network.argv_prefix, *execution_argv]
                 child_env = {
                     "PATH": "/usr/local/bin:/usr/bin:/bin",
                     "HOME": str(current),
@@ -232,6 +247,11 @@ class ProcessTrackingService:
                     "trace_complete": False,
                     "cookie": cookie,
                 }
+                if network is not None:
+                    row.update(
+                        network_mode=network.mode,
+                        network_namespace_pid=network.namespace_pid,
+                    )
                 self._runs[run_id] = {
                     "row": row,
                     "process": None,

@@ -22,3 +22,23 @@ def test_tracked_sandbox_has_session_view_and_no_capabilities():
     assert argv[cap_index : cap_index + 2] == ["--cap-drop", "ALL"]
     assert "/sys/fs/cgroup" not in argv
     assert "/sys/kernel/tracing" not in argv
+
+
+def test_network_connector_is_mounted_only_when_configured():
+    argv = build_bwrap_argv(
+        "/store/current",
+        "/store/shared",
+        "a",
+        "s",
+        ("true",),
+        network_socket="/dev/shm/allox-network/broker.sock",
+    )
+    assert argv[argv.index("/dev/shm/allox-network/broker.sock") :][:2] == [
+        "/dev/shm/allox-network/broker.sock",
+        "/run/allox/network.sock",
+    ]
+    assert "/run/allox/network.py" in argv
+    assert argv[argv.index("ALLOX_NETWORK_SOCKET") :][:2] == [
+        "ALLOX_NETWORK_SOCKET",
+        "/run/allox/network.sock",
+    ]

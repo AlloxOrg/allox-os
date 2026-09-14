@@ -84,7 +84,7 @@ Session Workspace。
 并通过 Bubblewrap 为每次执行建立 PID/mount namespace、最小文件视图和私有 `/tmp`；
 Agent 启动前会丢弃全部 Linux capabilities。Session 的所有子进程继承该 cgroup
 归属；受信控制面可据此追溯进程来源，并在 rollback 前以 cgroup 为单位终止它们。
-user namespace、network namespace 与细粒度出站策略仍是后续工作。
+user namespace 与对象级出站策略仍是后续工作。
 
 Session Workspace 绑定到进程的工作目录和 `HOME`；私有 `/tmp` 只属于本次
 Bubblewrap 执行。普通临时文件可同步回 Session Workspace，Unix socket 等内核
@@ -111,6 +111,18 @@ daemon 启用 `--share-tools` 后，tracked Bubblewrap 内可调用
 可用 `enable --scope output --permission write` 设置范围和权限，`disable` 立即停止
 接受新请求。目标回退与文件访问互斥，写入要求目标没有活跃执行。
 完整步骤和限制见 [Session 文件共享](docs/development/session-sharing.md)。
+
+### 可选：Session network namespace 与代理出站
+
+daemon 启用 `--session-network isolated` 或 `proxy` 后，每个 Session 持有一个跨
+`process.start` 复用的 network namespace。`isolated` 只有私有 loopback；`proxy`
+额外暴露固定的 `http://127.0.0.1:3128`，通过 Bubblewrap 外的 AF_UNIX broker
+访问网络。同时可用 `python3 /run/allox/network.py connect <host> <port>`
+进行通用 TCP 字节转发，包括作为 SSH/Git over SSH 的 `ProxyCommand`。沙箱
+没有 veth 或默认路由，不能绕过 broker 直连；策略、socket 与
+出站审计均位于 Session Workspace 之外。默认仍为 `disabled`，关闭时不改变原执行路径。
+设计、RPC、capability 要求和当前限制见
+[Session 网络隔离](docs/development/session-networking.md)。
 
 ## 快速开始
 
