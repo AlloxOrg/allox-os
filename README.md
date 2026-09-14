@@ -10,16 +10,15 @@
 
 </div>
 
-Allox OS 是一个用户或信任域专属的 Agent runtime。当前具体实现使用 Kata；本
-仓库构建 Guest Kernel、Rootfs 以及可信服务，并在该运行时内管理多个 Agent 和
-Session。Kata 是当前后端实现，而不是 Allox OS 不可替换的架构定义。
+Allox OS 是一个用户或信任域专属的 Agent runtime。当前后端使用 Kata；本仓库构建
+Guest Kernel、Rootfs 和可信服务，并在该运行时内管理多个 Agent 和 Session。
+Kata runtime 可替换，Agent/Session 语义由 Allox OS 定义。
 
 当前 Kata backend 提供 Guest Kernel 级的宿主机隔离；Allox OS 提供运行时内的
 进程归属、workspace 隔离、checkpoint、rollback 与观测能力。两层共同组成 Agent
 的可信执行环境。
 
-Allox OS 的目标架构不依赖 Allox CLI、OpenSandbox、execd 或 AIO Runtime；它们不
-属于 Allox OS 的运行时边界。
+Allox OS 的运行时边界包含 Guest Kernel、Rootfs、可信服务和 workspace 数据层。
 
 ## 架构
 
@@ -90,16 +89,14 @@ Session Workspace 绑定到进程的工作目录和 `HOME`；私有 `/tmp` 只�
 Bubblewrap 执行。普通临时文件可同步回 Session Workspace，Unix socket 等内核
 运行态则在执行结束或进程树被终止时消失；回退不依赖全局 `/tmp` 的软链接状态。
 
-### 当前已实现：独立安装的 eBPF 进程追踪插件
+### 可选插件：eBPF 进程追踪
 
-Core 只提供默认关闭的 process-tracker provider 接口与 Session cgroup 边界。
+Core 提供默认关闭的 process-tracker API 与 Session cgroup 边界。
 `allox-process-tree` 独立发行包提供 `ebpf` provider，通过原生 collector 在内核 sched
 tracepoint 上传播 Agent/Session run 归属并记录 fork、exec、exit。未安装该插件时，
 Core wheel 中不包含 eBPF adapter、bootstrap、内核配置或 collector 源码。
 
-这是显式启用的新 OS 服务接口，**迁移期遗留的 run/execd 路径不会自动受到追踪**。
-Allox CLI 对该接口的用户侧适配属于独立的 `allox-cli` 仓库。启用参数、Bubblewrap
-边界、构建方法、API 和限制见
+这是显式启用的 OS 服务接口。启用参数、Bubblewrap 边界、构建方法、API 和限制见
 [进程追踪说明](docs/development/process-tracking.md)。
 
 ### 可选插件：通过 Session ID 共享文件
@@ -125,7 +122,7 @@ Allox CLI 对该接口的用户侧适配属于独立的 `allox-cli` 仓库。启
 设计、RPC、capability 要求和当前限制见
 [Session 网络隔离](docs/development/session-networking.md)。
 
-三个功能以独立 wheel 发布；安装和启用相互分离：
+三个功能分别发布为独立 Python wheel：
 
 ```bash
 pip install allox-process-tree       # 可省略
@@ -133,19 +130,18 @@ pip install allox-session-share      # 可省略
 pip install allox-session-network    # 可省略
 ```
 
-只安装 Core 时不会下载上述实现。插件即使已经安装，也只有在对应 daemon 参数开启后
-才会被发现和加载。插件 ABI、包结构和组合规则见 [可选插件](plugins/README.md)。
+wheel 负责分发代码和 entry point 元数据。Core 仅加载显式启用的插件，校验 Plugin
+API v1，并合并命令前缀、环境变量、Bubblewrap 挂载、RPC 路由和运行元数据。资源按
+加载顺序的逆序释放。安装和启用相互独立，详见 [可选插件](plugins/README.md)。
 
 ## 快速开始
 
 ### OS 服务入口
 
-本仓库的 Python 发行包是 `allox-os`，只包含 Guest 侧 workspace/runtime 服务；
-不包含 Allox CLI、OpenSandbox client、execd client 或 AIO client。
+本仓库的 Python 发行包是 `allox-os`，内容限定为 Guest 侧 workspace/runtime 服务。
 
-当前 Guest 内的可执行控制入口是 `allox-workspace-daemon`。Allox OS 通过
-`/v1/rpc` 提供 Agent/Session、checkpoint、rollback 和进程追踪接口；面向用户的
-命令行封装由独立的 `allox-cli` 仓库提供。
+当前 Guest 内的控制入口是 `allox-workspace-daemon`，通过 `/v1/rpc` 提供
+Agent/Session、checkpoint、rollback 和进程追踪接口。
 
 ```bash
 allox-workspace-daemon \
@@ -185,7 +181,7 @@ Agent、Session 和 Kata VM 不受影响。Kata VM 级恢复会由 VM 生命周�
 allox-os/
 ├── kernel/                  # Allox Guest Kernel 的配置与补丁
 ├── plugins/                 # 独立安装的进程树、文件共享、网络插件
-├── src/allox/               # Guest daemon、workspace/runtime Core 与插件 ABI
+├── src/allox/               # Guest daemon、workspace/runtime Core 与 Plugin API v1
 ├── deploy/                  # 当前 Kata runtime 的宿主机部署配置
 ├── docs/
 │   ├── architecture/        # 当前架构与状态语义
