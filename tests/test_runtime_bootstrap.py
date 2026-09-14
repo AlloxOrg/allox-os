@@ -7,8 +7,9 @@ import subprocess
 from pathlib import Path
 
 import pytest
+from allox_process_tree.bootstrap import prepare_process_tracking_kernel
 
-from allox.runtime.bootstrap import prepare_process_tracking_kernel
+from allox.runtime.bootstrap import prepare_session_runtime
 from allox.workspace.store import WorkspaceError
 
 
@@ -50,6 +51,18 @@ def test_bootstrap_accepts_ready_guest_kernel(tmp_path):
     assert result["cgroup_root"] == str(cgroup_root)
     assert not result["cgroup_remounted_rw"]
     assert calls == []
+
+
+def test_core_bootstrap_prepares_cgroup_without_tracefs_plugin(tmp_path):
+    _, cgroup_root, _, mountinfo = _kernel_tree(tmp_path)
+    result = prepare_session_runtime(
+        cgroup_root=cgroup_root,
+        mountinfo=mountinfo,
+        runner=lambda argv, **kwargs: None,
+        platform="linux",
+    )
+    assert result["cgroup_root"] == str(cgroup_root)
+    assert "tracefs_root" not in result
 
 
 def test_bootstrap_remounts_read_only_cgroup2(tmp_path):

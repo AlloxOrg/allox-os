@@ -6,6 +6,7 @@ import time
 from pathlib import Path
 
 import pytest
+from allox_session_share.tool import call
 from test_sharing import DirectoryBackend
 
 from allox.workspace.daemon import WorkspaceService
@@ -27,7 +28,10 @@ def service(tmp_path):
     instance = WorkspaceService(
         store, process_tracking="ebpf", process_audit_root=tmp_path / "audit",
         process_cgroup_root=Path("/sys/fs/cgroup/allox-share-tests") / tmp_path.name,
-        process_tracker_command=os.environ.get("ALLOX_EBPF_COMMAND", "/src/native/process-tracker/allox-process-tracker"),
+        process_tracker_command=os.environ.get(
+            "ALLOX_EBPF_COMMAND",
+            "/src/plugins/process-tree/native/allox-process-tracker",
+        ),
         share_tools=True, share_socket_root=Path("/dev/shm/allox-share-tests"),
     )
     yield instance
@@ -80,9 +84,12 @@ def test_shared_write_then_target_rollback_with_real_agent_tool(service):
     assert (service.store.current("a", "s") / "restored").read_text() == "before"
     assert (service.store.current("a", "s") / "received").read_text() == "after"
     # The host-side process knows the socket path, but is not in A's cgroup.
-    from allox.runtime.share_tool import call
-
+    contribution = service.features.prepare_execution("a", "s")
+    endpoint = next(
+        mount.source for mount in contribution.mounts
+        if mount.target == "/run/allox/share.sock"
+    )
     with pytest.raises(ValueError, match="does not belong"):
-        call("enable", {}, service.share_endpoints.endpoint("a", "s"))
+        call("enable", {}, endpoint)
     records = [json.loads(line) for line in service.store._event_path("b", "s").read_text().splitlines()]
     assert any(r["op"] == "share.write" and r["caller_agent_id"] == "a" for r in records)

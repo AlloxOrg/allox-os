@@ -12,7 +12,8 @@ import time
 import unittest
 from pathlib import Path
 
-from allox.runtime.process_tracking.backends import EbpfBackend
+from allox_process_tree.backend import EbpfBackend
+
 from allox.runtime.process_tracking.service import ProcessTrackingService
 from allox.workspace.daemon import WorkspaceService
 from allox.workspace.store import WorkspaceError, WorkspaceStore

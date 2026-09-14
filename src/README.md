@@ -1,28 +1,23 @@
 # Source layout
 
-`src/` 是 Python 构建系统使用的源码根目录，`allox/` 是对外发布的 Python 包，
-对应统一的 `allox.*` 导入命名空间。
+`src/` 是 `allox-os` 的 Python 源码根目录。Allox CLI 位于独立仓库，不在本目录
+构建，也不是该发行包的依赖。
 
 ```text
 src/
 ├── README.md
 └── allox/
-    ├── cli/             # CLI 入口、命令和输出
-    ├── vm/              # OpenSandbox 与 Kata VM 生命周期
     ├── workspace/       # Agent/Session workspace 与回退
-    ├── runtime/         # VM 内 Runtime 服务适配
-    ├── integrations/    # Agent 框架集成
-    ├── config.py        # 配置解析
+    ├── runtime/         # Guest 执行边界、cgroup 与插件 ABI
     ├── __init__.py      # allox 包入口
-    └── __main__.py      # python -m allox 入口
+    └── __main__.py      # workspace daemon 入口
 ```
 
 `pyproject.toml` 将 `src/allox` 构建为 `allox` 包，并注册以下命令：
 
 ```text
-allox                    -> allox.cli.main:cli
 allox-workspace-daemon   -> allox.workspace.daemon:main
+allox-guest-bootstrap    -> allox.runtime.bootstrap:main
 ```
 
-这层结构让 CLI、VM、workspace、runtime 和 integrations 共享同一个产品命名空间，
-同时让 `src/` 保持为构建与测试工具统一识别的源码根目录。
+进程树、Session 文件共享和 Session 网络隔离分别由 `plugins/` 下的独立发行包提供。

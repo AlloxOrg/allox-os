@@ -127,7 +127,7 @@ def test_service_forwards_checkpoint_metadata_and_ancestor_rollback():
         None,
         num_ancestors=2,
         scrub_runtime=True,
-        origin="allox-cli",
+        origin="allox-control-plane",
     )
 
 

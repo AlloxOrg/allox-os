@@ -9,13 +9,13 @@ import threading
 from pathlib import Path
 
 import pytest
-
-from allox.runtime.networking import (
+from allox_session_network.networking import (
     SessionNetworkBroker,
     SessionNetworkManager,
     _proxy_client,
     validate_network_mode,
 )
+
 from allox.workspace.store import WorkspaceError
 
 

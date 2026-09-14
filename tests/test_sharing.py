@@ -7,9 +7,12 @@ import shutil
 from pathlib import Path
 
 import pytest
+from allox_session_share.endpoint import SessionShareEndpoints
+from allox_session_share.plugin import SessionShareFeature
+from allox_session_share.sharing import MAX_BYTES, ShareService
+from allox_session_share.tool import call
 
 from allox.workspace.daemon import WorkspaceService
-from allox.workspace.sharing import MAX_BYTES
 from allox.workspace.store import WorkspaceError, WorkspaceStore
 
 pytestmark = pytest.mark.skipif(os.name != "posix", reason="Linux filesystem sharing")
@@ -36,9 +39,28 @@ def service(tmp_path):
     for agent in ("a", "b", "c"):
         store.create_session(agent, "s")
         (store.current(agent, "s") / "output").mkdir()
-    result = WorkspaceService(store)
+    result = sharing_service(store, tmp_path / "audit")
     yield result
     result.close()
+
+
+class FakeExecutionService:
+    def __init__(self):
+        self.cgroups = object()
+        self.features = None
+
+    def close(self):
+        pass
+
+
+def sharing_service(store, audit_root):
+    return WorkspaceService(
+        store,
+        share_tools=True,
+        process_audit_root=audit_root,
+        process_service_factory=lambda *args, **kwargs: FakeExecutionService(),
+        feature_factories={"session-share": SessionShareFeature},
+    )
 
 
 def share(service, action, caller="a", target="b", **params):
@@ -156,16 +178,13 @@ def test_rollback_reopens_current_and_preserves_share_policy(service):
     assert base64.b64decode(share(service, "read", path="result")["data_base64"]) == b"before"
     share(service, "disable", caller="b")
     service.dispatch("session.rollback", {"agent_id": "b", "session_id": "s", "checkpoint_id": "cp"})
-    restarted = WorkspaceService(service.store)
+    restarted = sharing_service(service.store, service.store.root.parent / "audit-restarted")
     assert not share(restarted, "status", caller="b")["enabled"]
     with pytest.raises(WorkspaceError, match="both Sessions"):
         share(restarted, "read", path="result")
 
 
 def test_endpoint_rejects_wrong_cgroup_and_spoofed_identity(service, tmp_path):
-    from allox.runtime.share_endpoint import SessionShareEndpoints
-    from allox.runtime.share_tool import call
-
     class Cgroups:
         allowed = False
 
@@ -177,7 +196,8 @@ def test_endpoint_rejects_wrong_cgroup_and_spoofed_identity(service, tmp_path):
     import tempfile
 
     with tempfile.TemporaryDirectory(prefix="share-test-") as root:
-        endpoints = SessionShareEndpoints(service.shares, cgroups, Path(root))
+        shares = ShareService(service.store, service.executions)
+        endpoints = SessionShareEndpoints(shares, cgroups, Path(root))
         try:
             endpoint = endpoints.endpoint("a", "s")
             with pytest.raises(ValueError, match="does not belong"):

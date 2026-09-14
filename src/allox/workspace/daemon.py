@@ -14,6 +14,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from typing import Any
 
+from allox.runtime.extensions import FeatureManager, WorkspaceFeatureContext
 from allox.workspace.store import WorkspaceError, WorkspaceStore, validate_id
 
 
@@ -149,15 +150,11 @@ class WorkspaceService:
         network_root: Path = Path("/run/allox-network"),
         network_socket_root: Path = Path("/dev/shm/allox-network"),
         process_service_factory=None,
-        network_manager_factory=None,
+        feature_factories=None,
     ):
         self.store = store
         self.executions = ExecutionRegistry()
-        from allox.workspace.sharing import ShareService
-
-        self.shares = ShareService(store, self.executions)
-        self.share_endpoints = None
-        self.network = None
+        self.features = None
         self.processes = None
         self.process_tracking = process_tracking.strip().lower()
         session_network = session_network.strip().lower()
@@ -165,18 +162,33 @@ class WorkspaceService:
             raise WorkspaceError(
                 "session_network must be disabled, inherit, isolated, or proxy"
             )
-        if session_network != "disabled" and self.process_tracking == "disabled":
-            raise WorkspaceError("Session network isolation requires tracked execution")
-        if share_tools and self.process_tracking == "disabled":
-            raise WorkspaceError("share tools require tracked Session execution")
         if not isinstance(kill_session_processes_on_rollback, bool):
             raise WorkspaceError("kill_session_processes_on_rollback must be a boolean")
         self.kill_session_processes_on_rollback = kill_session_processes_on_rollback
-        if self.kill_session_processes_on_rollback and self.process_tracking == "disabled":
-            raise WorkspaceError("rollback process termination requires process tracking")
-        if self.process_tracking != "disabled":
+        feature_specs = []
+        if share_tools:
+            feature_specs.append(("session-share", {"socket_root": share_socket_root}))
+        if session_network != "disabled":
+            feature_specs.append(
+                (
+                    "session-network",
+                    {
+                        "root": network_root,
+                        "socket_root": network_socket_root,
+                        "default_mode": session_network,
+                    },
+                )
+            )
+        execution_required = bool(
+            self.process_tracking != "disabled"
+            or feature_specs
+            or self.kill_session_processes_on_rollback
+        )
+        if execution_required:
             if process_audit_root is None:
-                raise WorkspaceError("process audit root is required when tracking is enabled")
+                raise WorkspaceError(
+                    "process audit root is required when Session execution features are enabled"
+                )
             if process_service_factory is None:
                 from allox.runtime.process_tracking import ProcessTrackingService
 
@@ -189,44 +201,32 @@ class WorkspaceService:
                 provider_command=process_tracker_command,
                 cgroup_root=process_cgroup_root,
             )
-        if session_network != "disabled":
-            resolved_network_root = network_root.resolve()
-            resolved_socket_root = network_socket_root.resolve()
-            if (
-                resolved_network_root == store.root
-                or store.root in resolved_network_root.parents
-                or resolved_socket_root == store.root
-                or store.root in resolved_socket_root.parents
-            ):
-                raise WorkspaceError(
-                    "Session network state and sockets must be outside the workspace store"
+        if feature_specs:
+            try:
+                self.features = FeatureManager(
+                    WorkspaceFeatureContext(
+                        store=self.store,
+                        executions=self.executions,
+                        cgroups=self.processes.cgroups,
+                    ),
+                    tuple(feature_specs),
+                    factories=feature_factories,
                 )
-            if network_manager_factory is None:
-                from allox.runtime.networking import SessionNetworkManager
+                self.processes.features = self.features
+            except BaseException:
+                self.processes.close()
+                self.processes = None
+                raise
 
-                network_manager_factory = SessionNetworkManager
-
-            self.network = network_manager_factory(
-                network_root,
-                socket_root=network_socket_root,
-                default_mode=session_network,
-            )
-            self.processes.network = self.network
-        if share_tools:
-            from allox.runtime.share_endpoint import SessionShareEndpoints
-
-            self.share_endpoints = SessionShareEndpoints(
-                self.shares, self.processes.cgroups, share_socket_root
-            )
-            self.processes.share_endpoints = self.share_endpoints
+    @property
+    def feature_names(self) -> tuple[str, ...]:
+        return self.features.names if self.features is not None else ()
 
     def close(self) -> None:
         if self.processes is not None:
             self.processes.close()
-        if self.share_endpoints is not None:
-            self.share_endpoints.close()
-        if self.network is not None:
-            self.network.close()
+        if self.features is not None:
+            self.features.close()
 
     @staticmethod
     def _required(params: dict[str, Any], key: str) -> str:
@@ -245,28 +245,10 @@ class WorkspaceService:
     def dispatch(self, action: str, params: dict[str, Any]) -> Any:
         agent_id = params.get("agent_id")
         session_id = params.get("session_id")
-        origin = str(params.get("origin", "allox-cli"))
+        origin = str(params.get("origin", "allox-control-plane"))
 
-        if action.startswith("network."):
-            if self.network is None:
-                raise WorkspaceError("Session network management is not enabled")
-            agent_id = self._required(params, "agent_id")
-            session_id = self._required(params, "session_id")
-            self.store.describe(agent_id, session_id)
-            if action == "network.status":
-                return self.network.status(agent_id, session_id)
-            if action == "network.configure":
-                mode = self._required(params, "mode")
-                with self.executions.mutation(agent_id, session_id):
-                    return self.network.configure(agent_id, session_id, mode)
-            raise WorkspaceError(f"unknown action: {action}")
-
-        if action.startswith("share."):
-            # Management RPC is trusted; Agent sockets derive identity from cgroups.
-            return self.shares.dispatch(
-                (self._required(params, "agent_id"), self._required(params, "session_id")),
-                action.removeprefix("share."), params,
-            )
+        if self.features is not None and self.features.handles(action):
+            return self.features.dispatch(action, params)
 
         if action.startswith("process."):
             if action == "process.status":
@@ -438,7 +420,7 @@ class WorkspaceHTTPServer(ThreadingHTTPServer):
     daemon_threads = True
 
     def __init__(self, address, service: WorkspaceService, token: str):
-        if service.share_endpoints is not None and not token:
+        if "session-share" in service.feature_names and not token:
             raise WorkspaceError("share tools require an authenticated management endpoint")
         super().__init__(address, WorkspaceRequestHandler)
         self.service = service

@@ -7,13 +7,9 @@
 - [架构总览](architecture/overview.md)
 - [Agent/Session workspace](architecture/workspaces.md)
 
-## Guides
-
-- [Runtime 镜像](guides/runtime-image.md)
-- [MCP 服务](guides/mcp.md)
-- [Code Interpreter](guides/code-interpreter.md)
-
 ## Development
 
-- [CLI 框架选择](development/cli-framework.md)
-
+- [可选插件架构](development/plugin-architecture.md)
+- [进程追踪](development/process-tracking.md)
+- [Session 文件共享](development/session-sharing.md)
+- [Session 网络隔离](development/session-networking.md)

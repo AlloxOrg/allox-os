@@ -1,0 +1,20 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "allox-session-network"
+version = "0.1.0"
+description = "Optional Session network namespaces and forwarding for Allox OS"
+requires-python = ">=3.10"
+license = { text = "Apache-2.0" }
+dependencies = ["allox-os>=0.1.0"]
+
+[project.scripts]
+allox-network = "allox_session_network.tool:main"
+
+[project.entry-points."allox.workspace_features"]
+session-network = "allox_session_network.plugin:SessionNetworkFeature"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/allox_session_network"]

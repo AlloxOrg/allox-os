@@ -19,7 +19,7 @@ class SessionCgroup:
             raise WorkspaceError("use a dedicated cgroup subtree, not the cgroup mount root")
         self.root.mkdir(parents=True, exist_ok=True)
         if not (self.root / "cgroup.kill").exists():
-            raise WorkspaceError("process tracking requires cgroup v2 cgroup.kill (Linux 5.14+)")
+            raise WorkspaceError("Session execution requires cgroup v2 cgroup.kill (Linux 5.14+)")
 
     @staticmethod
     def _find_mount(path: Path) -> Path | None:

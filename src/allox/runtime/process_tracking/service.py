@@ -38,8 +38,7 @@ class ProcessTrackingService:
         boot_id: str | None = None,
     ) -> None:
         self.store = store
-        self.share_endpoints = None
-        self.network = None
+        self.features = None
         self.executions = executions
         self.audit_root = audit_root.resolve()
         if self.audit_root == store.root or store.root in self.audit_root.parents:
@@ -79,7 +78,8 @@ class ProcessTrackingService:
         result = self.backend.status()
         result.update(
             {
-                "enabled": True,
+                "enabled": self.backend.name != "disabled",
+                "execution_enabled": True,
                 "cgroup_root": str(self.cgroups.root),
                 "audit_root": str(self.audit_root),
                 "isolation": "bubblewrap",
@@ -191,15 +191,15 @@ class ProcessTrackingService:
                 directory.mkdir(mode=0o700)
                 current = self.store.current(agent_id, session_id)
                 shared = self.store.agent_shared(agent_id)
-                network = (
-                    self.network.prepare(agent_id, session_id)
-                    if self.network is not None
+                contribution = (
+                    self.features.prepare_execution(agent_id, session_id)
+                    if self.features is not None
                     else None
                 )
                 execution_environment = dict(env or {})
-                if network is not None:
-                    # Trusted routing variables win over caller-supplied values.
-                    execution_environment.update(dict(network.environment))
+                if contribution is not None:
+                    # Trusted feature variables win over caller-supplied values.
+                    execution_environment.update(dict(contribution.environment))
                 execution_argv = build_bwrap_argv(
                     str(current),
                     str(shared),
@@ -207,14 +207,10 @@ class ProcessTrackingService:
                     session_id,
                     tuple(argv),
                     tuple(execution_environment.items()),
-                    share_socket=(self.share_endpoints.endpoint(agent_id, session_id)
-                                  if self.share_endpoints else None),
-                    network_socket=(
-                        network.broker_socket if network is not None else None
-                    ),
+                    mounts=contribution.mounts if contribution is not None else (),
                 )
-                if network is not None:
-                    execution_argv = [*network.argv_prefix, *execution_argv]
+                if contribution is not None:
+                    execution_argv = [*contribution.argv_prefix, *execution_argv]
                 child_env = {
                     "PATH": "/usr/local/bin:/usr/bin:/bin",
                     "HOME": str(current),
@@ -247,11 +243,8 @@ class ProcessTrackingService:
                     "trace_complete": False,
                     "cookie": cookie,
                 }
-                if network is not None:
-                    row.update(
-                        network_mode=network.mode,
-                        network_namespace_pid=network.namespace_pid,
-                    )
+                if contribution is not None:
+                    row.update(contribution.metadata)
                 self._runs[run_id] = {
                     "row": row,
                     "process": None,
@@ -345,7 +338,7 @@ class ProcessTrackingService:
             if os.WIFSTOPPED(status):
                 return
             process.returncode = os.waitstatus_to_exitcode(status)
-            raise WorkspaceError("exec gate exited before eBPF attribution was installed")
+            raise WorkspaceError("exec gate exited before Session attribution was installed")
         raise WorkspaceError("exec gate did not stop before attribution timeout")
 
     def _watch(self, run_id: str) -> None:
@@ -369,10 +362,12 @@ class ProcessTrackingService:
             timer = run["timer"]
             if timer:
                 timer.cancel()
-            row["trace_complete"] = clean and self._backend_error is None and "error" not in row
+            successful = clean and self._backend_error is None and "error" not in row
+            row["trace_complete"] = successful and self.backend.name != "disabled"
+            row["lifecycle_complete"] = successful
             row["state"] = (
                 ("stopped" if run["stop_reason"] else "completed")
-                if row["trace_complete"]
+                if successful
                 else "failed"
             )
             row["session_fenced"] = not clean

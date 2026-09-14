@@ -7,18 +7,21 @@ Session 访问自己的共享范围**。ID 用于寻址，不是密码。默认�
 
 ## 启动与使用
 
-在满足 [进程追踪前置条件](process-tracking.md) 的 Guest 内，启动服务：
+先安装独立插件，并准备 Core 的 Session cgroup：
 
 ```sh
+pip install allox-session-share
 # 仅保存在可信 Guest 服务环境，不交给 Agent，也不需要在 Session 之间交换。
 export ALLOX_WORKSPACE_TOKEN="$(python3 -c 'import secrets; print(secrets.token_urlsafe(32))')"
 allox-guest-bootstrap
 allox-workspace-daemon \
   --root /var/lib/allox/workspaces \
-  --process-tracking ebpf \
   --process-audit-root /var/lib/allox-process-audit \
   --share-tools
 ```
+
+文件共享不要求安装 eBPF 进程树插件；Core cgroup 提供可信 Session 身份和整树终止边界。
+插件已安装但没有 `--share-tools` 时，不会注册 RPC、创建 socket 或修改 Bubblewrap。
 
 `--share-tools` 给随后通过 `process.start` 启动的每个 Bubblewrap 挂入
 `/run/allox/share.py` 和该 Session 专属的 `/run/allox/share.sock`。
@@ -83,7 +86,7 @@ stdlib Python 脚本方式，不依赖 Agent 的 Python 环境安装 Allox。
 - Share 实例在可信 daemon 内按 Session 划分，不为每个 Session 启动独立 daemon。
   Unix socket 使用 `SO_PEERCRED` 获取进程 PID，并核验它属于端点对应的 Session
   cgroup；工具不能通过填写来源 ID 冒充其他 Session。原始管理 RPC 仍属于可信控制面，
-  管理端 token 不应交给 Agent。此版 Agent 工具依赖现有 tracked/cgroup 路径。
+  管理端 token 不应交给 Agent。此版 Agent 工具依赖 Core 的 Session cgroup 路径。
 - 仅代理当前 Session workspace 的普通文件。使用目录 FD 和 `O_NOFOLLOW` 逐段打开，
   拒绝绝对路径、`..`、符号链接、硬链接文件、特殊文件和跨文件系统路径。
 - share 策略在 `.allox/shares/`，访问来源、目标、路径与结果在目标 Session 的

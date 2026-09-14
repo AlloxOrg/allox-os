@@ -37,13 +37,16 @@ def test_connector_forwards_opaque_bytes_in_both_directions():
         thread = threading.Thread(target=serve)
         thread.start()
         environment = dict(os.environ)
-        source = str(Path(__file__).parents[1] / "src")
-        environment["PYTHONPATH"] = source + os.pathsep + environment.get("PYTHONPATH", "")
+        source = str(Path(__file__).parents[1] / "plugins" / "session-network" / "src")
+        core = str(Path(__file__).parents[1] / "src")
+        environment["PYTHONPATH"] = (
+            source + os.pathsep + core + os.pathsep + environment.get("PYTHONPATH", "")
+        )
         result = subprocess.run(
             [
                 sys.executable,
                 "-m",
-                "allox.runtime.network_tool",
+                "allox_session_network.tool",
                 "connect",
                 "example.internal",
                 "2222",

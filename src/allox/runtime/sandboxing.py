@@ -2,8 +2,9 @@
 
 from __future__ import annotations
 
-from pathlib import Path
+from pathlib import PurePosixPath
 
+from allox.runtime.extensions import SandboxMount
 from allox.workspace.store import WorkspaceError, validate_id
 
 _TMP_SYNC_WRAPPER = """\
@@ -29,8 +30,7 @@ def build_bwrap_argv(
     command: tuple[str, ...],
     environment: tuple[tuple[str, str], ...] = (),
     *,
-    share_socket: str | None = None,
-    network_socket: str | None = None,
+    mounts: tuple[SandboxMount, ...] = (),
 ) -> list[str]:
     """Expose only one Agent shared area and one child Session workspace."""
     validate_id("agent", agent_id)
@@ -103,19 +103,16 @@ def build_bwrap_argv(
     ]
     for key, value in environment:
         argv.extend(["--setenv", key, value])
-    if share_socket is not None or network_socket is not None:
-        argv.extend(["--dir", "/run/allox"])
-    if share_socket is not None:
+    created_directories: set[str] = set()
+    for mount in mounts:
+        parent = str(PurePosixPath(mount.target).parent)
+        if parent != "/" and parent not in created_directories:
+            argv.extend(["--dir", parent])
+            created_directories.add(parent)
         argv.extend([
-            "--ro-bind", share_socket, "/run/allox/share.sock",
-            "--ro-bind", str(Path(__file__).with_name("share_tool.py")), "/run/allox/share.py",
-        ])
-    if network_socket is not None:
-        argv.extend([
-            "--ro-bind", network_socket, "/run/allox/network.sock",
-            "--ro-bind", str(Path(__file__).with_name("network_tool.py")),
-            "/run/allox/network.py",
-            "--setenv", "ALLOX_NETWORK_SOCKET", "/run/allox/network.sock",
+            "--ro-bind" if mount.read_only else "--bind",
+            mount.source,
+            mount.target,
         ])
     argv.extend(
         ["--chdir", "/workspace", "sh", "-c", _TMP_SYNC_WRAPPER, "allox-runtime", *command]

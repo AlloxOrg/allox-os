@@ -36,7 +36,7 @@ def service(tmp_path):
         process_audit_root=tmp_path / "audit",
         process_cgroup_root=Path("/sys/fs/cgroup/allox-network-tests") / tmp_path.name,
         process_tracker_command=os.environ.get(
-            "ALLOX_EBPF_COMMAND", "/src/native/process-tracker/allox-process-tracker"
+            "ALLOX_EBPF_COMMAND", "/src/plugins/process-tree/native/allox-process-tracker"
         ),
         session_network="isolated",
         network_root=tmp_path / "network",
@@ -164,7 +164,9 @@ def test_proxy_mode_allows_brokered_http_but_not_direct_connection(service):
     assert 100 <= proof["proxy_status"] <= 599
     assert proof["http_proxy"] == "http://127.0.0.1:3128"
     assert result["network_mode"] == "proxy"
-    network = service.network.status("agent", "proxy")
+    network = service.dispatch(
+        "network.status", {"agent_id": "agent", "session_id": "proxy"}
+    )
     assert network["active"]
 
 

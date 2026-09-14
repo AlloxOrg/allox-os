@@ -1,7 +1,7 @@
 # Agent / Session 进程追踪
 
-进程追踪是可插拔能力，默认关闭。`alloxd` 只依赖
-`ProcessTrackingBackend` 协议；内置 `ebpf` adapter 通过版本化 NDJSON
+进程追踪是独立安装的可插拔能力，默认关闭。Core 只依赖
+`ProcessTrackingBackend` 协议；`allox-process-tree` 包中的 `ebpf` adapter 通过版本化 NDJSON
 协议连接独立的 `allox-process-tracker` 二进制。因此更新 eBPF 程序不要求修改
 workspace/checkpoint 代码，第三方 provider 也可以通过
 `allox.process_trackers` Python entry-point 安装。
@@ -12,7 +12,7 @@ workspace/checkpoint 代码，第三方 provider 也可以通过
 alloxd
   ├─ ProcessTrackingService    归属、run 状态、审计持久化
   ├─ ProcessTrackingBackend    可替换 provider 接口
-  │    └─ EbpfBackend          collector 控制协议 adapter
+  │    └─ allox-process-tree   collector 控制协议 adapter（独立 wheel）
   ├─ SessionCgroup             权威成员集合、cgroup.kill
   └─ exec gate                 seed 完成前禁止目标代码运行
 
@@ -50,7 +50,7 @@ allox-process-tracker
 collector 统计丢事件/映射失败，发生损失时使后端失败；结束时先确认整个 cgroup
 （含嵌套 cgroup）为空，再核对该 run 的内核产出数与已读事件数，最后完成审计。
 
-当前 eBPF 程序位于 `native/process-tracker/`，只使用 sched tracepoint，不依赖
+当前 eBPF 程序位于 `plugins/process-tree/native/`，只使用 sched tracepoint，不依赖
 CO-RE 或 Guest BTF。tracepoint 的字段布局不是跨任意内核版本的稳定 ABI，因此发布
 Guest Kernel 时必须重新构建并运行真实内核测试。collector 的控制协议 ABI 当前为 1；
 adapter 会在启动时核对 ABI，版本不匹配时拒绝启动任务并保持 fail-closed。
@@ -68,7 +68,8 @@ allox-workspace-daemon \
 Allox Guest 的 init/service manager 先准备内核控制面，再启动 daemon：
 
 ```sh
-allox-guest-bootstrap \
+pip install allox-process-tree
+allox-process-tree-bootstrap \
   --cgroup-root /sys/fs/cgroup/allox \
   --tracefs-root /sys/kernel/tracing
 
@@ -81,7 +82,7 @@ allox-workspace-daemon \
   --kill-session-processes-on-rollback
 ```
 
-`allox-guest-bootstrap` 属于 Allox OS Guest，不通过 OpenSandbox 或 Allox CLI
+`allox-process-tree-bootstrap` 属于可选进程树插件，不通过 OpenSandbox 或 Allox CLI
 注入。它只应由可信启动环境调用：必要时将 cgroup v2 remount 为可写、建立 Allox
 专属子树、挂载 tracefs，并检查三个 sched tracepoint。任一步失败都会阻止追踪服务启动。
 
@@ -101,8 +102,8 @@ namespace；Session 归属使用 cgroup ID，审计事件中的 PID 仍是 Guest
 使用 `--cap-drop ALL` 启动 Agent，并且不向 Agent 挂载 cgroupfs、tracefs、审计目录或
 其他 Session workspace。不能把 daemon token 或 OpenSandbox 管理接口交给 Agent。
 
-`--kill-session-processes-on-rollback` 是独立的可选开关，默认关闭，并且只能在进程
-追踪启用时使用。开启后，`session.rollback` 会先持有 Session 启动栅栏，通过
+`--kill-session-processes-on-rollback` 是 Core cgroup 提供的独立可选开关，默认关闭，
+不要求安装 eBPF 插件。开启后，`session.rollback` 会先持有 Session 启动栅栏，通过
 `cgroup.kill` 终止该 Session 的根进程、普通子进程以及 double-fork/setsid 后代；确认
 cgroup 为空、执行租约释放后才恢复 workspace。单次 RPC 可用布尔参数
 `kill_processes` 覆盖 daemon 默认值。杀进程、确认退出或获取 mutation lease 任一步

@@ -1,0 +1,20 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "allox-session-share"
+version = "0.1.0"
+description = "Optional cross-Session file sharing for Allox OS"
+requires-python = ">=3.10"
+license = { text = "Apache-2.0" }
+dependencies = ["allox-os>=0.1.0"]
+
+[project.scripts]
+allox-share = "allox_session_share.tool:main"
+
+[project.entry-points."allox.workspace_features"]
+session-share = "allox_session_share.plugin:SessionShareFeature"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/allox_session_share"]

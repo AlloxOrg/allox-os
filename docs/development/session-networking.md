@@ -39,14 +39,18 @@ network namespace 的创建和 loopback 配置要求可信 Guest daemon 具备
 `CAP_SYS_ADMIN` 与 `CAP_NET_ADMIN`。Agent 进入 Bubblewrap 前仍会丢弃全部 capability。
 
 ```bash
+pip install allox-session-network
+allox-guest-bootstrap
 allox-workspace-daemon \
   --root /var/lib/allox/workspaces \
-  --process-tracking ebpf \
   --process-audit-root /var/lib/allox/audit/processes \
   --session-network isolated \
   --network-root /run/allox-network \
   --network-socket-root /dev/shm/allox-network
 ```
+
+网络插件不要求安装 eBPF 进程树插件。已安装但未传入 `--session-network`（默认
+`disabled`）时，插件不会被导入，也不会创建 namespace、Broker 或 socket。
 
 `--network-root` 保存策略、Session 身份、日志与审计；必须位于 workspace store 外。
 `--network-socket-root` 只保存运行期 Unix socket，应使用短路径和支持 socket 的 Guest

@@ -46,7 +46,8 @@ def service(tmp_path):
         process_audit_root=tmp_path / "audit",
         process_cgroup_root=Path("/sys/fs/cgroup/allox-kernel-tests") / tmp_path.name,
         process_tracker_command=os.environ.get(
-            "ALLOX_EBPF_COMMAND", "/src/native/process-tracker/allox-process-tracker"
+            "ALLOX_EBPF_COMMAND",
+            "/src/plugins/process-tree/native/allox-process-tracker",
         ),
     )
     yield instance

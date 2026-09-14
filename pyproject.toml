@@ -3,40 +3,35 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "allox-cli"
+name = "allox-os"
 version = "0.1.0"
-description = "Allox 2.0 — one Kata VM with isolated Agent/Session workspaces"
+description = "Allox OS guest services for isolated Agent/Session workspaces"
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "Apache-2.0" }
 authors = [{ name = "Allox" }]
-keywords = ["agent", "kata", "sandbox", "workspace", "checkpoint", "opensandbox"]
-dependencies = [
-    "opensandbox>=0.1.9,<0.2.0",
-    "agent-sandbox>=0.0.18",
-    "click>=8.1.0,<9.0",
-    "rich>=13.0.0,<14.0",
-    "httpx>=0.27.0",
-    "tomli>=2.0.0; python_version < '3.11'",
-    "pyyaml>=6.0.0",
-]
+keywords = ["agent", "kata", "sandbox", "workspace", "checkpoint"]
+dependencies = []
 
 [project.scripts]
-allox = "allox.cli.main:cli"
 allox-workspace-daemon = "allox.workspace.daemon:main"
 allox-guest-bootstrap = "allox.runtime.bootstrap:main"
-allox-share = "allox.runtime.share_tool:main"
-allox-network = "allox.runtime.network_tool:main"
-
-[project.entry-points."allox.integrations"]
-langchain-turn-checkpoint = "allox.integrations.langchain:LangChainTurnCheckpointPlugin"
 
 [project.urls]
 Repository = "https://github.com/AlloxOrg/allox-os"
 
-# 项目名 allox-cli，包目录 src/allox → 需显式声明（否则 hatch 找不到包）
+# Allox OS 与 allox-cli 是独立发行包。历史控制面代码不进入 OS wheel。
 [tool.hatch.build.targets.wheel]
 packages = ["src/allox"]
+exclude = [
+    "src/allox/cli/**",
+    "src/allox/vm/**",
+    "src/allox/config.py",
+    "src/allox/integrations/**",
+    "src/allox/runtime/health.py",
+    "src/allox/runtime/mcp.py",
+    "src/allox/workspace/client.py",
+]
 
 # editable 安装时从 src/ 加载，避免改代码后 .venv 仍跑旧 wheel
 [tool.hatch.build.targets.editable]
@@ -44,10 +39,6 @@ dev-mode-dirs = ["src"]
 
 [tool.uv]
 package = true
-
-# 使用本地 OpenSandbox SDK，避免 PyPI wheel 在部分环境下 adapter/converter 缺 .py 文件
-[tool.uv.sources]
-opensandbox = { path = "OpenSandbox/sdks/sandbox/python", editable = false }
 
 [dependency-groups]
 dev = [
@@ -61,7 +52,9 @@ line-length = 100
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-pythonpath = ["src"]
-markers = [
-    "integration: requires OpenSandbox server, Docker, and AIO image",
+pythonpath = [
+    "src",
+    "plugins/process-tree/src",
+    "plugins/session-share/src",
+    "plugins/session-network/src",
 ]
