@@ -212,3 +212,4 @@ uv run ruff check src tests
 ## License
 
 Apache-2.0。
+
