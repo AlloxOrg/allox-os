@@ -1,0 +1,25 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "allox-system-effects"
+version = "0.1.0"
+description = "Optional Linux/eBPF system-effects observer for Allox OS"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "Apache-2.0" }
+dependencies = ["allox-os>=0.1.0"]
+
+[project.entry-points."allox.workspace_features"]
+system-effects = "allox_system_effects.plugin:SystemEffectsFeature"
+
+[project.scripts]
+allox-system-effects-recover = "allox_system_effects.recover:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/allox_system_effects"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["../../src", "src"]

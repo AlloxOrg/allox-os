@@ -24,24 +24,41 @@ class ExecutionRegistry:
     def __init__(self) -> None:
         self._lock = threading.Lock()
         self._leases: dict[str, tuple[str, str]] = {}
+        self._recovery_leases: set[str] = set()
         self._mutating: set[tuple[str, str]] = set()
         self._background: dict[tuple[str, str], dict[str, dict[str, str]]] = {}
         self._resets: dict[str, tuple[str, str]] = {}
         self._share_readers: dict[tuple[str, str], int] = {}
 
-    def acquire(self, agent_id: str, session_id: str) -> dict[str, Any]:
+    def acquire(
+        self, agent_id: str, session_id: str, *, recovery: bool = False
+    ) -> dict[str, Any]:
         key = (validate_id("agent", agent_id), validate_id("session", session_id))
+        if not isinstance(recovery, bool):
+            raise WorkspaceError("execution recovery reservation must be a boolean")
         with self._lock:
             if key in self._mutating:
                 raise WorkspaceError(f"session is being checkpointed or restored: {agent_id}/{session_id}")
             if key in self._leases.values():
                 raise WorkspaceError(f"session already has an active execution: {agent_id}/{session_id}")
+            if recovery and self._share_readers.get(key):
+                raise WorkspaceError("recovery execution cannot start with active share reads")
+            if recovery and self._background.get(key):
+                raise WorkspaceError(
+                    "recovery execution requires no persistent runtime executions"
+                )
             token = uuid.uuid4().hex
             self._leases[token] = key
-        return {"lease_token": token}
+            if recovery:
+                self._recovery_leases.add(token)
+        result = {"lease_token": token}
+        if recovery:
+            result["recovery_reserved"] = True
+        return result
 
     def release(self, token: str) -> dict[str, Any]:
         with self._lock:
+            self._recovery_leases.discard(token)
             released = self._leases.pop(token, None) is not None
         return {"released": released}
 
@@ -54,6 +71,13 @@ class ExecutionRegistry:
         with self._lock:
             if key in self._mutating:
                 raise WorkspaceError(f"session is being restored: {agent_id}/{session_id}")
+            if any(
+                token in self._recovery_leases and lease_key == key
+                for token, lease_key in self._leases.items()
+            ):
+                raise WorkspaceError(
+                    "session has an active recovery execution reservation"
+                )
             records = self._background.setdefault(key, {})
             records[execution_id] = {"sandbox_id": sandbox_id, "execution_id": execution_id}
         return {"registered": True, "execution_id": execution_id}
@@ -124,6 +148,13 @@ class ExecutionRegistry:
         with self._lock:
             if key in self._mutating:
                 raise WorkspaceError("session is being checkpointed or restored")
+            if any(
+                token in self._recovery_leases and lease_key == key
+                for token, lease_key in self._leases.items()
+            ):
+                raise WorkspaceError(
+                    "session has an active recovery execution reservation"
+                )
             self._share_readers[key] = self._share_readers.get(key, 0) + 1
         try:
             yield
@@ -149,6 +180,7 @@ class WorkspaceService:
         session_network: str = "disabled",
         network_root: Path = Path("/run/allox-network"),
         network_socket_root: Path = Path("/dev/shm/allox-network"),
+        system_effects_config: dict[str, Any] | None = None,
         process_service_factory=None,
         feature_factories=None,
     ):
@@ -179,6 +211,15 @@ class WorkspaceService:
                     },
                 )
             )
+        if system_effects_config is not None:
+            if not isinstance(system_effects_config, dict):
+                raise WorkspaceError("system effects configuration must be an object")
+            if self.process_tracking != "disabled":
+                raise WorkspaceError(
+                    "system-effects already records process lifecycle; disable the separate "
+                    "process tracker to avoid duplicate kernel hooks"
+                )
+            feature_specs.append(("system-effects", dict(system_effects_config)))
         execution_required = bool(
             self.process_tracking != "disabled"
             or feature_specs
@@ -262,7 +303,9 @@ class WorkspaceService:
             if action == "process.start":
                 return self.processes.start(
                     agent_id, session_id, params.get("argv"),
-                    env=params.get("env"), timeout=params.get("timeout", 300),
+                    env=params.get("env"),
+                    timeout=params.get("timeout", 300),
+                    recovery=params.get("recovery"),
                 )
             if action == "process.list":
                 return self.processes.list_runs(agent_id, session_id)
@@ -532,7 +575,199 @@ def build_parser() -> argparse.ArgumentParser:
         default=Path("/dev/shm/allox-network"),
         help="Short tmpfs path for trusted per-Session network broker sockets",
     )
+    parser.add_argument(
+        "--system-effects-observer",
+        type=Path,
+        default=None,
+        help="Absolute deployment-observe binary; enables the system-effects plugin",
+    )
+    parser.add_argument(
+        "--system-effects-verifier",
+        type=Path,
+        default=None,
+        help="Absolute deployment-observe-verify binary (defaults beside observer)",
+    )
+    parser.add_argument(
+        "--system-effects-recovery-verifier",
+        type=Path,
+        default=None,
+        help="Absolute deployment-observe-recovery-verify binary",
+    )
+    parser.add_argument(
+        "--system-effects-recovery-helper",
+        type=Path,
+        default=None,
+        help="Content-bound Allox recovery adapter executable",
+    )
+    parser.add_argument("--system-effects-recovery-helper-sha256", default=None)
+    parser.add_argument(
+        "--system-effects-recovery-timeout-ms", type=int, default=None
+    )
+    parser.add_argument(
+        "--system-effects-recovery-max-output-bytes", type=int, default=None
+    )
+    parser.add_argument("--system-effects-recorder-object", type=Path, default=None)
+    parser.add_argument("--system-effects-recorder-sha256", default=None)
+    parser.add_argument("--system-effects-lifecycle-object", type=Path, default=None)
+    parser.add_argument("--system-effects-lifecycle-sha256", default=None)
+    parser.add_argument(
+        "--system-effects-profile",
+        choices=("control", "balanced", "full"),
+        default=None,
+    )
+    parser.add_argument(
+        "--system-effects-object-resolution",
+        choices=(
+            "USER_INPUT",
+            "KERNEL_FILE_OPEN_PARTIAL",
+            "KERNEL_FILE_OPEN_WRITE_PARTIAL",
+            "KERNEL_OBJECT_EXPANDED_PARTIAL",
+        ),
+        default=None,
+    )
+    parser.add_argument("--system-effects-bpf-scope", type=Path, default=None)
+    parser.add_argument("--system-effects-filesystem-scope", type=Path, default=None)
+    parser.add_argument("--system-effects-linux-scope", type=Path, default=None)
+    parser.add_argument("--system-effects-poll-interval-ms", type=int, default=None)
+    parser.add_argument("--system-effects-drain-timeout-ms", type=int, default=None)
+    parser.add_argument("--system-effects-ready-timeout", type=float, default=None)
+    parser.add_argument("--system-effects-finalize-timeout", type=float, default=None)
+    parser.add_argument(
+        "--system-effects-host-lock",
+        type=Path,
+        default=None,
+        help="Shared host lock serializing global S0/S1 snapshots",
+    )
     return parser
+
+
+def _system_effects_config_from_args(args) -> dict[str, Any] | None:
+    required = {
+        "observer_path": args.system_effects_observer,
+        "recorder_object_path": args.system_effects_recorder_object,
+        "recorder_object_sha256": args.system_effects_recorder_sha256,
+        "lifecycle_object_path": args.system_effects_lifecycle_object,
+        "lifecycle_object_sha256": args.system_effects_lifecycle_sha256,
+    }
+    if not any(value is not None for value in required.values()):
+        if any(
+            value is not None
+            for value in (
+                args.system_effects_verifier,
+                args.system_effects_recovery_verifier,
+                args.system_effects_recovery_helper,
+                args.system_effects_recovery_helper_sha256,
+                args.system_effects_recovery_timeout_ms,
+                args.system_effects_recovery_max_output_bytes,
+                args.system_effects_bpf_scope,
+                args.system_effects_filesystem_scope,
+                args.system_effects_linux_scope,
+                args.system_effects_profile,
+                args.system_effects_object_resolution,
+                args.system_effects_poll_interval_ms,
+                args.system_effects_drain_timeout_ms,
+                args.system_effects_ready_timeout,
+                args.system_effects_finalize_timeout,
+                args.system_effects_host_lock,
+            )
+        ):
+            raise WorkspaceError(
+                "system-effects scope/verifier options require the complete observer configuration"
+            )
+        return None
+    missing = [name for name, value in required.items() if value is None]
+    if missing:
+        raise WorkspaceError(
+            "incomplete system-effects configuration; missing " + ", ".join(sorted(missing))
+        )
+    observer = Path(args.system_effects_observer)
+    verifier = args.system_effects_verifier or observer.with_name("deployment-observe-verify")
+    recovery_values = (
+        args.system_effects_recovery_helper,
+        args.system_effects_recovery_helper_sha256,
+    )
+    if any(value is not None for value in recovery_values) and not all(
+        value is not None for value in recovery_values
+    ):
+        raise WorkspaceError(
+            "system-effects recovery helper path and SHA-256 must be configured together"
+        )
+    if (
+        args.system_effects_recovery_verifier is not None
+        and args.system_effects_recovery_helper is None
+    ):
+        raise WorkspaceError(
+            "system-effects recovery verifier requires a recovery helper"
+        )
+    return {
+        **{
+            key: str(value) if isinstance(value, Path) else value
+            for key, value in required.items()
+        },
+        "verifier_path": str(verifier),
+        "recovery_verifier_path": (
+            str(
+                args.system_effects_recovery_verifier
+                or observer.with_name("deployment-observe-recovery-verify")
+            )
+            if args.system_effects_recovery_helper is not None
+            else None
+        ),
+        "recovery_helper_path": (
+            str(args.system_effects_recovery_helper)
+            if args.system_effects_recovery_helper is not None
+            else None
+        ),
+        "recovery_helper_sha256": args.system_effects_recovery_helper_sha256,
+        "recovery_timeout_ms": (
+            args.system_effects_recovery_timeout_ms
+            if args.system_effects_recovery_timeout_ms is not None
+            else 120_000
+        ),
+        "recovery_max_output_bytes": (
+            args.system_effects_recovery_max_output_bytes
+            if args.system_effects_recovery_max_output_bytes is not None
+            else 65_536
+        ),
+        "profile": args.system_effects_profile or "balanced",
+        "object_resolution_mode": (
+            args.system_effects_object_resolution or "KERNEL_OBJECT_EXPANDED_PARTIAL"
+        ),
+        "bpf_state_scope_file": (
+            str(args.system_effects_bpf_scope) if args.system_effects_bpf_scope else None
+        ),
+        "filesystem_state_scope_file": (
+            str(args.system_effects_filesystem_scope)
+            if args.system_effects_filesystem_scope
+            else None
+        ),
+        "linux_state_scope_file": (
+            str(args.system_effects_linux_scope) if args.system_effects_linux_scope else None
+        ),
+        "poll_interval_ms": (
+            args.system_effects_poll_interval_ms
+            if args.system_effects_poll_interval_ms is not None
+            else 20
+        ),
+        "drain_timeout_ms": (
+            args.system_effects_drain_timeout_ms
+            if args.system_effects_drain_timeout_ms is not None
+            else 5000
+        ),
+        "ready_timeout": (
+            args.system_effects_ready_timeout
+            if args.system_effects_ready_timeout is not None
+            else 30.0
+        ),
+        "finalize_timeout": (
+            args.system_effects_finalize_timeout
+            if args.system_effects_finalize_timeout is not None
+            else 60.0
+        ),
+        "host_lock_path": str(
+            args.system_effects_host_lock or Path("/run/allox-system-effects.lock")
+        ),
+    }
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -545,8 +780,16 @@ def main(argv: list[str] | None = None) -> int:
     ):
         raise SystemExit("a bearer token is required when listening beyond loopback")
     token = args.token or os.environ.get("ALLOX_WORKSPACE_TOKEN", "")
+    try:
+        system_effects_config = _system_effects_config_from_args(args)
+    except WorkspaceError as exc:
+        raise SystemExit(str(exc)) from exc
     if args.share_tools and not token:
         raise SystemExit("--share-tools requires ALLOX_WORKSPACE_TOKEN for the management API")
+    if system_effects_config is not None and not token:
+        raise SystemExit(
+            "--system-effects-observer requires ALLOX_WORKSPACE_TOKEN for the management API"
+        )
     store = WorkspaceStore(args.root)
     store.initialize()
     service = WorkspaceService(
@@ -561,6 +804,7 @@ def main(argv: list[str] | None = None) -> int:
         session_network=args.session_network,
         network_root=args.network_root,
         network_socket_root=args.network_socket_root,
+        system_effects_config=system_effects_config,
     )
     server = WorkspaceHTTPServer((host, int(port_raw)), service, token)
     try:
