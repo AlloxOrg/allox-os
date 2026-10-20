@@ -352,14 +352,19 @@ class SessionNetworkManager:
         key = self._key(agent_id, session_id)
         with self._lock:
             runtime = self._runtime.get(key)
-            active = runtime is not None and runtime["process"].poll() is None
+            namespace_pid = None
+            proxy_url = None
+            if runtime is not None and runtime["process"].poll() is None:
+                namespace_pid = runtime["process"].pid
+                if runtime["mode"] == "proxy":
+                    proxy_url = f"http://127.0.0.1:{_PROXY_PORT}"
             return {
                 "agent_id": key[0],
                 "session_id": key[1],
                 "mode": self._configuration.get(self._storage_key(key), self.default_mode),
-                "active": active,
-                "namespace_pid": runtime["process"].pid if active else None,
-                "proxy_url": f"http://127.0.0.1:{_PROXY_PORT}" if active and runtime["mode"] == "proxy" else None,
+                "active": namespace_pid is not None,
+                "namespace_pid": namespace_pid,
+                "proxy_url": proxy_url,
             }
 
     def _stop_locked(self, key: tuple[str, str]) -> None:

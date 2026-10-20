@@ -13,12 +13,15 @@ import time
 import uuid
 from contextlib import contextmanager
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from allox.runtime.process_tracking.backends import create_backend
 from allox.runtime.process_tracking.cgroup import SessionCgroup
 from allox.runtime.sandboxing import build_bwrap_argv
 from allox.workspace.store import WorkspaceError, WorkspaceStore, validate_id
+
+if TYPE_CHECKING:
+    from allox.runtime.extensions import FeatureManager
 
 
 class ProcessTrackingService:
@@ -38,7 +41,7 @@ class ProcessTrackingService:
         boot_id: str | None = None,
     ) -> None:
         self.store = store
-        self.features = None
+        self.features: FeatureManager | None = None
         self.executions = executions
         self.audit_root = audit_root.resolve()
         if self.audit_root == store.root or store.root in self.audit_root.parents:
@@ -306,7 +309,7 @@ class ProcessTrackingService:
                 empty = process.poll() is not None and not self.cgroups.populated(
                     agent_id, session_id
                 )
-            if seeded and empty:
+            if seeded and empty and process is not None:
                 try:
                     self.backend.finish(process.pid, cookie)
                 except WorkspaceError:

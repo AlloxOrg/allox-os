@@ -198,9 +198,14 @@ turn 后创建 checkpoint；该策略必须可按 Agent 或 Session 关闭。
 ## 开发
 
 ```bash
+uv sync --locked --group dev
 uv run pytest -q
 uv run ruff check src tests
+uv run pyright
 ```
+
+Pyright 使用 Python 3.10、Linux 平台和 `standard` 模式，检查 Core 及三个插件的
+Python 源码；开发机无需安装或启用插件。PR 和 `main` 分支推送会自动运行类型检查。
 
 ## 文档
 

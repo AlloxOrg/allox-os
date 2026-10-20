@@ -42,6 +42,7 @@ package = true
 
 [dependency-groups]
 dev = [
+    "pyright>=1.1.414",
     "pytest>=8.0.0",
     "ruff>=0.14.0",
 ]
@@ -49,6 +50,23 @@ dev = [
 [tool.ruff]
 target-version = "py310"
 line-length = 100
+
+[tool.pyright]
+pythonVersion = "3.10"
+pythonPlatform = "Linux"
+typeCheckingMode = "standard"
+include = [
+    "src",
+    "plugins/process-tree/src",
+    "plugins/session-share/src",
+    "plugins/session-network/src",
+]
+extraPaths = [
+    "src",
+    "plugins/process-tree/src",
+    "plugins/session-share/src",
+    "plugins/session-network/src",
+]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

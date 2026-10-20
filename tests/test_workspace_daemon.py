@@ -25,6 +25,46 @@ class FakeProcessService:
         pass
 
 
+@pytest.mark.parametrize("argv_params", [{}, {"argv": None}, {"argv": "echo hello"}, {"argv": 1}])
+def test_process_start_rejects_non_array_argv_before_launch(argv_params):
+    processes = MagicMock()
+    service = WorkspaceService(
+        MagicMock(),
+        process_tracking="fake",
+        process_audit_root=Path("/audit"),
+        process_service_factory=lambda *args, **kwargs: processes,
+    )
+
+    with pytest.raises(WorkspaceError, match="argv must be a nonempty array"):
+        service.dispatch("process.start", {"agent_id": "a", "session_id": "s", **argv_params})
+
+    processes.start.assert_not_called()
+
+
+def test_process_start_forwards_argv_and_execution_options():
+    processes = MagicMock()
+    service = WorkspaceService(
+        MagicMock(),
+        process_tracking="fake",
+        process_audit_root=Path("/audit"),
+        process_service_factory=lambda *args, **kwargs: processes,
+    )
+    service.dispatch(
+        "process.start",
+        {
+            "agent_id": "a",
+            "session_id": "s",
+            "argv": ["echo", "hello"],
+            "env": {"LANG": "C"},
+            "timeout": 10,
+        },
+    )
+
+    processes.start.assert_called_once_with(
+        "a", "s", ["echo", "hello"], env={"LANG": "C"}, timeout=10
+    )
+
+
 def test_share_tools_require_management_authentication(monkeypatch):
     from allox.workspace.daemon import main
 
@@ -163,12 +203,13 @@ def test_rollback_can_request_tracked_session_termination(global_setting, reques
     store.rollback.assert_called_once()
 
 
-def test_rollback_kill_is_rejected_without_process_tracking():
+@pytest.mark.parametrize("action", ["session.rollback", "runtime.begin_reset"])
+def test_termination_is_rejected_without_process_tracking(action):
     service = WorkspaceService(MagicMock())
 
     with pytest.raises(WorkspaceError, match="requires process tracking"):
         service.dispatch(
-            "session.rollback",
+            action,
             {
                 "agent_id": "agent-a",
                 "session_id": "session-1",

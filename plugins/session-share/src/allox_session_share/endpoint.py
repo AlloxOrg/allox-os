@@ -10,20 +10,26 @@ import struct
 import tempfile
 import threading
 from pathlib import Path
+from typing import TYPE_CHECKING, cast
 
 from allox.workspace.store import WorkspaceError
+
+if TYPE_CHECKING:
+    from allox.runtime.process_tracking.cgroup import SessionCgroup
+    from allox_session_share.sharing import ShareService
 
 MAX_REQUEST = 512 * 1024
 
 
 class ShareHandler(socketserver.StreamRequestHandler):
     def handle(self):
+        server = cast(ShareServer, self.server)
         self.request.settimeout(10)
         try:
             pid, _, _ = struct.unpack("3i", self.request.getsockopt(
                 socket.SOL_SOCKET, socket.SO_PEERCRED, struct.calcsize("3i")
             ))
-            if not self.server.cgroups.owns(*self.server.identity, pid):
+            if not server.cgroups.owns(*server.identity, pid):
                 raise WorkspaceError("caller does not belong to this Session")
             line = self.rfile.readline(MAX_REQUEST + 1)
             if len(line) > MAX_REQUEST or not line.endswith(b"\n"):
@@ -37,7 +43,7 @@ class ShareHandler(socketserver.StreamRequestHandler):
             action = request.get("action")
             if not isinstance(action, str):
                 raise WorkspaceError("invalid share action")
-            result = self.server.shares.dispatch(self.server.identity, action, params)
+            result = server.shares.dispatch(server.identity, action, params)
             response = {"ok": True, "result": result}
         except (WorkspaceError, ValueError) as exc:
             response = {"ok": False, "error": str(exc)}
@@ -49,9 +55,12 @@ class ShareHandler(socketserver.StreamRequestHandler):
             pass
 
 
-if hasattr(socketserver, "UnixStreamServer"):
+if TYPE_CHECKING or hasattr(socketserver, "UnixStreamServer"):
     class ShareServer(socketserver.ThreadingMixIn, socketserver.UnixStreamServer):
         daemon_threads = True
+        identity: tuple[str, str]
+        shares: ShareService
+        cgroups: SessionCgroup
 else:  # pragma: no cover - the plugin activates only in the Linux Guest
     class ShareServer:
         def __init__(self, *args, **kwargs):
@@ -59,19 +68,21 @@ else:  # pragma: no cover - the plugin activates only in the Linux Guest
 
 
 class SessionShareEndpoints:
-    def __init__(self, shares, cgroups, root: Path):
+    def __init__(self, shares: ShareService, cgroups: SessionCgroup, root: Path):
         self.shares = shares
         self.cgroups = cgroups
         self.root = root
         self._directory = None
-        self._servers = {}
+        self._servers: dict[tuple[str, str], ShareServer] = {}
         self._lock = threading.Lock()
 
-    def endpoint(self, agent_id, session_id):
+    def endpoint(self, agent_id: str, session_id: str) -> str:
         identity = (agent_id, session_id)
         with self._lock:
             if identity in self._servers:
-                return self._servers[identity].server_address
+                address = self._servers[identity].server_address
+                assert isinstance(address, str)
+                return address
             self.root.mkdir(parents=True, exist_ok=True, mode=0o700)
             if self._directory is None:
                 self._directory = tempfile.TemporaryDirectory(prefix="share-", dir=self.root)

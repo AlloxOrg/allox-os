@@ -9,6 +9,9 @@ uv run pytest -q
 # 静态检查
 uv run ruff check src tests
 
+# 类型检查（Core 及三个插件，目标为 Python 3.10 / Linux）
+uv run pyright
+
 # 真实 eBPF/cgroup v2 测试（只能在隔离的特权测试 VM 中运行）
 ALLOX_EBPF_TEST=1 uv run pytest tests/test_process_tracking_kernel.py -v
 

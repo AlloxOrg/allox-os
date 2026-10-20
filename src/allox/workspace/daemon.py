@@ -12,10 +12,13 @@ from contextlib import contextmanager, nullcontext
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any, cast
 
 from allox.runtime.extensions import FeatureManager, WorkspaceFeatureContext
 from allox.workspace.store import WorkspaceError, WorkspaceStore, validate_id
+
+if TYPE_CHECKING:
+    from allox.runtime.process_tracking import ProcessTrackingService
 
 
 class ExecutionRegistry:
@@ -154,8 +157,8 @@ class WorkspaceService:
     ):
         self.store = store
         self.executions = ExecutionRegistry()
-        self.features = None
-        self.processes = None
+        self.features: FeatureManager | None = None
+        self.processes: ProcessTrackingService | None = None
         self.process_tracking = process_tracking.strip().lower()
         session_network = session_network.strip().lower()
         if session_network not in {"disabled", "inherit", "isolated", "proxy"}:
@@ -202,6 +205,7 @@ class WorkspaceService:
                 cgroup_root=process_cgroup_root,
             )
         if feature_specs:
+            assert self.processes is not None
             try:
                 self.features = FeatureManager(
                     WorkspaceFeatureContext(
@@ -260,8 +264,11 @@ class WorkspaceService:
             agent_id = self._required(params, "agent_id")
             session_id = self._required(params, "session_id")
             if action == "process.start":
+                argv = params.get("argv")
+                if not isinstance(argv, list):
+                    raise WorkspaceError("argv must be a nonempty array of nonempty strings")
                 return self.processes.start(
-                    agent_id, session_id, params.get("argv"),
+                    agent_id, session_id, argv,
                     env=params.get("env"), timeout=params.get("timeout", 300),
                 )
             if action == "process.list":
@@ -317,15 +324,14 @@ class WorkspaceService:
             terminate = self._boolean(
                 params, "kill_processes", self.kill_session_processes_on_rollback
             )
-            if terminate and self.processes is None:
-                raise WorkspaceError("kill_processes requires process tracking")
-            launch_fence = (
-                self.processes.session_launch_fence(
+            if terminate:
+                if self.processes is None:
+                    raise WorkspaceError("kill_processes requires process tracking")
+                launch_fence = self.processes.session_launch_fence(
                     agent_id, session_id, terminate=True, reason="rollback"
                 )
-                if terminate
-                else nullcontext([])
-            )
+            else:
+                launch_fence = nullcontext([])
             with launch_fence as stopped:
                 result = self.executions.begin_runtime_reset(agent_id, session_id)
             if terminate:
@@ -355,15 +361,14 @@ class WorkspaceService:
             terminate = action.startswith("session.rollback") and self._boolean(
                 params, "kill_processes", self.kill_session_processes_on_rollback
             )
-            if terminate and self.processes is None:
-                raise WorkspaceError("kill_processes requires process tracking")
-            launch_fence = (
-                self.processes.session_launch_fence(
+            if terminate:
+                if self.processes is None:
+                    raise WorkspaceError("kill_processes requires process tracking")
+                launch_fence = self.processes.session_launch_fence(
                     agent_id, session_id, terminate=True, reason="rollback"
                 )
-                if terminate
-                else nullcontext([])
-            )
+            else:
+                launch_fence = nullcontext([])
             with launch_fence as stopped, mutation:
                 if action == "checkpoint.create":
                     checkpoint_id = params.get("checkpoint_id")
@@ -428,7 +433,6 @@ class WorkspaceHTTPServer(ThreadingHTTPServer):
 
 
 class WorkspaceRequestHandler(BaseHTTPRequestHandler):
-    server: WorkspaceHTTPServer
     protocol_version = "HTTP/1.1"
 
     def log_message(self, format: str, *args: Any) -> None:
@@ -443,12 +447,13 @@ class WorkspaceRequestHandler(BaseHTTPRequestHandler):
         self.wfile.write(body)
 
     def _authorized(self) -> bool:
-        if not self.server.token:
+        server = cast(WorkspaceHTTPServer, self.server)
+        if not server.token:
             return True
         supplied = self.headers.get("Authorization", "")
         prefix = "Bearer "
         return supplied.startswith(prefix) and secrets.compare_digest(
-            supplied[len(prefix) :], self.server.token
+            supplied[len(prefix) :], server.token
         )
 
     def do_GET(self) -> None:
@@ -473,7 +478,8 @@ class WorkspaceRequestHandler(BaseHTTPRequestHandler):
             params = request.get("params", {})
             if not isinstance(action, str) or not isinstance(params, dict):
                 raise WorkspaceError("request requires string action and object params")
-            result = self.server.service.dispatch(action, params)
+            server = cast(WorkspaceHTTPServer, self.server)
+            result = server.service.dispatch(action, params)
             self._write_json(HTTPStatus.OK, {"ok": True, "result": result})
         except (WorkspaceError, ValueError, json.JSONDecodeError) as exc:
             self._write_json(HTTPStatus.BAD_REQUEST, {"ok": False, "error": str(exc)})
