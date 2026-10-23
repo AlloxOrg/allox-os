@@ -4,6 +4,7 @@ import base64
 import json
 import os
 import shutil
+import socket
 from pathlib import Path
 
 import pytest
@@ -184,6 +185,7 @@ def test_rollback_reopens_current_and_preserves_share_policy(service):
         share(restarted, "read", path="result")
 
 
+@pytest.mark.skipif(not hasattr(socket, "SO_PEERCRED"), reason="requires Linux peer credentials")
 def test_endpoint_rejects_wrong_cgroup_and_spoofed_identity(service, tmp_path):
     class Cgroups:
         allowed = False

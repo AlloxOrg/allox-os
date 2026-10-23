@@ -7,6 +7,7 @@ import socket
 import tempfile
 import threading
 from pathlib import Path
+from unittest.mock import Mock
 
 import pytest
 from allox_session_network.networking import (
@@ -48,6 +49,31 @@ def test_network_mode_validation():
     assert validate_network_mode(" PROXY ") == "proxy"
     with pytest.raises(WorkspaceError, match="network mode"):
         validate_network_mode("open")
+
+
+@pytest.mark.parametrize("mode", ["isolated", "proxy"])
+@pytest.mark.parametrize("exit_code", [None, 0])
+def test_network_status_reports_only_live_namespaces(tmp_path, mode, exit_code):
+    manager = SessionNetworkManager(
+        tmp_path, socket_root=tmp_path / "sockets", default_mode=mode
+    )
+    process = Mock(pid=1234)
+    process.poll.return_value = exit_code
+    manager._runtime[("agent", "session")] = {
+        "mode": mode,
+        "process": process,
+        "broker": None,
+        "stderr": Mock(),
+    }
+    try:
+        status = manager.status("agent", "session")
+        assert status["active"] is (exit_code is None)
+        assert status["namespace_pid"] == (1234 if exit_code is None else None)
+        assert status["proxy_url"] == (
+            "http://127.0.0.1:3128" if exit_code is None and mode == "proxy" else None
+        )
+    finally:
+        manager.close()
 
 
 def test_broker_can_connect_to_a_loopback_tcp_service():
