@@ -11,6 +11,7 @@ option is enabled.
 | `allox-session-share` | `allox.workspace_features:session-share` | `--share-tools` |
 | `allox-session-network` | `allox.workspace_features:session-network` | `--session-network isolated/proxy` |
 | `allox-agent-monitor` | `allox.workspace_features:agent-monitor` | `--monitor-root PATH` |
+| `allox-system-effects` | `allox.workspace_features:system-effects` | `--system-effects-observer PATH` plus pinned BPF objects |
 
 Agent call tracing, timing, cgroup resource correlation and semantic profiling are described in
 [`agent-monitor/README.md`](agent-monitor/README.md). Monitoring remains optional and independently
@@ -18,3 +19,10 @@ packaged; neither framework event ingestion nor remote model timing is inferred 
 
 The directories share a repository during development, but produce separate wheels. They can
 be split into separate repositories without changing the Core plugin ABI.
+
+`allox-system-effects` defaults to compatible protocol-v2 A-to-B observation. Its wheel also
+installs `allox-system-effects-recover`; configuring that pinned helper together with
+`deployment-observe-recovery-verify` enables opt-in protocol-v3 A/B/rollback/C requests. The
+current deployment adapter is `DIRECT` only—Docker and Kata are not implied by installing the
+plugin. See [the system-effects guide](system-effects/README.md) and its
+[Chinese version](system-effects/README.zh-CN.md).
