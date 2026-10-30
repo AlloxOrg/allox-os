@@ -16,6 +16,22 @@ from allox_agent_monitor.resources import delta, snapshot
 from allox_agent_monitor.store import TraceStore, identifier
 
 
+def validate_sdk_event(event: Any) -> dict:
+    if not isinstance(event, dict):
+        raise WorkspaceError("framework event required")
+    events = event.get("events", []) if event.get("event") == "batch" else [event]
+    if not isinstance(events, list) or not events:
+        raise WorkspaceError("invalid event batch")
+    for item in events:
+        if not isinstance(item, dict):
+            raise WorkspaceError("invalid event")
+        if item.get("kind") == "process":
+            raise WorkspaceError("process spans are Core-owned")
+        if any(k in item for k in ("agent_id", "session_id", "source", "process_run_id")):
+            raise WorkspaceError("Agent cannot supply caller identity or source")
+    return event
+
+
 class AgentMonitorFeature:
     name = "agent-monitor"
     abi = 1
@@ -54,8 +70,7 @@ class AgentMonitorFeature:
         session = identifier(params.get("session_id"), "session")
         if action == "monitor.ingest":
             event = params.get("event")
-            if not isinstance(event, dict) or event.get("kind") == "process":
-                raise WorkspaceError("framework event required; process spans are Core-owned")
+            event = validate_sdk_event(event)
             return self.store.ingest(agent, session, event)
         sessions = params.get("session_ids", [session])
         if not isinstance(sessions, list) or not 0 < len(sessions) <= 100:
@@ -89,8 +104,7 @@ class AgentMonitorFeature:
         run_id = self.active_run_id(identity)
         if run_id != expected_run_id:
             raise WorkspaceError("process run changed while telemetry was pending")
-        if event.get("kind") == "process":
-            raise WorkspaceError("process spans are Core-owned")
+        validate_sdk_event(event)
         return self.store.ingest(*identity, event, source="session-sdk", process_run_id=run_id)
 
     def execution_started(self, row: dict) -> None:

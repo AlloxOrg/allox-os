@@ -7,6 +7,7 @@ import math
 import sqlite3
 import threading
 import time
+from contextlib import nullcontext
 from pathlib import Path
 from typing import Any
 
@@ -49,9 +50,14 @@ class TraceStore:
         )
         self._db.commit()
         self.accepted = self.rejected = self.collector_ns = 0
+        self._batching = False
+        self.transactions = 0
 
     def ingest(self, agent: str, session: str, event: dict, *, source="framework-sdk",
                process_run_id: str | None = None) -> dict:
+        if isinstance(event, dict) and event.get("event") == "batch":
+            return self.ingest_batch(agent, session, event, source=source,
+                                     process_run_id=process_run_id)
         started = time.perf_counter_ns()
         try:
             return self._ingest(agent, session, event, source, process_run_id)
@@ -78,7 +84,7 @@ class TraceStore:
         trace = identifier(event.get("trace_id"), "trace")
         span = identifier(event.get("span_id"), "span")
         key = (agent, session, trace, span)
-        with self._lock, self._db:
+        with self._lock, (nullcontext() if self._batching else self._db):
             found = self._db.execute(
                 "SELECT payload FROM spans WHERE agent=? AND session=? AND trace=? AND span=?", key
             ).fetchone()
@@ -130,7 +136,40 @@ class TraceStore:
                 raise WorkspaceError("event must be start or end")
         with self._lock:
             self.accepted += 1  # Count only events whose SQLite transaction committed.
+            if not self._batching:
+                self.transactions += 1
         return {"accepted": True, "trace_id": trace, "span_id": span}
+
+    def ingest_batch(self, agent, session, envelope, *, source="framework-sdk",
+                     process_run_id=None):
+        started = time.perf_counter_ns()
+        events = envelope.get("events")
+        if set(envelope) != {"event", "events"} or not isinstance(events, list) or not 1 <= len(events) <= 64:
+            raise WorkspaceError("batch requires 1..64 events")
+        try:
+            encoded = json.dumps(envelope, allow_nan=False).encode()
+        except (TypeError, ValueError) as exc:
+            raise WorkspaceError("batch must contain finite JSON data") from exc
+        if len(encoded) > 65536:
+            raise WorkspaceError("batch exceeds 64 KiB")
+        if any(not isinstance(e, dict) or e.get("event") not in {"start", "end"} for e in events):
+            raise WorkspaceError("batch contains an invalid event")
+        with self._lock:
+            accepted = self.accepted
+            try:
+                self._batching = True
+                with self._db:
+                    for event in events:
+                        self._ingest(agent, session, event, source, process_run_id)
+                self.transactions += 1
+                return {"accepted": True, "event_count": len(events), "durable": True}
+            except Exception:
+                self.accepted = accepted
+                self.rejected += len(events)
+                raise
+            finally:
+                self._batching = False
+                self.collector_ns += time.perf_counter_ns()-started
 
     def _validate_start(self, key: tuple, event: dict) -> dict:
         if not isinstance(event.get("kind"), str) or event["kind"] not in KINDS:
@@ -204,6 +243,7 @@ class TraceStore:
                 "collector_ns_this_process": self.collector_ns,
                 "storage_bytes": sum(p.stat().st_size for p in self.root.glob("traces.sqlite3*")),
                 "delivery": "synchronous-acknowledged", "event_loss_rate": None,
+                "committed_transactions_this_process": self.transactions,
                 "event_loss_note": "no claim about events never submitted by a producer",
             }
 

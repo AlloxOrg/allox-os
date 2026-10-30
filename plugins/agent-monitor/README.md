@@ -21,6 +21,24 @@
 
 ## 使用
 
+### 可选批量模式
+
+默认 `batch_size=1` 保留逐事件同步确认。显式启用批量模式可减少 SQLite FULL 提交和 Session socket 请求：
+
+```python
+with Tracer(emit_session, strict=True, batch_size=32) as tracer:
+    for item in work_items:
+        tracer.call_tool("work", process, item)
+# 正常退出 context 时 flush；也可以显式 tracer.flush() / tracer.close()
+```
+
+`flush()` 成功后才确认整批持久化，服务端仍使用 WAL/FULL，一批任一事件非法会整体回滚。
+SDK 缓冲最多 64 个事件、单批不超过 64 KiB；没有周期性自动 flush。交出跨进程 parent context、
+查询结果、结束 turn 或 checkpoint 前必须先 flush。未 flush 事件不是 durable ACK，进程被杀时可能丢失；
+`health()` 明确报告 pending/acknowledged，pending 或未确认时 complete=false。
+strict 模式在批量发送/flush 时报告错误，不保证每次入队立即获知远端故障。没有自动重试不确定的 ACK，
+避免重复执行/重复 span。需要每一步立刻可见、逐事件崩溃证据的场景应继续用默认同步模式。
+
 ```bash
 pip install ./plugins/agent-monitor
 export ALLOX_WORKSPACE_TOKEN='<management-only token>'

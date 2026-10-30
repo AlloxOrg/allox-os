@@ -6,6 +6,8 @@ import asyncio
 import hashlib
 import json
 import math
+import os
+import threading
 import time
 import uuid
 from collections.abc import Callable
@@ -104,6 +106,7 @@ class Tracer:
     def __init__(
         self, emit: Callable[[dict], Any], *, trace_id: str | None = None,
         enabled: bool = True, capture_content: bool = False, strict: bool = False,
+        batch_size: int = 1,
     ) -> None:
         self.trace_id = trace_id or uuid.uuid4().hex
         self.clock_id = uuid.uuid4().hex
@@ -112,9 +115,40 @@ class Tracer:
         self.strict = strict
         self._emit = emit
         self.attempted = self.failed = self.emit_ns = self.wire_bytes = self.metric_errors = 0
+        if type(batch_size) is not int or not 1 <= batch_size <= 64:
+            raise ValueError("batch_size must be 1..64")
+        self.batch_size = batch_size
+        self._pending: list[dict] = []
+        self._pending_bytes = 0
+        self._emit_lock = threading.RLock()
+        self._owner_pid = os.getpid()
+        self.acknowledged = self.batch_requests = 0
 
     def emit(self, event: dict) -> None:
         if not self.enabled:
+            return
+        if self.batch_size > 1:
+            with self._emit_lock:
+                if os.getpid() != self._owner_pid:
+                    raise RuntimeError("create a new Tracer after fork")
+                try:
+                    encoded = json.dumps(event, allow_nan=False).encode()
+                    if len(encoded) > 60000:
+                        raise ValueError("buffered event too large")
+                except (TypeError, ValueError):
+                    self.attempted += 1
+                    self.failed += 1
+                    if self.strict:
+                        raise
+                    return
+                if self._pending and self._pending_bytes+len(encoded)+1024 > 65536:
+                    self.flush()
+                self.attempted += 1
+                self.wire_bytes += len(encoded)
+                self._pending.append(json.loads(encoded))
+                self._pending_bytes += len(encoded)+2
+                if len(self._pending) >= self.batch_size:
+                    self.flush()
             return
         started = time.perf_counter_ns()
         self.attempted += 1
@@ -124,12 +158,50 @@ class Tracer:
             ack = self._emit(event)
             if isinstance(ack, dict) and (ack.get("accepted") is False or ack.get("ok") is False):
                 raise RuntimeError("collector rejected event")
+            self.acknowledged += 1
         except Exception:
             self.failed += 1
             if self.strict:
                 raise
         finally:
             self.emit_ns += time.perf_counter_ns() - started
+
+    def flush(self) -> None:
+        """Explicit durability barrier; no automatic retries after ambiguous delivery."""
+        with self._emit_lock:
+            if os.getpid() != self._owner_pid:
+                raise RuntimeError("create a new Tracer after fork")
+            if not self._pending:
+                return
+            events, self._pending = self._pending, []
+            self._pending_bytes = 0
+            started = time.perf_counter_ns()
+            self.batch_requests += 1
+            try:
+                ack = self._emit({"event": "batch", "events": events})
+                if not isinstance(ack, dict) or ack.get("accepted") is not True or ack.get("durable") is not True or ack.get("event_count") != len(events):
+                    raise RuntimeError("batch lacks a complete durable acknowledgement")
+                self.acknowledged += len(events)
+            except Exception:
+                self.failed += len(events)
+                if self.strict:
+                    raise
+            finally:
+                self.emit_ns += time.perf_counter_ns()-started
+
+    def close(self):
+        self.flush()
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc, tb):
+        try:
+            self.flush()
+        except Exception:
+            if exc is None:
+                raise
+        return False
 
     def span(self, name: str, kind: str = "tool", **fields) -> Span:
         return Span(self, name, kind, **fields)
@@ -192,7 +264,10 @@ class Tracer:
         return {"enabled": self.enabled, "attempted_events": self.attempted,
                 "failed_events": self.failed, "emit_ns": self.emit_ns,
                 "serialized_bytes": self.wire_bytes,
-                "complete": self.failed == 0 and self.metric_errors == 0,
+                "complete": self.failed == 0 and self.metric_errors == 0 and not self._pending
+                            and self.acknowledged == self.attempted,
+                "acknowledged_events": self.acknowledged, "pending_events": len(self._pending),
+                "batch_requests": self.batch_requests, "batch_size": self.batch_size,
                 "metric_errors": self.metric_errors, "strict": self.strict}
 
 

@@ -20,10 +20,11 @@ from allox_agent_monitor.sdk import Tracer
 from allox_agent_monitor.store import TraceStore
 
 
-def worker(enabled: bool, steps: int) -> dict:
+def worker(enabled: bool, steps: int, batch_size: int = 1) -> dict:
     with tempfile.TemporaryDirectory(prefix="allox-monitor-bench-") as tmp:
         store = TraceStore(Path(tmp)) if enabled else None
-        tracer = Tracer(lambda e: store.ingest("benchmark", "session", e), strict=True)
+        tracer = Tracer(lambda e: store.ingest("benchmark", "session", e), strict=True,
+                        batch_size=batch_size)
         elapsed = []
         before = resource.getrusage(resource.RUSAGE_SELF)
         started = time.perf_counter_ns()
@@ -34,6 +35,8 @@ def worker(enabled: bool, steps: int) -> dict:
             else:
                 workload()
             elapsed.append(time.perf_counter_ns() - step_start)
+        if enabled:
+            tracer.flush()
         total = time.perf_counter_ns()-started
         after = resource.getrusage(resource.RUSAGE_SELF)
         result = {
@@ -61,18 +64,20 @@ def main():
     parser.add_argument("--worker", choices=("on", "off"))
     parser.add_argument("--steps", type=int, default=40)
     parser.add_argument("--pairs", type=int, default=5)
+    parser.add_argument("--batch-size", type=int, default=1)
     args = parser.parse_args()
     if args.steps < 1 or args.pairs < 1:
         parser.error("steps and pairs must be positive")
     if args.worker:
-        print(json.dumps(worker(args.worker == "on", args.steps)))
+        print(json.dumps(worker(args.worker == "on", args.steps, args.batch_size)))
         return
     trials = []
     for index in range(args.pairs):
         pair = {}
         for mode in (("off", "on") if index % 2 == 0 else ("on", "off")):
             output = subprocess.check_output([
-                sys.executable, __file__, "--worker", mode, "--steps", str(args.steps)
+                sys.executable, __file__, "--worker", mode, "--steps", str(args.steps),
+                "--batch-size", str(args.batch_size)
             ], text=True)
             pair[mode] = json.loads(output)
         pair["wall_overhead_percent"] = (pair["on"]["wall_ns"]/pair["off"]["wall_ns"]-1)*100
