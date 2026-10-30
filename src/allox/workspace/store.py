@@ -133,11 +133,25 @@ class WorkspaceStore:
         )
 
     @staticmethod
-    def _atomic_write_json(target: Path, value: dict[str, Any]) -> None:
+    def _atomic_write_json(
+        target: Path,
+        value: dict[str, Any],
+        *,
+        file_mode: int | None = None,
+    ) -> None:
         target.parent.mkdir(parents=True, exist_ok=True)
         temporary = target.with_name(f".{target.name}.{uuid.uuid4().hex}.tmp")
         try:
-            with temporary.open("w", encoding="utf-8") as stream:
+            if file_mode is None:
+                stream = temporary.open("w", encoding="utf-8")
+            else:
+                descriptor = os.open(
+                    temporary,
+                    os.O_WRONLY | os.O_CREAT | os.O_EXCL,
+                    file_mode,
+                )
+                stream = os.fdopen(descriptor, "w", encoding="utf-8")
+            with stream:
                 json.dump(value, stream, indent=2, sort_keys=True)
                 stream.write("\n")
                 stream.flush()
@@ -202,6 +216,84 @@ class WorkspaceStore:
     def _clear_transaction(self, agent_id: str, session_id: str) -> None:
         self._transaction_path(agent_id, session_id).unlink(missing_ok=True)
 
+    def _load_transaction(
+        self, agent_id: str, session_id: str
+    ) -> dict[str, Any] | None:
+        target = self._transaction_path(agent_id, session_id)
+        if not target.exists():
+            return None
+        if target.is_symlink() or not target.is_file():
+            raise WorkspaceError("rollback transaction is not a managed file")
+        try:
+            loaded = json.loads(target.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError) as exc:
+            raise WorkspaceError(f"invalid rollback transaction: {exc}") from exc
+        if not isinstance(loaded, dict):
+            raise WorkspaceError("rollback transaction root must be an object")
+        return loaded
+
+    def _recovery_receipt_path(
+        self, agent_id: str, session_id: str, recovery_id: str
+    ) -> Path:
+        validate_id("agent", agent_id)
+        validate_id("session", session_id)
+        validate_id("recovery", recovery_id)
+        return (
+            self.root
+            / ".allox"
+            / "recovery-receipts"
+            / agent_id
+            / session_id
+            / f"{recovery_id}.json"
+        )
+
+    def _write_recovery_receipt(
+        self,
+        agent_id: str,
+        session_id: str,
+        recovery_id: str,
+        receipt: dict[str, Any],
+    ) -> None:
+        target = self._recovery_receipt_path(agent_id, session_id, recovery_id)
+        private_directories = [
+            self.root / ".allox" / "recovery-receipts",
+            self.root / ".allox" / "recovery-receipts" / agent_id,
+            target.parent,
+        ]
+        for directory in private_directories:
+            directory.mkdir(mode=0o700, parents=True, exist_ok=True)
+            os.chmod(directory, 0o700)
+        self._atomic_write_json(target, receipt, file_mode=0o600)
+
+    def _load_recovery_receipt(
+        self, agent_id: str, session_id: str, recovery_id: str
+    ) -> dict[str, Any] | None:
+        target = self._recovery_receipt_path(agent_id, session_id, recovery_id)
+        if not target.exists():
+            return None
+        if target.is_symlink() or not target.is_file():
+            raise WorkspaceError("deferred rollback receipt is not a managed file")
+        try:
+            loaded = json.loads(target.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError) as exc:
+            raise WorkspaceError(f"invalid deferred rollback receipt: {exc}") from exc
+        if not isinstance(loaded, dict):
+            raise WorkspaceError("deferred rollback receipt root must be an object")
+        if (
+            loaded.get("version") != 1
+            or loaded.get("agent_id") != agent_id
+            or loaded.get("session_id") != session_id
+            or loaded.get("recovery_id") != recovery_id
+            or loaded.get("status") not in {"cleanup_started", "completed"}
+        ):
+            raise WorkspaceError("deferred rollback receipt does not match the request")
+        checkpoint_value = loaded.get("checkpoint_id")
+        if not isinstance(checkpoint_value, str):
+            raise WorkspaceError("deferred rollback receipt checkpoint_id must be a string")
+        validate_id("checkpoint", checkpoint_value)
+        self._safe_transaction_name(loaded.get("discard_name"), ".discard-")
+        return loaded
+
     @staticmethod
     def _safe_transaction_name(value: Any, prefix: str) -> str:
         if (
@@ -211,6 +303,22 @@ class WorkspaceStore:
         ):
             raise WorkspaceError("rollback transaction contains an unsafe path")
         return value
+
+    def _transaction_subvolume_path(
+        self,
+        session_dir: Path,
+        value: Any,
+        prefix: str,
+    ) -> Path:
+        name = self._safe_transaction_name(value, prefix)
+        candidate = session_dir / name
+        try:
+            candidate.resolve(strict=False).relative_to(session_dir.resolve(strict=True))
+        except (OSError, ValueError) as exc:
+            raise WorkspaceError("rollback transaction path escapes the session") from exc
+        if candidate.parent != session_dir or candidate.is_symlink():
+            raise WorkspaceError("rollback transaction path is not confined to the session")
+        return candidate
 
     def _recover_sessions(self) -> list[str]:
         recovered: list[str] = []
@@ -240,16 +348,7 @@ class WorkspaceStore:
     def _recover_session(self, agent_id: str, session_id: str) -> bool:
         session_dir = self.session_dir(agent_id, session_id)
         current = self.current(agent_id, session_id)
-        transaction_path = self._transaction_path(agent_id, session_id)
-        transaction: dict[str, Any] | None = None
-        if transaction_path.exists():
-            try:
-                loaded = json.loads(transaction_path.read_text(encoding="utf-8"))
-            except (OSError, json.JSONDecodeError) as exc:
-                raise WorkspaceError(f"invalid rollback transaction: {exc}") from exc
-            if not isinstance(loaded, dict):
-                raise WorkspaceError("rollback transaction root must be an object")
-            transaction = loaded
+        transaction = self._load_transaction(agent_id, session_id)
 
         restores = sorted(session_dir.glob(".restore-*"))
         discards = sorted(session_dir.glob(".discard-*"))
@@ -276,34 +375,155 @@ class WorkspaceStore:
         phase = transaction.get("phase")
         if phase not in {"preparing", "prepared", "old_moved", "committed"}:
             raise WorkspaceError(f"invalid rollback transaction phase: {phase!r}")
-        if transaction.get("version") != 1:
+        version = transaction.get("version")
+        if version not in {1, 2}:
             raise WorkspaceError("unsupported rollback transaction version")
+        deferred = version == 2
+        recovery_id: str | None = None
+        if deferred:
+            if transaction.get("defer_cleanup") is not True:
+                raise WorkspaceError("deferred rollback transaction is not marked deferred")
+            recovery_value = transaction.get("recovery_id")
+            if not isinstance(recovery_value, str):
+                raise WorkspaceError(
+                    "deferred rollback transaction recovery_id must be a string"
+                )
+            recovery_id = validate_id("recovery", recovery_value)
+            if not isinstance(transaction.get("scrub_runtime"), bool):
+                raise WorkspaceError(
+                    "deferred rollback transaction scrub_runtime must be a boolean"
+                )
         checkpoint_value = transaction.get("checkpoint_id")
         if not isinstance(checkpoint_value, str):
             raise WorkspaceError("rollback transaction checkpoint_id must be a string")
         checkpoint_id = validate_id("checkpoint", checkpoint_value)
-        restored = session_dir / self._safe_transaction_name(
-            transaction.get("restore_name"), ".restore-"
+        restored = self._transaction_subvolume_path(
+            session_dir, transaction.get("restore_name"), ".restore-"
         )
-        discarded = session_dir / self._safe_transaction_name(
-            transaction.get("discard_name"), ".discard-"
+        discarded = self._transaction_subvolume_path(
+            session_dir, transaction.get("discard_name"), ".discard-"
         )
+
+        if deferred and phase == "committed" and current.exists():
+            assert recovery_id is not None
+            self._require_managed_directory(current, "session workspace")
+            if restored.exists():
+                raise WorkspaceError("committed deferred rollback retains a restore path")
+            index = self._load_index(agent_id, session_id)
+            if index.head != checkpoint_id:
+                raise WorkspaceError(
+                    "committed deferred rollback does not match the checkpoint head"
+                )
+            receipt = self._load_recovery_receipt(
+                agent_id, session_id, recovery_id
+            )
+            if receipt is None:
+                if not discarded.exists():
+                    raise WorkspaceError(
+                        "committed deferred rollback is missing its discarded workspace"
+                    )
+                self._require_managed_directory(
+                    discarded, "deferred rollback discarded workspace"
+                )
+                return False
+            if (
+                receipt.get("checkpoint_id") != checkpoint_id
+                or receipt.get("discard_name") != discarded.name
+            ):
+                raise WorkspaceError(
+                    "deferred rollback receipt does not match the transaction"
+                )
+            if discarded.exists():
+                self._require_managed_directory(
+                    discarded, "deferred rollback discarded workspace"
+                )
+                self.backend.delete_subvolume(discarded)
+            completed_receipt = dict(receipt)
+            completed_receipt["status"] = "completed"
+            completed_receipt.setdefault("completed_at_ns", time.time_ns())
+            self._write_recovery_receipt(
+                agent_id, session_id, recovery_id, completed_receipt
+            )
+            self._clear_transaction(agent_id, session_id)
+            self._append_event(
+                {
+                    "op": "session.rollback.cleanup.recovered",
+                    "checkpoint_id": checkpoint_id,
+                    "recovery_id": recovery_id,
+                    "outcome": "completed",
+                },
+                agent_id,
+                session_id,
+            )
+            return True
+
         commit = current.exists() and phase in {"old_moved", "committed"}
 
         if not current.exists():
             if phase in {"prepared", "old_moved", "committed"} and restored.exists():
+                self._require_managed_directory(restored, "rollback restore workspace")
                 restored.rename(current)
                 commit = True
             elif discarded.exists():
+                self._require_managed_directory(discarded, "rollback discarded workspace")
                 discarded.rename(current)
                 commit = False
             else:
                 raise WorkspaceError(
                     f"rollback recovery has no current workspace: {agent_id}/{session_id}"
                 )
+
+        if deferred and commit:
+            assert recovery_id is not None
+            self._require_managed_directory(current, "session workspace")
+            if not discarded.exists():
+                raise WorkspaceError(
+                    "deferred rollback recovery is missing its discarded workspace"
+                )
+            self._require_managed_directory(
+                discarded, "deferred rollback discarded workspace"
+            )
+            if restored.exists():
+                raise WorkspaceError("deferred rollback recovery retains a restore path")
+            removed = (
+                self._scrub_runtime_entries(current / ".allox-tmp")
+                if transaction["scrub_runtime"]
+                else []
+            )
+            index = self._load_index(agent_id, session_id)
+            try:
+                resolved = index.resolve(checkpoint_id=checkpoint_id)
+                index.move_head(resolved)
+            except CheckpointIndexError as exc:
+                raise WorkspaceError(str(exc)) from exc
+            self._save_index(agent_id, session_id, index)
+            transaction["phase"] = "committed"
+            transaction["removed_runtime_entries"] = removed
+            transaction["committed_at_ns"] = time.time_ns()
+            self._write_transaction(agent_id, session_id, transaction)
+            self._append_event(
+                {
+                    "op": "session.rollback.recovered",
+                    "checkpoint_id": checkpoint_id,
+                    "recovery_id": recovery_id,
+                    "outcome": "committed-deferred",
+                },
+                agent_id,
+                session_id,
+            )
+            return True
+
+        if deferred:
+            assert recovery_id is not None
+            if self._load_recovery_receipt(agent_id, session_id, recovery_id) is not None:
+                raise WorkspaceError(
+                    "aborted deferred rollback unexpectedly has a cleanup receipt"
+                )
         if discarded.exists():
+            self._require_managed_directory(discarded, "rollback discarded workspace")
             self.backend.delete_subvolume(discarded)
         if restored.exists():
+            self._require_managed_directory(restored, "rollback restore workspace")
             self.backend.delete_subvolume(restored)
 
         if commit:
@@ -319,6 +539,7 @@ class WorkspaceStore:
             {
                 "op": "session.rollback.recovered",
                 "checkpoint_id": checkpoint_id,
+                "recovery_id": recovery_id,
                 "outcome": "committed" if commit else "aborted",
             },
             agent_id,
@@ -534,15 +755,56 @@ class WorkspaceStore:
         num_ancestors: int | None = None,
         scrub_runtime: bool = True,
         origin: str = "unknown",
+        recovery_id: str | None = None,
+        defer_cleanup: bool = False,
     ) -> dict[str, Any]:
+        if not isinstance(defer_cleanup, bool):
+            raise WorkspaceError("defer_cleanup must be a boolean")
         if checkpoint_id is not None:
             checkpoint_id = validate_id("checkpoint", checkpoint_id)
+        if recovery_id is not None:
+            if not isinstance(recovery_id, str):
+                raise WorkspaceError("recovery_id must be a string")
+            recovery_id = validate_id("recovery", recovery_id)
+        if defer_cleanup:
+            if recovery_id is None:
+                raise WorkspaceError(
+                    "recovery_id is required when rollback cleanup is deferred"
+                )
+            if not isinstance(scrub_runtime, bool):
+                raise WorkspaceError(
+                    "scrub_runtime must be a boolean for deferred rollback"
+                )
+            if checkpoint_id is None or num_ancestors is not None:
+                raise WorkspaceError(
+                    "deferred rollback requires an exact checkpoint_id"
+                )
+        elif recovery_id is not None:
+            raise WorkspaceError("recovery_id requires defer_cleanup=True")
         with self._session_lock(agent_id, session_id):
+            if self._load_transaction(agent_id, session_id) is not None:
+                raise WorkspaceError(
+                    f"session has an unfinished rollback transaction: "
+                    f"{agent_id}/{session_id}"
+                )
+            if (
+                recovery_id is not None
+                and self._load_recovery_receipt(
+                    agent_id, session_id, recovery_id
+                )
+                is not None
+            ):
+                raise WorkspaceError(f"recovery_id was already used: {recovery_id}")
             index = self._load_index(agent_id, session_id)
+            requested_checkpoint_id = checkpoint_id
             try:
                 checkpoint_id = index.resolve(checkpoint_id, num_ancestors)
             except CheckpointIndexError as exc:
                 raise WorkspaceError(str(exc)) from exc
+            if defer_cleanup and checkpoint_id != requested_checkpoint_id:
+                raise WorkspaceError(
+                    "deferred rollback requires the complete checkpoint_id, not a prefix"
+                )
             source = self.checkpoints(agent_id, session_id) / checkpoint_id
             current = self.current(agent_id, session_id)
             if not source.exists():
@@ -556,7 +818,7 @@ class WorkspaceStore:
             restored = current.parent / f".restore-{token}"
             discarded = current.parent / f".discard-{token}"
             transaction = {
-                "version": 1,
+                "version": 2 if defer_cleanup else 1,
                 "phase": "preparing",
                 "checkpoint_id": checkpoint_id,
                 "restore_name": restored.name,
@@ -564,6 +826,9 @@ class WorkspaceStore:
                 "scrub_runtime": scrub_runtime,
                 "origin": origin,
             }
+            if defer_cleanup:
+                transaction["defer_cleanup"] = True
+                transaction["recovery_id"] = recovery_id
             self._write_transaction(agent_id, session_id, transaction)
             try:
                 self.backend.snapshot(source, restored, readonly=False)
@@ -585,18 +850,30 @@ class WorkspaceStore:
                     self.backend.delete_subvolume(restored)
                 self._clear_transaction(agent_id, session_id)
                 raise
-            transaction["phase"] = "committed"
-            self._write_transaction(agent_id, session_id, transaction)
-
-            removed = (
-                self._scrub_runtime_entries(current / ".allox-tmp")
-                if scrub_runtime
-                else []
-            )
-            self.backend.delete_subvolume(discarded)
-            index.move_head(checkpoint_id)
-            self._save_index(agent_id, session_id, index)
-            self._clear_transaction(agent_id, session_id)
+            if defer_cleanup:
+                removed = (
+                    self._scrub_runtime_entries(current / ".allox-tmp")
+                    if scrub_runtime
+                    else []
+                )
+                index.move_head(checkpoint_id)
+                self._save_index(agent_id, session_id, index)
+                transaction["phase"] = "committed"
+                transaction["removed_runtime_entries"] = removed
+                transaction["committed_at_ns"] = time.time_ns()
+                self._write_transaction(agent_id, session_id, transaction)
+            else:
+                transaction["phase"] = "committed"
+                self._write_transaction(agent_id, session_id, transaction)
+                removed = (
+                    self._scrub_runtime_entries(current / ".allox-tmp")
+                    if scrub_runtime
+                    else []
+                )
+                self.backend.delete_subvolume(discarded)
+                index.move_head(checkpoint_id)
+                self._save_index(agent_id, session_id, index)
+                self._clear_transaction(agent_id, session_id)
             self._append_event(
                 {
                     "op": "session.rollback",
@@ -604,6 +881,8 @@ class WorkspaceStore:
                     "origin": origin,
                     "scrub_runtime": scrub_runtime,
                     "removed_runtime_entries": removed,
+                    "recovery_id": recovery_id,
+                    "deferred_cleanup": defer_cleanup,
                 },
                 agent_id,
                 session_id,
@@ -614,6 +893,167 @@ class WorkspaceStore:
             "checkpoint_id": checkpoint_id,
             "relative_workspace": self.relative_current(agent_id, session_id),
             "removed_runtime_entries": removed,
+            "recovery_id": recovery_id,
+            "deferred_cleanup": defer_cleanup,
+            "cleanup_pending": defer_cleanup,
+            "deferred_discard_relative_path": (
+                discarded.relative_to(self.root).as_posix()
+                if defer_cleanup
+                else None
+            ),
+        }
+
+    def complete_deferred_rollback(
+        self,
+        agent_id: str,
+        session_id: str,
+        recovery_id: str,
+    ) -> dict[str, Any]:
+        if not isinstance(recovery_id, str):
+            raise WorkspaceError("recovery_id must be a string")
+        recovery_id = validate_id("recovery", recovery_id)
+        with self._session_lock(agent_id, session_id):
+            transaction = self._load_transaction(agent_id, session_id)
+            if transaction is None:
+                receipt = self._load_recovery_receipt(
+                    agent_id, session_id, recovery_id
+                )
+                if receipt is None or receipt.get("status") != "completed":
+                    raise WorkspaceError(
+                        f"no completed deferred rollback for recovery_id: {recovery_id}"
+                    )
+                discarded = self._transaction_subvolume_path(
+                    self.session_dir(agent_id, session_id),
+                    receipt.get("discard_name"),
+                    ".discard-",
+                )
+                if discarded.exists():
+                    raise WorkspaceError(
+                        "completed deferred rollback still has a discarded workspace"
+                    )
+                return {
+                    "agent_id": agent_id,
+                    "session_id": session_id,
+                    "checkpoint_id": receipt["checkpoint_id"],
+                    "recovery_id": recovery_id,
+                    "cleanup_status": "already_completed",
+                    "cleanup_completed": True,
+                    "already_completed": True,
+                    "cleanup_pending": False,
+                    "deferred_discard_relative_path": discarded.relative_to(
+                        self.root
+                    ).as_posix(),
+                }
+
+            if (
+                transaction.get("version") != 2
+                or transaction.get("phase") != "committed"
+                or transaction.get("defer_cleanup") is not True
+            ):
+                raise WorkspaceError(
+                    "rollback transaction is not a committed deferred rollback"
+                )
+            transaction_recovery = transaction.get("recovery_id")
+            if not isinstance(transaction_recovery, str):
+                raise WorkspaceError(
+                    "deferred rollback transaction recovery_id must be a string"
+                )
+            transaction_recovery = validate_id("recovery", transaction_recovery)
+            if transaction_recovery != recovery_id:
+                raise WorkspaceError("recovery_id does not match deferred rollback")
+            checkpoint_value = transaction.get("checkpoint_id")
+            if not isinstance(checkpoint_value, str):
+                raise WorkspaceError(
+                    "deferred rollback transaction checkpoint_id must be a string"
+                )
+            checkpoint_id = validate_id("checkpoint", checkpoint_value)
+            session_dir = self.session_dir(agent_id, session_id)
+            current = self.current(agent_id, session_id)
+            self._require_managed_directory(current, "session workspace")
+            restored = self._transaction_subvolume_path(
+                session_dir, transaction.get("restore_name"), ".restore-"
+            )
+            discarded = self._transaction_subvolume_path(
+                session_dir, transaction.get("discard_name"), ".discard-"
+            )
+            if restored.exists():
+                raise WorkspaceError(
+                    "committed deferred rollback retains a restore workspace"
+                )
+            index = self._load_index(agent_id, session_id)
+            if index.head != checkpoint_id:
+                raise WorkspaceError(
+                    "committed deferred rollback does not match the checkpoint head"
+                )
+
+            receipt = self._load_recovery_receipt(
+                agent_id, session_id, recovery_id
+            )
+            if receipt is not None and (
+                receipt.get("checkpoint_id") != checkpoint_id
+                or receipt.get("discard_name") != discarded.name
+            ):
+                raise WorkspaceError(
+                    "deferred rollback receipt does not match the transaction"
+                )
+            if receipt is None:
+                if not discarded.exists():
+                    raise WorkspaceError(
+                        "deferred rollback is missing its discarded workspace"
+                    )
+                self._require_managed_directory(
+                    discarded, "deferred rollback discarded workspace"
+                )
+                receipt = {
+                    "version": 1,
+                    "status": "cleanup_started",
+                    "agent_id": agent_id,
+                    "session_id": session_id,
+                    "checkpoint_id": checkpoint_id,
+                    "recovery_id": recovery_id,
+                    "discard_name": discarded.name,
+                    "cleanup_started_at_ns": time.time_ns(),
+                }
+                self._write_recovery_receipt(
+                    agent_id, session_id, recovery_id, receipt
+                )
+
+            if discarded.exists():
+                self._require_managed_directory(
+                    discarded, "deferred rollback discarded workspace"
+                )
+                self.backend.delete_subvolume(discarded)
+
+            completed_receipt = dict(receipt)
+            completed_receipt["status"] = "completed"
+            completed_receipt.setdefault("completed_at_ns", time.time_ns())
+            self._write_recovery_receipt(
+                agent_id, session_id, recovery_id, completed_receipt
+            )
+            self._clear_transaction(agent_id, session_id)
+            self._append_event(
+                {
+                    "op": "session.rollback.cleanup",
+                    "checkpoint_id": checkpoint_id,
+                    "recovery_id": recovery_id,
+                    "outcome": "completed",
+                },
+                agent_id,
+                session_id,
+            )
+
+        return {
+            "agent_id": agent_id,
+            "session_id": session_id,
+            "checkpoint_id": checkpoint_id,
+            "recovery_id": recovery_id,
+            "cleanup_status": "completed",
+            "cleanup_completed": True,
+            "already_completed": False,
+            "cleanup_pending": False,
+            "deferred_discard_relative_path": discarded.relative_to(
+                self.root
+            ).as_posix(),
         }
 
     def delete_checkpoint(

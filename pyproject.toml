@@ -75,4 +75,5 @@ pythonpath = [
     "plugins/process-tree/src",
     "plugins/session-share/src",
     "plugins/session-network/src",
+    "plugins/system-effects/src",
 ]

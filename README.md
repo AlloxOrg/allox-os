@@ -122,12 +122,52 @@ Core wheel 中不包含 eBPF adapter、bootstrap、内核配置或 collector 源
 设计、RPC、capability 要求和当前限制见
 [Session 网络隔离](docs/development/session-networking.md)。
 
-三个功能分别发布为独立 Python wheel：
+### 可选插件：Linux/eBPF 系统效果观测
+
+安装 `allox-system-effects` 并显式配置 Observer 后，每次受管理执行会在 Agent 真正开始前
+建立一个冻结的 Session cgroup 边界，启动独立的 privileged `deployment-observe`，完成 S0
+采集后才放行 Agent。v2 在整个进程树退出且 cgroup 已空、冻结后采集 B；v3 也先证明
+整个进程树已退出并把同一空 cgroup 冻结，再依次采集 B、执行 rollback、采集 C。两种模式
+都会关闭证据集并强制运行对应的独立 verifier；任何启动、运行中或收尾故障都会 fence
+Session，不会把未验证证据标成成功。
+
+Observer 记录 syscall/对象/进程历史；可选 scope 文件开启文件系统、BPF Program/Map/Link、
+sysctl、mount、网络配置、内核模块和残留进程的 S0/S1 确认。它和单独的 eBPF process-tree
+provider 二选一，以免重复加载生命周期 hook。安装、内核要求、启动命令与证据目录见
+[中文教程](plugins/system-effects/README.zh-CN.md)
+（[English](plugins/system-effects/README.md)）。
+
+未指定 recovery 时，集成保持 Observer protocol v2 的 A→B 直接执行观测。显式在
+`process.start.params.recovery` 中请求恢复时，插件改用 protocol v3：采集 A，运行 Agent
+并采集 B，由固定且 hash-pinned 的 `allox-system-effects-recover` 恢复 Session Workspace，
+再采集 C 并由独立 recovery verifier 校验 A→B、B→C 和 A→C。当前 `DIRECT` 适配仍不代表
+Docker/Kata 已接入；证据为 `INCOMPLETE`/`INCONCLUSIVE` 时不会被提升为完整或一致。
+
+```json
+{
+  "action": "process.start",
+  "params": {
+    "agent_id": "agent-a",
+    "session_id": "session-1",
+    "argv": ["/bin/sh", "-c", "printf changed > effect.txt"],
+    "recovery": {"scrub_runtime": true, "require_consistent": true}
+  }
+}
+```
+
+省略 `checkpoint_id` 时，Allox 会在放行 Agent 前自动创建并 pin baseline；显式值必须是
+完整且存在的 checkpoint ID。`require_consistent` 默认 `true`，所以 verifier 通过但 A→C
+不一致或无法确认时仍会 fence Session。这里的 Allox rollback 只恢复 Session Workspace，
+不恢复 Agent shared、BPF、sysctl、mount、网络配置或内核模块；这些域的残留会进入 verdict，
+不会被掩盖。完整 flags、证据清单与安全边界见上述插件教程。
+
+四个功能分别发布为独立 Python wheel：
 
 ```bash
 pip install allox-process-tree       # 可省略
 pip install allox-session-share      # 可省略
 pip install allox-session-network    # 可省略
+pip install allox-system-effects     # 可省略
 ```
 
 wheel 负责分发代码和 entry point 元数据。Core 仅加载显式启用的插件，校验 Plugin
@@ -180,7 +220,7 @@ Agent、Session 和 Kata VM 不受影响。Kata VM 级恢复会由 VM 生命周�
 ```text
 allox-os/
 ├── kernel/                  # Allox Guest Kernel 的配置与补丁
-├── plugins/                 # 独立安装的进程树、文件共享、网络插件
+├── plugins/                 # 独立安装的进程树、文件共享、网络、系统效果插件
 ├── src/allox/               # Guest daemon、workspace/runtime Core 与 Plugin API v1
 ├── deploy/                  # 当前 Kata runtime 的宿主机部署配置
 ├── docs/

@@ -9,9 +9,16 @@ from allox.workspace.store import WorkspaceError, validate_id
 
 _TMP_SYNC_WRAPPER = """\
 set -eu
+barrier_enabled=$1
+shift
 cp -a /workspace/.allox-tmp/. /tmp/
+if [ "$barrier_enabled" = 1 ]; then
+    kill -STOP "$$"
+elif [ "$barrier_enabled" != 0 ]; then
+    exit 125
+fi
 status=0
-"$@" || status=$?
+/usr/bin/env -i -- "$@" || status=$?
 find /tmp -xdev \\( -type s -o -type p -o -type b -o -type c \\) -delete
 rm -rf /workspace/.allox-tmp.new
 install -d -m 700 /workspace/.allox-tmp.new
@@ -31,12 +38,25 @@ def build_bwrap_argv(
     environment: tuple[tuple[str, str], ...] = (),
     *,
     mounts: tuple[SandboxMount, ...] = (),
+    launch_barrier: bool = False,
+    run_id: str | None = None,
 ) -> list[str]:
     """Expose only one Agent shared area and one child Session workspace."""
     validate_id("agent", agent_id)
     validate_id("session", session_id)
     if not command:
         raise WorkspaceError("workspace run requires a command after --")
+    if "=" in command[0]:
+        raise WorkspaceError("sandbox executable name cannot contain '='")
+    if run_id is not None:
+        validate_id("run", run_id)
+    if any(
+        not key or "=" in key or "\0" in key + value
+        for key, value in environment
+    ):
+        raise WorkspaceError("invalid sandbox environment")
+    if not isinstance(launch_barrier, bool):
+        raise WorkspaceError("invalid trusted launch barrier")
     argv = [
         "bwrap",
         "--die-with-parent",
@@ -81,28 +101,26 @@ def build_bwrap_argv(
         "--clearenv",
         "--setenv",
         "PATH",
-        "/usr/local/bin:/usr/bin:/bin",
+        "/usr/bin:/bin",
         "--setenv",
         "HOME",
-        "/workspace",
+        "/",
         "--setenv",
         "TMPDIR",
         "/tmp",
-        "--setenv",
-        "ALLOX_AGENT_ID",
-        agent_id,
-        "--setenv",
-        "ALLOX_AGENT_WORKSPACE",
-        "/agent",
-        "--setenv",
-        "ALLOX_AGENT_SHARED",
-        "/agent/shared",
-        "--setenv",
-        "ALLOX_SESSION_ID",
-        session_id,
     ]
-    for key, value in environment:
-        argv.extend(["--setenv", key, value])
+    agent_environment = {
+        "PATH": "/usr/local/bin:/usr/bin:/bin",
+        **dict(environment),
+        "HOME": "/workspace",
+        "TMPDIR": "/tmp",
+        "ALLOX_AGENT_ID": agent_id,
+        "ALLOX_AGENT_WORKSPACE": "/agent",
+        "ALLOX_AGENT_SHARED": "/agent/shared",
+        "ALLOX_SESSION_ID": session_id,
+    }
+    if run_id is not None:
+        agent_environment["ALLOX_RUN_ID"] = run_id
     created_directories: set[str] = set()
     for mount in mounts:
         parent = str(PurePosixPath(mount.target).parent)
@@ -115,6 +133,19 @@ def build_bwrap_argv(
             mount.target,
         ])
     argv.extend(
-        ["--chdir", "/workspace", "sh", "-c", _TMP_SYNC_WRAPPER, "allox-runtime", *command]
+        [
+            "--chdir",
+            "/workspace",
+            "/bin/sh",
+            "-c",
+            _TMP_SYNC_WRAPPER,
+            "allox-runtime",
+            "1" if launch_barrier else "0",
+            *(
+                f"{key}={value}"
+                for key, value in agent_environment.items()
+            ),
+            *command,
+        ]
     )
     return argv
