@@ -159,9 +159,12 @@ class ProcessTrackingService:
         *,
         env: dict[str, str] | None = None,
         timeout: float = 300,
+        trace_context: dict | None = None,
     ) -> dict:
         with self._launch_lock:
-            return self._start(agent_id, session_id, argv, env=env, timeout=timeout)
+            return self._start(
+                agent_id, session_id, argv, env=env, timeout=timeout, trace_context=trace_context
+            )
 
     def _start(
         self,
@@ -171,10 +174,20 @@ class ProcessTrackingService:
         *,
         env: dict[str, str] | None = None,
         timeout: float = 300,
+        trace_context: dict | None = None,
     ) -> dict:
         validate_id("agent", agent_id)
         validate_id("session", session_id)
         self._validate_start(argv, env, timeout)
+        if trace_context is not None:
+            if not isinstance(trace_context, dict) or set(trace_context) != {"trace_id", "span_id"}:
+                raise WorkspaceError("trace_context requires trace_id and span_id")
+            for name, value in trace_context.items():
+                if not isinstance(value, str):
+                    raise WorkspaceError("trace_context IDs must be strings")
+                validate_id(name, value)
+            if self.features is None or "agent-monitor" not in self.features.names:
+                raise WorkspaceError("trace_context requires the agent-monitor plugin")
         self.store.describe(agent_id, session_id)
         lease = self.executions.acquire(agent_id, session_id)
         run_id = uuid.uuid4().hex
@@ -248,6 +261,8 @@ class ProcessTrackingService:
                 }
                 if contribution is not None:
                     row.update(contribution.metadata)
+                if trace_context is not None:
+                    row["trace_context"] = dict(trace_context)
                 self._runs[run_id] = {
                     "row": row,
                     "process": None,
@@ -285,6 +300,8 @@ class ProcessTrackingService:
                 row["root_pid"] = process.pid
                 row["cgroup"] = str(cgroup)
                 row["state"] = "running"
+                if self.features is not None:
+                    self.features.execution_started(row)
                 self._save(row)
             os.kill(process.pid, signal.SIGCONT)
             timer = threading.Timer(timeout, self._terminate, args=(run_id, "timeout"))
@@ -355,6 +372,8 @@ class ProcessTrackingService:
                 row["root_exit_code"] = process.returncode
             while self.cgroups.populated(row["agent_id"], row["session_id"]):
                 time.sleep(0.02)
+            if self.features is not None:
+                self.features.execution_finished(row)
             clean = True
             self.backend.finish(process.pid, row["cookie"])
         except Exception as exc:  # noqa: BLE001 - keep the lease unless emptiness is confirmed

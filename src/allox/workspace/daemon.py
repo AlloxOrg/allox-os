@@ -152,6 +152,8 @@ class WorkspaceService:
         session_network: str = "disabled",
         network_root: Path = Path("/run/allox-network"),
         network_socket_root: Path = Path("/dev/shm/allox-network"),
+        monitor_root: Path | None = None,
+        monitor_socket_root: Path = Path("/dev/shm/allox-monitor"),
         process_service_factory=None,
         feature_factories=None,
     ):
@@ -169,6 +171,10 @@ class WorkspaceService:
             raise WorkspaceError("kill_session_processes_on_rollback must be a boolean")
         self.kill_session_processes_on_rollback = kill_session_processes_on_rollback
         feature_specs = []
+        if monitor_root is not None:
+            feature_specs.append(("agent-monitor", {
+                "root": monitor_root, "socket_root": monitor_socket_root,
+            }))
         if share_tools:
             feature_specs.append(("session-share", {"socket_root": share_socket_root}))
         if session_network != "disabled":
@@ -264,12 +270,16 @@ class WorkspaceService:
             agent_id = self._required(params, "agent_id")
             session_id = self._required(params, "session_id")
             if action == "process.start":
+                trace_options = (
+                    {"trace_context": params["trace_context"]} if "trace_context" in params else {}
+                )
                 argv = params.get("argv")
                 if not isinstance(argv, list):
                     raise WorkspaceError("argv must be a nonempty array of nonempty strings")
                 return self.processes.start(
                     agent_id, session_id, argv,
                     env=params.get("env"), timeout=params.get("timeout", 300),
+                    **trace_options,
                 )
             if action == "process.list":
                 return self.processes.list_runs(agent_id, session_id)
@@ -425,8 +435,8 @@ class WorkspaceHTTPServer(ThreadingHTTPServer):
     daemon_threads = True
 
     def __init__(self, address, service: WorkspaceService, token: str):
-        if "session-share" in service.feature_names and not token:
-            raise WorkspaceError("share tools require an authenticated management endpoint")
+        if {"session-share", "agent-monitor"}.intersection(service.feature_names) and not token:
+            raise WorkspaceError("share/monitor tools require an authenticated management endpoint")
         super().__init__(address, WorkspaceRequestHandler)
         self.service = service
         self.token = token
@@ -495,6 +505,10 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--root", required=True, help="Btrfs workspace store root")
     parser.add_argument("--listen", default="127.0.0.1:8092")
     parser.add_argument("--token", default="", help="Bearer token (prefer ALLOX_WORKSPACE_TOKEN)")
+    parser.add_argument("--monitor-root", type=Path, default=None,
+                        help="Enable agent-monitor; durable traces outside workspace store")
+    parser.add_argument("--monitor-socket-root", type=Path, default=Path("/dev/shm/allox-monitor"),
+                        help="Trusted tmpfs for Session-scoped append-only telemetry sockets")
     parser.add_argument(
         "--process-tracking", default="disabled", metavar="PROVIDER",
         help="Process tracker provider: disabled, ebpf, or an installed plugin name",
@@ -553,6 +567,8 @@ def main(argv: list[str] | None = None) -> int:
     token = args.token or os.environ.get("ALLOX_WORKSPACE_TOKEN", "")
     if args.share_tools and not token:
         raise SystemExit("--share-tools requires ALLOX_WORKSPACE_TOKEN for the management API")
+    if args.monitor_root is not None and not token:
+        raise SystemExit("--monitor-root requires ALLOX_WORKSPACE_TOKEN for the management API")
     store = WorkspaceStore(args.root)
     store.initialize()
     service = WorkspaceService(
@@ -567,6 +583,8 @@ def main(argv: list[str] | None = None) -> int:
         session_network=args.session_network,
         network_root=args.network_root,
         network_socket_root=args.network_socket_root,
+        monitor_root=args.monitor_root,
+        monitor_socket_root=args.monitor_socket_root,
     )
     server = WorkspaceHTTPServer((host, int(port_raw)), service, token)
     try:

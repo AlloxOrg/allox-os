@@ -10,6 +10,11 @@ option is enabled.
 | `allox-process-tree` | `allox.process_trackers:ebpf` | `--process-tracking ebpf` |
 | `allox-session-share` | `allox.workspace_features:session-share` | `--share-tools` |
 | `allox-session-network` | `allox.workspace_features:session-network` | `--session-network isolated/proxy` |
+| `allox-agent-monitor` | `allox.workspace_features:agent-monitor` | `--monitor-root PATH` |
+
+Agent call tracing, timing, cgroup resource correlation and semantic profiling are described in
+[`agent-monitor/README.md`](agent-monitor/README.md). Monitoring remains optional and independently
+packaged; neither framework event ingestion nor remote model timing is inferred from syscall traces.
 
 The directories share a repository during development, but produce separate wheels. They can
 be split into separate repositories without changing the Core plugin ABI.

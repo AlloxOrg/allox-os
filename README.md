@@ -191,6 +191,10 @@ allox-os/
 
 ## Agent turn checkpoint
 
+可选的 [Agent 观测与 profiling 插件](plugins/agent-monitor/README.md) 提供调用轨迹、
+工具内部耗时、模型指标、进程资源关联和跨运行语义汇总；通过 `--monitor-root` 显式启用。
+当前为首个实现切片，未宣称覆盖全部系统事件或自动接入所有 Agent 框架。
+
 Agent framework 可通过 Allox OS 的 guest 接口发布 Session/Turn 生命周期事件。
 启用后，Allox OS daemon 在 Session 建立时创建基线 checkpoint，并在每个成功结束的
 turn 后创建 checkpoint；该策略必须可按 Agent 或 Session 关闭。

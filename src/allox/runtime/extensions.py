@@ -157,6 +157,20 @@ class FeatureManager:
     def handles(self, action: str) -> bool:
         return any(action.startswith(prefix) for prefix in self._routes)
 
+    def execution_started(self, row: dict) -> None:
+        """Optional observational hooks; no installed plugin means no extra work."""
+        for feature in self._features:
+            callback = getattr(feature, "execution_started", None)
+            if callback is not None:
+                callback(row)
+
+    def execution_finished(self, row: dict) -> None:
+        """Observe final cgroup counters before Core removes the empty cgroup."""
+        for feature in reversed(self._features):
+            callback = getattr(feature, "execution_finished", None)
+            if callback is not None:
+                callback(row)
+
     def close(self) -> None:
         for feature in reversed(self._features):
             with suppress(Exception):

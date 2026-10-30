@@ -60,12 +60,14 @@ include = [
     "plugins/process-tree/src",
     "plugins/session-share/src",
     "plugins/session-network/src",
+    "plugins/agent-monitor/src",
 ]
 extraPaths = [
     "src",
     "plugins/process-tree/src",
     "plugins/session-share/src",
     "plugins/session-network/src",
+    "plugins/agent-monitor/src",
 ]
 
 [tool.pytest.ini_options]
@@ -75,4 +77,5 @@ pythonpath = [
     "plugins/process-tree/src",
     "plugins/session-share/src",
     "plugins/session-network/src",
+    "plugins/agent-monitor/src",
 ]
