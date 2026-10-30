@@ -1,0 +1,3 @@
+{"cgroup_mount": "/sys/fs/cgroup", "cgroup_remounted_rw": true, "cgroup_root": "/sys/fs/cgroup/allox"}
+{"turn": 1, "exit_code": 1, "command_count": 0}
+{"passed": false, "error": "Codex did not finish with a real shell action", "checks": null}

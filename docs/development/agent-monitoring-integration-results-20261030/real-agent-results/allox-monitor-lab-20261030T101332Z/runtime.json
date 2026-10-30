@@ -1,0 +1,34 @@
+{
+  "passed": false,
+  "model": "qwen3.8-27b-int4",
+  "runtime": "kata-allox-ebpf",
+  "provider_credential_in_guest": false,
+  "cpu_binding": "none; user override",
+  "protocol_bridge": "test-only Responses to Chat Completions",
+  "main_commit": "44977ad",
+  "snapshot_backend": "directory fixture; no rollback tested",
+  "container": "b47623d5b359105fd9d9e36b4fe6d94f43cac42ae35c104781afed191f3a6549",
+  "container_exit_code": 1,
+  "test_container_removed": true,
+  "gateway_requests": [
+    {
+      "http_status": 502,
+      "upstream_http_status": 500,
+      "elapsed_ns": 33825804,
+      "tool_names": [
+        "exec_command",
+        "write_stdin",
+        "update_plan",
+        "request_user_input",
+        "view_image",
+        "multi_agent_v1",
+        "get_goal",
+        "create_goal",
+        "update_goal",
+        "web_search"
+      ],
+      "response_output_types": [],
+      "upstream_error": "{'message': 'generation failed: remote API returned status 400: {\"error\":{\"message\":\"System message must be at the beginning.\",\"type\":\"BadRequestError\",\"param\":null,\"code\":400}}', 'type': 'server_error'}"
+    }
+  ]
+}

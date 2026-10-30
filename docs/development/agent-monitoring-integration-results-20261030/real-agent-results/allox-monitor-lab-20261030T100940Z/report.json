@@ -1,0 +1,131 @@
+{
+  "passed": false,
+  "kernel": "6.1.62",
+  "snapshot_backend": "directory fixture; no rollback tested",
+  "execution_boundary": "real Kata + Bubblewrap + cgroup v2",
+  "model": "qwen3.8-27b-int4",
+  "rounds": [
+    {
+      "turn": 1,
+      "run_id": "730e256b6c7e470dbbaa7402b17ac475",
+      "thread_id": "01a18c4a-03c6-7d20-b3a6-5df2c8561255",
+      "exit_code": 1,
+      "commands": [],
+      "state": "completed"
+    }
+  ],
+  "error_type": "RuntimeError",
+  "error": "Codex did not finish with a real shell action",
+  "model_requests": [
+    {
+      "http_status": 502,
+      "input_tokens": null,
+      "output_tokens": null,
+      "input_bytes": 46906,
+      "output_bytes": 49
+    }
+  ],
+  "sdk_health": {
+    "enabled": true,
+    "attempted_events": 6,
+    "failed_events": 0,
+    "emit_ns": 4272423,
+    "serialized_bytes": 2010,
+    "complete": true,
+    "metric_errors": 0,
+    "strict": true
+  },
+  "profile": {
+    "runs": 1,
+    "spans": 4,
+    "complete": false,
+    "warnings": [
+      {
+        "span_id": "c646be1669d7445f9a1d1d4940d858af",
+        "reason": "child timing incomplete"
+      }
+    ],
+    "groups": [
+      {
+        "semantic_path": [
+          "codex-qwen-smoke"
+        ],
+        "kind": "llm",
+        "name": "qwen3.8-27b-int4",
+        "model": "qwen3.8-27b-int4",
+        "calls": 1,
+        "runs": 1,
+        "errors": 1,
+        "inclusive_ns": 1118380181,
+        "self_ns": 1118380181,
+        "p50_ns": 1118380181,
+        "p95_ns": 1118380181,
+        "metrics": {
+          "client.request_ns": {
+            "sum": 1116097138,
+            "samples": 1
+          }
+        }
+      },
+      {
+        "semantic_path": [
+          "codex-qwen-smoke"
+        ],
+        "kind": "process",
+        "name": "allox.execution",
+        "model": null,
+        "calls": 1,
+        "runs": 1,
+        "errors": 1,
+        "inclusive_ns": 3108330599,
+        "self_ns": 3108330599,
+        "p50_ns": 3108330599,
+        "p95_ns": 3108330599,
+        "metrics": {
+          "cgroup.cpu_usage_usec": {
+            "sum": 708848,
+            "samples": 1
+          }
+        }
+      },
+      {
+        "semantic_path": [
+          "codex-qwen-smoke"
+        ],
+        "kind": "run",
+        "name": "codex-qwen-real-agent",
+        "model": null,
+        "calls": 1,
+        "runs": 1,
+        "errors": 1,
+        "inclusive_ns": 3755016746,
+        "self_ns": 1771576,
+        "p50_ns": 3755016746,
+        "p95_ns": 3755016746,
+        "metrics": {}
+      },
+      {
+        "semantic_path": [
+          "codex-qwen-smoke"
+        ],
+        "kind": "turn",
+        "name": "turn-1",
+        "model": null,
+        "calls": 1,
+        "runs": 1,
+        "errors": 1,
+        "inclusive_ns": 3753245170,
+        "self_ns": null,
+        "p50_ns": 3753245170,
+        "p95_ns": 3753245170,
+        "metrics": {}
+      }
+    ],
+    "completeness_scope": "received spans only; reconcile producer health separately",
+    "time_semantics": "inclusive sums are work, not elapsed wall time; self subtracts child union",
+    "unobserved": [
+      "transport unless instrumented",
+      "server timings unless provider reports"
+    ]
+  }
+}

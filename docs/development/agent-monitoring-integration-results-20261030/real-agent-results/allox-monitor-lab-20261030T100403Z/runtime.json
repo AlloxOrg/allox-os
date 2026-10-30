@@ -1,0 +1,25 @@
+{
+  "passed": false,
+  "model": "qwen3.8-27b-int4",
+  "runtime": "kata-allox-ebpf",
+  "provider_credential_in_guest": false,
+  "cpu_binding": "none; user override",
+  "protocol_bridge": "test-only Responses to Chat Completions",
+  "main_commit": "44977ad",
+  "snapshot_backend": "directory fixture; no rollback tested",
+  "container": "a9af1a827526ef2d596b95ff32df318109c99a014d04cf23ea2f67a344986472",
+  "container_exit_code": 1,
+  "test_container_removed": true,
+  "gateway_requests": [
+    {
+      "http_status": 200,
+      "upstream_http_status": 200,
+      "elapsed_ns": 7842610354
+    },
+    {
+      "http_status": 200,
+      "upstream_http_status": 200,
+      "elapsed_ns": 1505770334
+    }
+  ]
+}

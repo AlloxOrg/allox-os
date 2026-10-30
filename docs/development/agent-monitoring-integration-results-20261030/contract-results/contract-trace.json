@@ -1,0 +1,497 @@
+[
+  {
+    "agent_id": "agent-a",
+    "session_id": "s1",
+    "trace_id": "7243dad8c811431d9ce3bced6b6db64f",
+    "span_id": "process-e024182ef5cd4301a4047c4d53acaf3a",
+    "parent_id": null,
+    "kind": "process",
+    "name": "allox.execution",
+    "start_ns": 10184679621,
+    "clock_id": "992f3d100071437297ea7ea0eeb6b3a2",
+    "turn_id": null,
+    "parallel_group": null,
+    "loop_id": null,
+    "iteration": null,
+    "model": null,
+    "input": null,
+    "links": [],
+    "semantic_path": [
+      "system-execution"
+    ],
+    "status": "ok",
+    "end_ns": 11380857313,
+    "duration_ns": 1196177692,
+    "metrics": {
+      "cgroup.cpu_usage_usec": 353692
+    },
+    "source": "allox-executor",
+    "process_run_id": "e024182ef5cd4301a4047c4d53acaf3a",
+    "result": {
+      "run_id": "e024182ef5cd4301a4047c4d53acaf3a",
+      "root_exit_code": 0,
+      "resource_scope": "whole Session cgroup, not one nested span",
+      "events": "query process.events when process-tree is enabled",
+      "unavailable_counters": [
+        "cgroup.io_read_bytes",
+        "cgroup.io_write_bytes",
+        "cgroup.memory_peak_bytes"
+      ]
+    },
+    "error_type": null
+  },
+  {
+    "agent_id": "agent-a",
+    "session_id": "s1",
+    "trace_id": "shared-trace",
+    "span_id": "f58a749af6fe40d7a40b1034443822f7",
+    "parent_id": null,
+    "kind": "run",
+    "name": "contract-run",
+    "start_ns": 11070751088,
+    "clock_id": "f43f7876bb04455698e0b64cb8065ce9",
+    "turn_id": null,
+    "parallel_group": null,
+    "loop_id": null,
+    "iteration": null,
+    "model": null,
+    "input": null,
+    "links": [],
+    "semantic_path": [
+      "contract"
+    ],
+    "status": "ok",
+    "end_ns": 11222784199,
+    "duration_ns": 152033111,
+    "metrics": {},
+    "source": "session-sdk",
+    "process_run_id": "e024182ef5cd4301a4047c4d53acaf3a",
+    "result": null,
+    "error_type": null
+  },
+  {
+    "agent_id": "agent-a",
+    "session_id": "s1",
+    "trace_id": "shared-trace",
+    "span_id": "fceba0b435d84ed4bf94ee21c5d9baa3",
+    "parent_id": "f58a749af6fe40d7a40b1034443822f7",
+    "kind": "tool",
+    "name": "probe",
+    "start_ns": 11074836228,
+    "clock_id": "f43f7876bb04455698e0b64cb8065ce9",
+    "turn_id": null,
+    "parallel_group": null,
+    "loop_id": null,
+    "iteration": null,
+    "model": null,
+    "input": {
+      "bytes": 26,
+      "sha256": "ddcb0ace97c5704824a4e6a1624cbedfd89afd84f67ef88f47fdf2f4c816bfed"
+    },
+    "links": [],
+    "semantic_path": [
+      "contract"
+    ],
+    "status": "ok",
+    "end_ns": 11210874346,
+    "duration_ns": 136038118,
+    "metrics": {},
+    "source": "session-sdk",
+    "process_run_id": "e024182ef5cd4301a4047c4d53acaf3a",
+    "result": {
+      "bytes": 135,
+      "sha256": "5a2ad06f559509ca9db8020bd70b306ae3c22d9ec550676fb7ddd13e49f2b5c6"
+    },
+    "error_type": null
+  },
+  {
+    "agent_id": "agent-a",
+    "session_id": "s1",
+    "trace_id": "shared-trace",
+    "span_id": "eeb2f37652e44f6ab00c4655f382df95",
+    "parent_id": "fceba0b435d84ed4bf94ee21c5d9baa3",
+    "kind": "phase",
+    "name": "tool_execution",
+    "start_ns": 11079643857,
+    "clock_id": "f43f7876bb04455698e0b64cb8065ce9",
+    "turn_id": null,
+    "parallel_group": null,
+    "loop_id": null,
+    "iteration": null,
+    "model": null,
+    "input": null,
+    "links": [],
+    "semantic_path": [
+      "contract"
+    ],
+    "status": "ok",
+    "end_ns": 11207187197,
+    "duration_ns": 127543340,
+    "metrics": {
+      "executor.execution_ns": 124844642
+    },
+    "source": "session-sdk",
+    "process_run_id": "e024182ef5cd4301a4047c4d53acaf3a",
+    "result": null,
+    "error_type": null
+  },
+  {
+    "agent_id": "agent-a",
+    "session_id": "s1",
+    "trace_id": "shared-trace",
+    "span_id": "e03155e573704f8d8688eca8e79869be",
+    "parent_id": "f58a749af6fe40d7a40b1034443822f7",
+    "kind": "tool",
+    "name": "expected-tool-error",
+    "start_ns": 11212773279,
+    "clock_id": "f43f7876bb04455698e0b64cb8065ce9",
+    "turn_id": null,
+    "parallel_group": null,
+    "loop_id": null,
+    "iteration": null,
+    "model": null,
+    "input": null,
+    "links": [],
+    "semantic_path": [
+      "contract"
+    ],
+    "status": "error",
+    "end_ns": 11216175725,
+    "duration_ns": 3402446,
+    "metrics": {},
+    "source": "session-sdk",
+    "process_run_id": "e024182ef5cd4301a4047c4d53acaf3a",
+    "result": null,
+    "error_type": "ValueError"
+  },
+  {
+    "agent_id": "agent-a",
+    "session_id": "s2",
+    "trace_id": "1f4854b5cef44570b228ebed66eada12",
+    "span_id": "process-1f62dd7c0dc8422682d9c5a0f6b01211",
+    "parent_id": null,
+    "kind": "process",
+    "name": "allox.execution",
+    "start_ns": 10855416415,
+    "clock_id": "992f3d100071437297ea7ea0eeb6b3a2",
+    "turn_id": null,
+    "parallel_group": null,
+    "loop_id": null,
+    "iteration": null,
+    "model": null,
+    "input": null,
+    "links": [],
+    "semantic_path": [
+      "system-execution"
+    ],
+    "status": "ok",
+    "end_ns": 12017052873,
+    "duration_ns": 1161636458,
+    "metrics": {
+      "cgroup.cpu_usage_usec": 331962
+    },
+    "source": "allox-executor",
+    "process_run_id": "1f62dd7c0dc8422682d9c5a0f6b01211",
+    "result": {
+      "run_id": "1f62dd7c0dc8422682d9c5a0f6b01211",
+      "root_exit_code": 0,
+      "resource_scope": "whole Session cgroup, not one nested span",
+      "events": "query process.events when process-tree is enabled",
+      "unavailable_counters": [
+        "cgroup.io_read_bytes",
+        "cgroup.io_write_bytes",
+        "cgroup.memory_peak_bytes"
+      ]
+    },
+    "error_type": null
+  },
+  {
+    "agent_id": "agent-a",
+    "session_id": "s2",
+    "trace_id": "shared-trace",
+    "span_id": "58b4e85b6bf2493793b2f9dde9a10b49",
+    "parent_id": null,
+    "kind": "run",
+    "name": "contract-run",
+    "start_ns": 11818082074,
+    "clock_id": "f05cbec65e464cfd9e69713297ec993e",
+    "turn_id": null,
+    "parallel_group": null,
+    "loop_id": null,
+    "iteration": null,
+    "model": null,
+    "input": null,
+    "links": [],
+    "semantic_path": [
+      "contract"
+    ],
+    "status": "ok",
+    "end_ns": 11924798989,
+    "duration_ns": 106716915,
+    "metrics": {},
+    "source": "session-sdk",
+    "process_run_id": "1f62dd7c0dc8422682d9c5a0f6b01211",
+    "result": null,
+    "error_type": null
+  },
+  {
+    "agent_id": "agent-a",
+    "session_id": "s2",
+    "trace_id": "shared-trace",
+    "span_id": "8de10bdaaae94785a3e6aef5d8eb8aa7",
+    "parent_id": "58b4e85b6bf2493793b2f9dde9a10b49",
+    "kind": "tool",
+    "name": "probe",
+    "start_ns": 11819926120,
+    "clock_id": "f05cbec65e464cfd9e69713297ec993e",
+    "turn_id": null,
+    "parallel_group": null,
+    "loop_id": null,
+    "iteration": null,
+    "model": null,
+    "input": {
+      "bytes": 26,
+      "sha256": "ddcb0ace97c5704824a4e6a1624cbedfd89afd84f67ef88f47fdf2f4c816bfed"
+    },
+    "links": [],
+    "semantic_path": [
+      "contract"
+    ],
+    "status": "ok",
+    "end_ns": 11918808522,
+    "duration_ns": 98882402,
+    "metrics": {},
+    "source": "session-sdk",
+    "process_run_id": "1f62dd7c0dc8422682d9c5a0f6b01211",
+    "result": {
+      "bytes": 135,
+      "sha256": "a9b01fb9ee5893092380feca41756177b5591a17b5a826aeb3cd0ba6387c559a"
+    },
+    "error_type": null
+  },
+  {
+    "agent_id": "agent-a",
+    "session_id": "s2",
+    "trace_id": "shared-trace",
+    "span_id": "0861a270fbe94dc195389e961eff63e6",
+    "parent_id": "8de10bdaaae94785a3e6aef5d8eb8aa7",
+    "kind": "phase",
+    "name": "tool_execution",
+    "start_ns": 11821417402,
+    "clock_id": "f05cbec65e464cfd9e69713297ec993e",
+    "turn_id": null,
+    "parallel_group": null,
+    "loop_id": null,
+    "iteration": null,
+    "model": null,
+    "input": null,
+    "links": [],
+    "semantic_path": [
+      "contract"
+    ],
+    "status": "ok",
+    "end_ns": 11917498226,
+    "duration_ns": 96080824,
+    "metrics": {
+      "executor.execution_ns": 94789063
+    },
+    "source": "session-sdk",
+    "process_run_id": "1f62dd7c0dc8422682d9c5a0f6b01211",
+    "result": null,
+    "error_type": null
+  },
+  {
+    "agent_id": "agent-a",
+    "session_id": "s2",
+    "trace_id": "shared-trace",
+    "span_id": "1b971f34986e4964b5a3abf63e794a20",
+    "parent_id": "58b4e85b6bf2493793b2f9dde9a10b49",
+    "kind": "tool",
+    "name": "expected-tool-error",
+    "start_ns": 11920081134,
+    "clock_id": "f05cbec65e464cfd9e69713297ec993e",
+    "turn_id": null,
+    "parallel_group": null,
+    "loop_id": null,
+    "iteration": null,
+    "model": null,
+    "input": null,
+    "links": [],
+    "semantic_path": [
+      "contract"
+    ],
+    "status": "error",
+    "end_ns": 11922721759,
+    "duration_ns": 2640625,
+    "metrics": {},
+    "source": "session-sdk",
+    "process_run_id": "1f62dd7c0dc8422682d9c5a0f6b01211",
+    "result": null,
+    "error_type": "ValueError"
+  },
+  {
+    "agent_id": "agent-b",
+    "session_id": "s1",
+    "trace_id": "93deadbd142b44d3b95ba70404375888",
+    "span_id": "process-b5b3104dc006408491a2dd68f0424b76",
+    "parent_id": null,
+    "kind": "process",
+    "name": "allox.execution",
+    "start_ns": 11662223612,
+    "clock_id": "992f3d100071437297ea7ea0eeb6b3a2",
+    "turn_id": null,
+    "parallel_group": null,
+    "loop_id": null,
+    "iteration": null,
+    "model": null,
+    "input": null,
+    "links": [],
+    "semantic_path": [
+      "system-execution"
+    ],
+    "status": "ok",
+    "end_ns": 12628682222,
+    "duration_ns": 966458610,
+    "metrics": {
+      "cgroup.cpu_usage_usec": 299511
+    },
+    "source": "allox-executor",
+    "process_run_id": "b5b3104dc006408491a2dd68f0424b76",
+    "result": {
+      "run_id": "b5b3104dc006408491a2dd68f0424b76",
+      "root_exit_code": 0,
+      "resource_scope": "whole Session cgroup, not one nested span",
+      "events": "query process.events when process-tree is enabled",
+      "unavailable_counters": [
+        "cgroup.io_read_bytes",
+        "cgroup.io_write_bytes",
+        "cgroup.memory_peak_bytes"
+      ]
+    },
+    "error_type": null
+  },
+  {
+    "agent_id": "agent-b",
+    "session_id": "s1",
+    "trace_id": "shared-trace",
+    "span_id": "76aedef27ff041bea918e5ddcedd53e9",
+    "parent_id": null,
+    "kind": "run",
+    "name": "contract-run",
+    "start_ns": 12419654732,
+    "clock_id": "ca9bf541fcff42c2b42c0126988f8f13",
+    "turn_id": null,
+    "parallel_group": null,
+    "loop_id": null,
+    "iteration": null,
+    "model": null,
+    "input": null,
+    "links": [],
+    "semantic_path": [
+      "contract"
+    ],
+    "status": "ok",
+    "end_ns": 12520226766,
+    "duration_ns": 100572034,
+    "metrics": {},
+    "source": "session-sdk",
+    "process_run_id": "b5b3104dc006408491a2dd68f0424b76",
+    "result": null,
+    "error_type": null
+  },
+  {
+    "agent_id": "agent-b",
+    "session_id": "s1",
+    "trace_id": "shared-trace",
+    "span_id": "08fd209b860a432fb26da5102b4e7266",
+    "parent_id": "76aedef27ff041bea918e5ddcedd53e9",
+    "kind": "tool",
+    "name": "probe",
+    "start_ns": 12421311460,
+    "clock_id": "ca9bf541fcff42c2b42c0126988f8f13",
+    "turn_id": null,
+    "parallel_group": null,
+    "loop_id": null,
+    "iteration": null,
+    "model": null,
+    "input": {
+      "bytes": 26,
+      "sha256": "ddcb0ace97c5704824a4e6a1624cbedfd89afd84f67ef88f47fdf2f4c816bfed"
+    },
+    "links": [],
+    "semantic_path": [
+      "contract"
+    ],
+    "status": "ok",
+    "end_ns": 12516484081,
+    "duration_ns": 95172621,
+    "metrics": {},
+    "source": "session-sdk",
+    "process_run_id": "b5b3104dc006408491a2dd68f0424b76",
+    "result": {
+      "bytes": 135,
+      "sha256": "ae1fa9186ed3752e6cbe9a1b7e7377501786f8dbee66a1262996a953bcd5f686"
+    },
+    "error_type": null
+  },
+  {
+    "agent_id": "agent-b",
+    "session_id": "s1",
+    "trace_id": "shared-trace",
+    "span_id": "ec9450ff955246e6a18bf9c7b3964961",
+    "parent_id": "08fd209b860a432fb26da5102b4e7266",
+    "kind": "phase",
+    "name": "tool_execution",
+    "start_ns": 12422478713,
+    "clock_id": "ca9bf541fcff42c2b42c0126988f8f13",
+    "turn_id": null,
+    "parallel_group": null,
+    "loop_id": null,
+    "iteration": null,
+    "model": null,
+    "input": null,
+    "links": [],
+    "semantic_path": [
+      "contract"
+    ],
+    "status": "ok",
+    "end_ns": 12515403760,
+    "duration_ns": 92925047,
+    "metrics": {
+      "executor.execution_ns": 91786617
+    },
+    "source": "session-sdk",
+    "process_run_id": "b5b3104dc006408491a2dd68f0424b76",
+    "result": null,
+    "error_type": null
+  },
+  {
+    "agent_id": "agent-b",
+    "session_id": "s1",
+    "trace_id": "shared-trace",
+    "span_id": "7c2770cab185494ba11652e90ae03f25",
+    "parent_id": "76aedef27ff041bea918e5ddcedd53e9",
+    "kind": "tool",
+    "name": "expected-tool-error",
+    "start_ns": 12517537743,
+    "clock_id": "ca9bf541fcff42c2b42c0126988f8f13",
+    "turn_id": null,
+    "parallel_group": null,
+    "loop_id": null,
+    "iteration": null,
+    "model": null,
+    "input": null,
+    "links": [],
+    "semantic_path": [
+      "contract"
+    ],
+    "status": "error",
+    "end_ns": 12518565753,
+    "duration_ns": 1028010,
+    "metrics": {},
+    "source": "session-sdk",
+    "process_run_id": "b5b3104dc006408491a2dd68f0424b76",
+    "result": null,
+    "error_type": "ValueError"
+  }
+]

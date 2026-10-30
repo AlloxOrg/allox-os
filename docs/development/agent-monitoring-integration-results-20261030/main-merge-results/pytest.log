@@ -1,0 +1,25 @@
+................ssssss..............s..s.......s.sssssssss.............. [ 39%]
+.ss..................................................................... [ 79%]
+......................................                                   [100%]
+=========================== short test summary info ============================
+SKIPPED [1] tests/test_network_kernel.py:75: requires a privileged Allox Kata Guest with network namespaces
+SKIPPED [1] tests/test_network_kernel.py:103: requires a privileged Allox Kata Guest with network namespaces
+SKIPPED [1] tests/test_network_kernel.py:118: requires a privileged Allox Kata Guest with network namespaces
+SKIPPED [1] tests/test_network_kernel.py:145: requires a privileged Allox Kata Guest with network namespaces
+SKIPPED [1] tests/test_network_kernel.py:173: requires a privileged Allox Kata Guest with network namespaces
+SKIPPED [1] tests/test_network_kernel.py:214: requires a privileged Allox Kata Guest with network namespaces
+SKIPPED [1] tests/test_process_tracking.py:452: requires Linux pidfds
+SKIPPED [1] tests/test_process_tracking.py:344: execution lifecycle requires Linux pidfds
+SKIPPED [1] tests/test_process_tracking.py:474: requires Bubblewrap and Linux namespaces
+SKIPPED [1] tests/test_process_tracking_kernel.py:91: requires an isolated Linux VM with eBPF/cgroup v2
+SKIPPED [1] tests/test_process_tracking_kernel.py:118: requires an isolated Linux VM with eBPF/cgroup v2
+SKIPPED [1] tests/test_process_tracking_kernel.py:138: requires an isolated Linux VM with eBPF/cgroup v2
+SKIPPED [1] tests/test_process_tracking_kernel.py:158: requires an isolated Linux VM with eBPF/cgroup v2
+SKIPPED [1] tests/test_process_tracking_kernel.py:181: requires an isolated Linux VM with eBPF/cgroup v2
+SKIPPED [1] tests/test_process_tracking_kernel.py:197: requires an isolated Linux VM with eBPF/cgroup v2
+SKIPPED [1] tests/test_process_tracking_kernel.py:209: requires an isolated Linux VM with eBPF/cgroup v2
+SKIPPED [1] tests/test_process_tracking_kernel.py:225: requires an isolated Linux VM with eBPF/cgroup v2
+SKIPPED [1] tests/test_process_tracking_kernel.py:237: requires an isolated Linux VM with eBPF/cgroup v2
+SKIPPED [1] tests/test_share_kernel.py:59: requires isolated Linux eBPF test Guest
+SKIPPED [1] tests/test_share_kernel.py:73: requires isolated Linux eBPF test Guest
+162 passed, 20 skipped in 11.59s

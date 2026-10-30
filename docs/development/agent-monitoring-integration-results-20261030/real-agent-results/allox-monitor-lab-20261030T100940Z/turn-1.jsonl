@@ -1,0 +1,6 @@
+{"type":"thread.started","thread_id":"01a18c4a-03c6-7d20-b3a6-5df2c8561255"}
+{"type":"item.completed","item":{"id":"item_0","type":"error","message":"Model metadata for `qwen3.8-27b-int4` not found. Defaulting to fallback metadata; this can degrade performance and cause issues."}}
+{"type":"turn.started"}
+{"type":"item.completed","item":{"id":"item_1","type":"error","message":"Skill descriptions were shortened to fit the 2% skills context budget. Codex can still see every skill, but some descriptions are shorter. Disable unused skills or plugins to leave more room for the rest."}}
+{"type":"error","message":"unexpected status 502 Bad Gateway: model proxy: RuntimeError, url: http://127.0.0.1:44095/v1/responses"}
+{"type":"turn.failed","error":{"message":"unexpected status 502 Bad Gateway: model proxy: RuntimeError, url: http://127.0.0.1:44095/v1/responses"}}

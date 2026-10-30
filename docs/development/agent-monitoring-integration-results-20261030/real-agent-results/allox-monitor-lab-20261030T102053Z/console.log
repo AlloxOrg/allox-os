@@ -1,0 +1,4 @@
+{"cgroup_mount": "/sys/fs/cgroup", "cgroup_remounted_rw": true, "cgroup_root": "/sys/fs/cgroup/allox"}
+{"turn": 1, "exit_code": 0, "command_count": 2}
+{"turn": 2, "exit_code": 0, "command_count": 1}
+{"passed": true, "error": null, "checks": {"sum_55": true, "resumed_sum_56": true, "memory_marker": true, "real_model_requests": true, "sandbox_sdk_events": true, "core_process_spans": true, "executor_internal_timing": true, "all_received_spans_ended": true, "real_cgroup_cpu": true}}

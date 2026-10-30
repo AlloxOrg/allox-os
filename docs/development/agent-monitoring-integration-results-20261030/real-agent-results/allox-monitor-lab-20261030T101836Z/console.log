@@ -1,0 +1,4 @@
+{"cgroup_mount": "/sys/fs/cgroup", "cgroup_remounted_rw": true, "cgroup_root": "/sys/fs/cgroup/allox"}
+{"turn": 1, "exit_code": 0, "command_count": 1}
+{"turn": 2, "exit_code": 0, "command_count": 1}
+{"passed": false, "error": "[Errno 2] No such file or directory: '/dev/shm/allox-qwen-monitor/workspace/agents/qwen/workspace/sessions/s1/current/proof.json'", "checks": null}

@@ -1,0 +1,120 @@
+{
+  "passed": true,
+  "model": "qwen3.8-27b-int4",
+  "runtime": "kata-allox-ebpf",
+  "provider_credential_in_guest": false,
+  "cpu_binding": "none; user override",
+  "protocol_bridge": "test-only Responses to Chat Completions",
+  "main_commit": "44977ad",
+  "snapshot_backend": "directory fixture; no rollback tested",
+  "container": "a4464e79f7cd7f9dd52a44c0573b50b9a968a5a5a99b13881c42e8e1d2c9098f",
+  "container_exit_code": 0,
+  "test_container_removed": true,
+  "gateway_requests": [
+    {
+      "http_status": 200,
+      "upstream_http_status": 200,
+      "elapsed_ns": 1232087325,
+      "tool_names": [
+        "exec_command",
+        "write_stdin",
+        "update_plan",
+        "request_user_input",
+        "view_image",
+        "multi_agent_v1",
+        "get_goal",
+        "create_goal",
+        "update_goal",
+        "web_search"
+      ],
+      "response_output_types": [
+        "message"
+      ],
+      "upstream_error": null
+    },
+    {
+      "http_status": 200,
+      "upstream_http_status": 200,
+      "elapsed_ns": 1298529831,
+      "tool_names": [
+        "exec_command",
+        "write_stdin",
+        "update_plan",
+        "request_user_input",
+        "view_image",
+        "multi_agent_v1",
+        "get_goal",
+        "create_goal",
+        "update_goal",
+        "web_search"
+      ],
+      "response_output_types": [
+        "message"
+      ],
+      "upstream_error": null
+    },
+    {
+      "http_status": 200,
+      "upstream_http_status": 200,
+      "elapsed_ns": 1252617037,
+      "tool_names": [
+        "exec_command",
+        "write_stdin",
+        "update_plan",
+        "request_user_input",
+        "view_image",
+        "multi_agent_v1",
+        "get_goal",
+        "create_goal",
+        "update_goal",
+        "web_search"
+      ],
+      "response_output_types": [
+        "message"
+      ],
+      "upstream_error": null
+    },
+    {
+      "http_status": 200,
+      "upstream_http_status": 200,
+      "elapsed_ns": 1203492485,
+      "tool_names": [
+        "exec_command",
+        "write_stdin",
+        "update_plan",
+        "request_user_input",
+        "view_image",
+        "multi_agent_v1",
+        "get_goal",
+        "create_goal",
+        "update_goal",
+        "web_search"
+      ],
+      "response_output_types": [
+        "function_call"
+      ],
+      "upstream_error": null
+    },
+    {
+      "http_status": 200,
+      "upstream_http_status": 200,
+      "elapsed_ns": 1308103015,
+      "tool_names": [
+        "exec_command",
+        "write_stdin",
+        "update_plan",
+        "request_user_input",
+        "view_image",
+        "multi_agent_v1",
+        "get_goal",
+        "create_goal",
+        "update_goal",
+        "web_search"
+      ],
+      "response_output_types": [
+        "message"
+      ],
+      "upstream_error": null
+    }
+  ]
+}

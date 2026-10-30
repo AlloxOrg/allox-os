@@ -1,0 +1,6 @@
+{"type":"thread.started","thread_id":"01a18c44-ba21-7ec1-9b90-ffb389b34be7"}
+{"type":"item.completed","item":{"id":"item_0","type":"error","message":"Model metadata for `qwen3.8-27b-int4` not found. Defaulting to fallback metadata; this can degrade performance and cause issues."}}
+{"type":"turn.started"}
+{"type":"item.completed","item":{"id":"item_1","type":"error","message":"Skill descriptions were shortened to fit the 2% skills context budget. Codex can still see every skill, but some descriptions are shorter. Disable unused skills or plugins to leave more room for the rest."}}
+{"type":"item.completed","item":{"id":"item_2","type":"agent_message","text":"Tool call shell (call_qwen_msg_17e4d510c1d04282b98822660f43d315) with arguments: {\"command\":\"ls -la /workspace\",\"description\":\"List files in /workspace\"}"}}
+{"type":"turn.completed","usage":{"input_tokens":11662,"cached_input_tokens":0,"output_tokens":122,"reasoning_output_tokens":0}}

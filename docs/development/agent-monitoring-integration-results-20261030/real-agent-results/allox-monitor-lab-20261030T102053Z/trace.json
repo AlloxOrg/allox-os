@@ -1,0 +1,490 @@
+[
+  {
+    "agent_id": "qwen",
+    "session_id": "s1",
+    "trace_id": "78c62b3c5a40468a879a52d8471bd127",
+    "span_id": "0450abc2b24c430bb63183e58d7f4110",
+    "parent_id": null,
+    "kind": "run",
+    "name": "codex-qwen-real-agent",
+    "start_ns": 9235414447,
+    "clock_id": "3623b779c6ac461596c22a61cee133cb",
+    "turn_id": null,
+    "parallel_group": null,
+    "loop_id": null,
+    "iteration": null,
+    "model": null,
+    "input": null,
+    "links": [],
+    "semantic_path": [
+      "codex-qwen-smoke"
+    ],
+    "status": "ok",
+    "end_ns": 21749670983,
+    "duration_ns": 12514256536,
+    "metrics": {},
+    "source": "framework-sdk",
+    "process_run_id": null,
+    "result": null,
+    "error_type": null
+  },
+  {
+    "agent_id": "qwen",
+    "session_id": "s1",
+    "trace_id": "78c62b3c5a40468a879a52d8471bd127",
+    "span_id": "303686c6e34d4c8bb9db86415d720b99",
+    "parent_id": "0450abc2b24c430bb63183e58d7f4110",
+    "kind": "turn",
+    "name": "turn-1",
+    "start_ns": 9236110995,
+    "clock_id": "3623b779c6ac461596c22a61cee133cb",
+    "turn_id": "turn-1",
+    "parallel_group": null,
+    "loop_id": null,
+    "iteration": null,
+    "model": null,
+    "input": null,
+    "links": [],
+    "semantic_path": [
+      "codex-qwen-smoke"
+    ],
+    "status": "ok",
+    "end_ns": 16916097843,
+    "duration_ns": 7679986848,
+    "metrics": {},
+    "source": "framework-sdk",
+    "process_run_id": null,
+    "result": null,
+    "error_type": null
+  },
+  {
+    "agent_id": "qwen",
+    "session_id": "s1",
+    "trace_id": "78c62b3c5a40468a879a52d8471bd127",
+    "span_id": "process-f723ccc04b4f46a2bb88062611c7d2c7",
+    "parent_id": "303686c6e34d4c8bb9db86415d720b99",
+    "kind": "process",
+    "name": "allox.execution",
+    "start_ns": 9851736069,
+    "clock_id": "d94083966f2e47e9844c276b1ab5dafd",
+    "turn_id": "turn-1",
+    "parallel_group": null,
+    "loop_id": null,
+    "iteration": null,
+    "model": null,
+    "input": null,
+    "links": [],
+    "semantic_path": [
+      "codex-qwen-smoke"
+    ],
+    "status": "ok",
+    "end_ns": 16910572261,
+    "duration_ns": 7058836192,
+    "metrics": {
+      "cgroup.cpu_usage_usec": 1340615
+    },
+    "source": "allox-executor",
+    "process_run_id": "f723ccc04b4f46a2bb88062611c7d2c7",
+    "result": {
+      "run_id": "f723ccc04b4f46a2bb88062611c7d2c7",
+      "root_exit_code": 0,
+      "resource_scope": "whole Session cgroup, not one nested span",
+      "events": "query process.events when process-tree is enabled",
+      "unavailable_counters": [
+        "cgroup.io_read_bytes",
+        "cgroup.io_write_bytes",
+        "cgroup.memory_peak_bytes"
+      ]
+    },
+    "error_type": null
+  },
+  {
+    "agent_id": "qwen",
+    "session_id": "s1",
+    "trace_id": "78c62b3c5a40468a879a52d8471bd127",
+    "span_id": "6b4ae420f8ce48b0ada08232ca3d4bfa",
+    "parent_id": "303686c6e34d4c8bb9db86415d720b99",
+    "kind": "llm",
+    "name": "qwen3.8-27b-int4",
+    "start_ns": 11502679472,
+    "clock_id": "3623b779c6ac461596c22a61cee133cb",
+    "turn_id": null,
+    "parallel_group": null,
+    "loop_id": null,
+    "iteration": null,
+    "model": "qwen3.8-27b-int4",
+    "input": {
+      "bytes": 47429,
+      "sha256": "2e663990f3472a2649baea97915c50fa5e5e96d336a4a4c0bcc0cb551b673aa0"
+    },
+    "links": [],
+    "semantic_path": [
+      "codex-qwen-smoke"
+    ],
+    "status": "ok",
+    "end_ns": 12741801230,
+    "duration_ns": 1239121758,
+    "metrics": {
+      "client.request_ns": 1236756791,
+      "provider.input_tokens": 5814,
+      "provider.output_tokens": 61
+    },
+    "source": "framework-sdk",
+    "process_run_id": null,
+    "result": {
+      "bytes": 671,
+      "sha256": "621cc009372dd3a1be3721afe719a00a4035e94ece90ed269dea5bcce43c73ac"
+    },
+    "error_type": null
+  },
+  {
+    "agent_id": "qwen",
+    "session_id": "s1",
+    "trace_id": "78c62b3c5a40468a879a52d8471bd127",
+    "span_id": "d064d11d912241fb8e62c31167d7c9a6",
+    "parent_id": "303686c6e34d4c8bb9db86415d720b99",
+    "kind": "llm",
+    "name": "qwen3.8-27b-int4",
+    "start_ns": 13057762516,
+    "clock_id": "3623b779c6ac461596c22a61cee133cb",
+    "turn_id": null,
+    "parallel_group": null,
+    "loop_id": null,
+    "iteration": null,
+    "model": "qwen3.8-27b-int4",
+    "input": {
+      "bytes": 47901,
+      "sha256": "72ea36c87768a3a2dd9113ce86d7b7bf49bcdda3d816b4800811fe3ff595e4c7"
+    },
+    "links": [],
+    "semantic_path": [
+      "codex-qwen-smoke"
+    ],
+    "status": "ok",
+    "end_ns": 14359799173,
+    "duration_ns": 1302036657,
+    "metrics": {
+      "client.request_ns": 1301294657,
+      "provider.input_tokens": 5889,
+      "provider.output_tokens": 68
+    },
+    "source": "framework-sdk",
+    "process_run_id": null,
+    "result": {
+      "bytes": 727,
+      "sha256": "de069008a50db02f5e8de1fccfc071f8591e867497e394428ab11b83d1211fda"
+    },
+    "error_type": null
+  },
+  {
+    "agent_id": "qwen",
+    "session_id": "s1",
+    "trace_id": "3d5a57971c7b4912a29de70bdc5cb0bc",
+    "span_id": "7217e1eae88c42929d1e0ddf9ef170cf",
+    "parent_id": null,
+    "kind": "tool",
+    "name": "sum-and-child-process",
+    "start_ns": 15284621705,
+    "clock_id": "dbee3bf236a54b4aa2fc7d6ee356d0d3",
+    "turn_id": null,
+    "parallel_group": null,
+    "loop_id": null,
+    "iteration": null,
+    "model": null,
+    "input": {
+      "bytes": 26,
+      "sha256": "ddcb0ace97c5704824a4e6a1624cbedfd89afd84f67ef88f47fdf2f4c816bfed"
+    },
+    "links": [],
+    "semantic_path": [],
+    "status": "ok",
+    "end_ns": 15379598927,
+    "duration_ns": 94977222,
+    "metrics": {},
+    "source": "session-sdk",
+    "process_run_id": "f723ccc04b4f46a2bb88062611c7d2c7",
+    "result": {
+      "bytes": 73,
+      "sha256": "9c5ee206506e74191d11fcc0987234ea7a41a3538d0a292b63a3c098f43e1f32"
+    },
+    "error_type": null
+  },
+  {
+    "agent_id": "qwen",
+    "session_id": "s1",
+    "trace_id": "3d5a57971c7b4912a29de70bdc5cb0bc",
+    "span_id": "7b8bfafa1fd1474182176d4ee9d25b3a",
+    "parent_id": "7217e1eae88c42929d1e0ddf9ef170cf",
+    "kind": "phase",
+    "name": "tool_execution",
+    "start_ns": 15287009207,
+    "clock_id": "dbee3bf236a54b4aa2fc7d6ee356d0d3",
+    "turn_id": null,
+    "parallel_group": null,
+    "loop_id": null,
+    "iteration": null,
+    "model": null,
+    "input": null,
+    "links": [],
+    "semantic_path": [],
+    "status": "ok",
+    "end_ns": 15377287160,
+    "duration_ns": 90277953,
+    "metrics": {
+      "executor.execution_ns": 88988146
+    },
+    "source": "session-sdk",
+    "process_run_id": "f723ccc04b4f46a2bb88062611c7d2c7",
+    "result": null,
+    "error_type": null
+  },
+  {
+    "agent_id": "qwen",
+    "session_id": "s1",
+    "trace_id": "78c62b3c5a40468a879a52d8471bd127",
+    "span_id": "66b3cd787f7346a1acb7b87b425f3f03",
+    "parent_id": "303686c6e34d4c8bb9db86415d720b99",
+    "kind": "llm",
+    "name": "qwen3.8-27b-int4",
+    "start_ns": 15472117073,
+    "clock_id": "3623b779c6ac461596c22a61cee133cb",
+    "turn_id": null,
+    "parallel_group": null,
+    "loop_id": null,
+    "iteration": null,
+    "model": "qwen3.8-27b-int4",
+    "input": {
+      "bytes": 48392,
+      "sha256": "353a6725aa798a799ac1bd5dc2ee6acb6213322429b01028bcccf24343de14b0"
+    },
+    "links": [],
+    "semantic_path": [
+      "codex-qwen-smoke"
+    ],
+    "status": "ok",
+    "end_ns": 16728138988,
+    "duration_ns": 1256021915,
+    "metrics": {
+      "client.request_ns": 1255290860,
+      "provider.input_tokens": 5984,
+      "provider.output_tokens": 64
+    },
+    "source": "framework-sdk",
+    "process_run_id": null,
+    "result": {
+      "bytes": 615,
+      "sha256": "8c29a655d7dadfdb1a2e8dc8a0dce65724bf7c0675ed1cd2a3d574fd8f686282"
+    },
+    "error_type": null
+  },
+  {
+    "agent_id": "qwen",
+    "session_id": "s1",
+    "trace_id": "78c62b3c5a40468a879a52d8471bd127",
+    "span_id": "8538634c779940e0801f3e3e53b3571d",
+    "parent_id": "0450abc2b24c430bb63183e58d7f4110",
+    "kind": "turn",
+    "name": "turn-2",
+    "start_ns": 16917395427,
+    "clock_id": "3623b779c6ac461596c22a61cee133cb",
+    "turn_id": "turn-2",
+    "parallel_group": null,
+    "loop_id": null,
+    "iteration": null,
+    "model": null,
+    "input": null,
+    "links": [],
+    "semantic_path": [
+      "codex-qwen-smoke"
+    ],
+    "status": "ok",
+    "end_ns": 21748652151,
+    "duration_ns": 4831256724,
+    "metrics": {},
+    "source": "framework-sdk",
+    "process_run_id": null,
+    "result": null,
+    "error_type": null
+  },
+  {
+    "agent_id": "qwen",
+    "session_id": "s1",
+    "trace_id": "78c62b3c5a40468a879a52d8471bd127",
+    "span_id": "process-fec279e08ba44d87b7bf18e537258d92",
+    "parent_id": "8538634c779940e0801f3e3e53b3571d",
+    "kind": "process",
+    "name": "allox.execution",
+    "start_ns": 17602144836,
+    "clock_id": "d94083966f2e47e9844c276b1ab5dafd",
+    "turn_id": "turn-2",
+    "parallel_group": null,
+    "loop_id": null,
+    "iteration": null,
+    "model": null,
+    "input": null,
+    "links": [],
+    "semantic_path": [
+      "codex-qwen-smoke"
+    ],
+    "status": "ok",
+    "end_ns": 21743752176,
+    "duration_ns": 4141607340,
+    "metrics": {
+      "cgroup.cpu_usage_usec": 904711
+    },
+    "source": "allox-executor",
+    "process_run_id": "fec279e08ba44d87b7bf18e537258d92",
+    "result": {
+      "run_id": "fec279e08ba44d87b7bf18e537258d92",
+      "root_exit_code": 0,
+      "resource_scope": "whole Session cgroup, not one nested span",
+      "events": "query process.events when process-tree is enabled",
+      "unavailable_counters": [
+        "cgroup.io_read_bytes",
+        "cgroup.io_write_bytes",
+        "cgroup.memory_peak_bytes"
+      ]
+    },
+    "error_type": null
+  },
+  {
+    "agent_id": "qwen",
+    "session_id": "s1",
+    "trace_id": "78c62b3c5a40468a879a52d8471bd127",
+    "span_id": "ad4ef0f36ebd45aca8708af6aa8ef52b",
+    "parent_id": "8538634c779940e0801f3e3e53b3571d",
+    "kind": "llm",
+    "name": "qwen3.8-27b-int4",
+    "start_ns": 18012901461,
+    "clock_id": "3623b779c6ac461596c22a61cee133cb",
+    "turn_id": null,
+    "parallel_group": null,
+    "loop_id": null,
+    "iteration": null,
+    "model": "qwen3.8-27b-int4",
+    "input": {
+      "bytes": 48991,
+      "sha256": "6a10b5915725fa47fe5665c6528152463cc2353b08f4fea8b964482b3670c405"
+    },
+    "links": [],
+    "semantic_path": [
+      "codex-qwen-smoke"
+    ],
+    "status": "ok",
+    "end_ns": 19221241110,
+    "duration_ns": 1208339649,
+    "metrics": {
+      "client.request_ns": 1207477932,
+      "provider.input_tokens": 6113,
+      "provider.output_tokens": 56
+    },
+    "source": "framework-sdk",
+    "process_run_id": null,
+    "result": {
+      "bytes": 533,
+      "sha256": "2618f256a8f1536e6924b1417b7f266f7901579993b74da0c7b3d90953bef6bd"
+    },
+    "error_type": null
+  },
+  {
+    "agent_id": "qwen",
+    "session_id": "s1",
+    "trace_id": "11e308391d5146daba97518ab50b849a",
+    "span_id": "7ca99aed4dc5466b9ffe156d71eb44e8",
+    "parent_id": null,
+    "kind": "tool",
+    "name": "resume-and-write",
+    "start_ns": 20192579380,
+    "clock_id": "6cc74565dbc8415daad7e5882027d88c",
+    "turn_id": null,
+    "parallel_group": null,
+    "loop_id": null,
+    "iteration": null,
+    "model": null,
+    "input": {
+      "bytes": 26,
+      "sha256": "ddcb0ace97c5704824a4e6a1624cbedfd89afd84f67ef88f47fdf2f4c816bfed"
+    },
+    "links": [],
+    "semantic_path": [],
+    "status": "ok",
+    "end_ns": 20197517046,
+    "duration_ns": 4937666,
+    "metrics": {},
+    "source": "session-sdk",
+    "process_run_id": "fec279e08ba44d87b7bf18e537258d92",
+    "result": {
+      "bytes": 39,
+      "sha256": "a713c34ce171bcc5fde0ff881bb43582deaa6958a906dcedec2543af96e24b1c"
+    },
+    "error_type": null
+  },
+  {
+    "agent_id": "qwen",
+    "session_id": "s1",
+    "trace_id": "11e308391d5146daba97518ab50b849a",
+    "span_id": "474c1969f6de4c35a2fd98244ac668db",
+    "parent_id": "7ca99aed4dc5466b9ffe156d71eb44e8",
+    "kind": "phase",
+    "name": "tool_execution",
+    "start_ns": 20194259082,
+    "clock_id": "6cc74565dbc8415daad7e5882027d88c",
+    "turn_id": null,
+    "parallel_group": null,
+    "loop_id": null,
+    "iteration": null,
+    "model": null,
+    "input": null,
+    "links": [],
+    "semantic_path": [],
+    "status": "ok",
+    "end_ns": 20195743767,
+    "duration_ns": 1484685,
+    "metrics": {
+      "executor.execution_ns": 278116
+    },
+    "source": "session-sdk",
+    "process_run_id": "fec279e08ba44d87b7bf18e537258d92",
+    "result": null,
+    "error_type": null
+  },
+  {
+    "agent_id": "qwen",
+    "session_id": "s1",
+    "trace_id": "78c62b3c5a40468a879a52d8471bd127",
+    "span_id": "3c75c08b4bbd421ca7d9fdef664d2cc7",
+    "parent_id": "8538634c779940e0801f3e3e53b3571d",
+    "kind": "llm",
+    "name": "qwen3.8-27b-int4",
+    "start_ns": 20268958597,
+    "clock_id": "3623b779c6ac461596c22a61cee133cb",
+    "turn_id": null,
+    "parallel_group": null,
+    "loop_id": null,
+    "iteration": null,
+    "model": "qwen3.8-27b-int4",
+    "input": {
+      "bytes": 49447,
+      "sha256": "385c728c8b8ed8a5cbc2d0e8afb8fc684f560dd91e21f43706495529ea37b3ff"
+    },
+    "links": [],
+    "semantic_path": [
+      "codex-qwen-smoke"
+    ],
+    "status": "ok",
+    "end_ns": 21580732878,
+    "duration_ns": 1311774281,
+    "metrics": {
+      "client.request_ns": 1311066159,
+      "provider.input_tokens": 6192,
+      "provider.output_tokens": 63
+    },
+    "source": "framework-sdk",
+    "process_run_id": null,
+    "result": {
+      "bytes": 620,
+      "sha256": "c3c88f4690f6738db46b30dded65e73b5ad16a6c7c0f455739ad8cdabcbce742"
+    },
+    "error_type": null
+  }
+]

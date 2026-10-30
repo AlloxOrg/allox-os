@@ -1,0 +1,206 @@
+{
+  "passed": false,
+  "kernel": "6.1.62",
+  "snapshot_backend": "directory fixture; no rollback tested",
+  "execution_boundary": "real Kata + Bubblewrap + cgroup v2",
+  "model": "qwen3.8-27b-int4",
+  "rounds": [
+    {
+      "turn": 1,
+      "run_id": "d01b0be0ebb640c1967f13c8195bfd56",
+      "thread_id": "01a18c52-2645-7891-b1e4-859c1de028bc",
+      "exit_code": 0,
+      "commands": [
+        {
+          "id": "item_2",
+          "type": "command_execution",
+          "command": "/bin/bash -lc '[\"python3\", \"task.py\"]'",
+          "aggregated_output": "/bin/bash: line 1: [python3,: command not found\n",
+          "exit_code": 127,
+          "status": "failed"
+        }
+      ],
+      "state": "completed"
+    },
+    {
+      "turn": 2,
+      "run_id": "b8b7441b7c1f41bd9e0324982c847deb",
+      "thread_id": "01a18c52-2645-7891-b1e4-859c1de028bc",
+      "exit_code": 0,
+      "commands": [
+        {
+          "id": "item_1",
+          "type": "command_execution",
+          "command": "/bin/bash -lc '[\"python3\", \"resume_task.py\", \"JADE_CRANE_926\"]'",
+          "aggregated_output": "/bin/bash: line 1: [python3,: command not found\n",
+          "exit_code": 127,
+          "status": "failed"
+        }
+      ],
+      "state": "completed"
+    }
+  ],
+  "error_type": "FileNotFoundError",
+  "error": "[Errno 2] No such file or directory: '/dev/shm/allox-qwen-monitor/workspace/agents/qwen/workspace/sessions/s1/current/proof.json'",
+  "model_requests": [
+    {
+      "http_status": 200,
+      "input_tokens": 5814,
+      "output_tokens": 55,
+      "input_bytes": 47066,
+      "output_bytes": 610
+    },
+    {
+      "http_status": 200,
+      "input_tokens": 5888,
+      "output_tokens": 14,
+      "input_bytes": 47524,
+      "output_bytes": 480
+    },
+    {
+      "http_status": 200,
+      "input_tokens": 5966,
+      "output_tokens": 58,
+      "input_bytes": 47996,
+      "output_bytes": 611
+    },
+    {
+      "http_status": 200,
+      "input_tokens": 6039,
+      "output_tokens": 35,
+      "input_bytes": 48485,
+      "output_bytes": 583
+    }
+  ],
+  "sdk_health": {
+    "enabled": true,
+    "attempted_events": 14,
+    "failed_events": 0,
+    "emit_ns": 8325161,
+    "serialized_bytes": 5299,
+    "complete": true,
+    "metric_errors": 0,
+    "strict": true
+  },
+  "profile": {
+    "runs": 1,
+    "spans": 9,
+    "complete": false,
+    "warnings": [
+      {
+        "span_id": "c8fd5f0ca5c9469d8edad8a0d4672be9",
+        "reason": "child timing incomplete"
+      },
+      {
+        "span_id": "9493370732264e9fbffbde587295340c",
+        "reason": "child timing incomplete"
+      }
+    ],
+    "groups": [
+      {
+        "semantic_path": [
+          "codex-qwen-smoke"
+        ],
+        "kind": "llm",
+        "name": "qwen3.8-27b-int4",
+        "model": "qwen3.8-27b-int4",
+        "calls": 4,
+        "runs": 1,
+        "errors": 0,
+        "inclusive_ns": 4618287778,
+        "self_ns": 4618287778,
+        "p50_ns": 1103996987,
+        "p95_ns": 1859893308,
+        "metrics": {
+          "client.request_ns": {
+            "sum": 4614478891,
+            "samples": 4
+          },
+          "provider.input_tokens": {
+            "sum": 23707,
+            "samples": 4
+          },
+          "provider.output_tokens": {
+            "sum": 162,
+            "samples": 4
+          }
+        }
+      },
+      {
+        "semantic_path": [
+          "codex-qwen-smoke"
+        ],
+        "kind": "process",
+        "name": "allox.execution",
+        "model": null,
+        "calls": 2,
+        "runs": 1,
+        "errors": 0,
+        "inclusive_ns": 8269122830,
+        "self_ns": 8269122830,
+        "p50_ns": 3881933151,
+        "p95_ns": 4387189679,
+        "metrics": {
+          "cgroup.cpu_usage_usec": {
+            "sum": 1444114,
+            "samples": 2
+          }
+        }
+      },
+      {
+        "semantic_path": [
+          "codex-qwen-smoke"
+        ],
+        "kind": "run",
+        "name": "codex-qwen-real-agent",
+        "model": null,
+        "calls": 1,
+        "runs": 1,
+        "errors": 0,
+        "inclusive_ns": 9630595211,
+        "self_ns": 3799670,
+        "p50_ns": 9630595211,
+        "p95_ns": 9630595211,
+        "metrics": {}
+      },
+      {
+        "semantic_path": [
+          "codex-qwen-smoke"
+        ],
+        "kind": "turn",
+        "name": "turn-1",
+        "model": null,
+        "calls": 1,
+        "runs": 1,
+        "errors": 0,
+        "inclusive_ns": 5095525079,
+        "self_ns": null,
+        "p50_ns": 5095525079,
+        "p95_ns": 5095525079,
+        "metrics": {}
+      },
+      {
+        "semantic_path": [
+          "codex-qwen-smoke"
+        ],
+        "kind": "turn",
+        "name": "turn-2",
+        "model": null,
+        "calls": 1,
+        "runs": 1,
+        "errors": 0,
+        "inclusive_ns": 4531270462,
+        "self_ns": null,
+        "p50_ns": 4531270462,
+        "p95_ns": 4531270462,
+        "metrics": {}
+      }
+    ],
+    "completeness_scope": "received spans only; reconcile producer health separately",
+    "time_semantics": "inclusive sums are work, not elapsed wall time; self subtracts child union",
+    "unobserved": [
+      "transport unless instrumented",
+      "server timings unless provider reports"
+    ]
+  }
+}

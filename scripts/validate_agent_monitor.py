@@ -9,6 +9,7 @@ import subprocess
 import sys
 from pathlib import Path
 
+USE_AFFINITY = True
 
 def run(argv: list[str], *, output: Path | None = None) -> int:
     cpus = []
@@ -16,21 +17,25 @@ def run(argv: list[str], *, output: Path | None = None) -> int:
         bounds = [int(v) for v in part.split("-")]
         cpus.extend(range(bounds[0], bounds[-1]+1))
     affinity = ",".join(str(v) for v in sorted(set(cpus))[-24:])
-    print(json.dumps({"cpu_ids": affinity, "argv": argv}), flush=True)
+    command = ["taskset", "-c", affinity, *argv] if USE_AFFINITY else argv
+    print(json.dumps({"cpu_ids": affinity if USE_AFFINITY else None, "argv": argv}), flush=True)
     if output:
         with output.open("w") as stream:
-            result = subprocess.run(["taskset", "-c", affinity, *argv], check=False, stdout=stream,
+            result = subprocess.run(command, check=False, stdout=stream,
                                     stderr=subprocess.STDOUT)
         print(output.read_text()[-12000:], flush=True)
         return result.returncode
-    return subprocess.call(["taskset", "-c", affinity, *argv])
+    return subprocess.call(command)
 
 
 def main():
+    global USE_AFFINITY
     parser = argparse.ArgumentParser()
     parser.add_argument("--skip-bootstrap", action="store_true")
     parser.add_argument("--skip-typecheck", action="store_true")
+    parser.add_argument("--no-affinity", action="store_true", help="Explicit user override only")
     args = parser.parse_args()
+    USE_AFFINITY = not args.no_affinity
     root = Path(__file__).resolve().parents[1]
     if not str(root).startswith("/data/hy/Allox/"):
         raise SystemExit("run only in the isolated 117 experiment workspace")
@@ -45,7 +50,7 @@ def main():
           "hatchling", "editables"], "dependencies.log"),
         ([str(python), "-m", "pip", "install", "--no-build-isolation", "-e", ".",
           "-e", "plugins/agent-monitor"], "install.log"),
-        ([str(python), "-m", "pytest", "-q"], "pytest.log"),
+        ([str(python), "-m", "pytest", "-q", "tests", "plugins/system-effects/tests", "-ra"], "pytest.log"),
         ([str(python), "-m", "ruff", "check", "src", "plugins/agent-monitor", "tests/test_agent_monitor.py",
           "examples/monitoring_benchmark.py", "scripts/validate_agent_monitor.py"], "ruff.log"),
         ([str(python), "-m", "pyright"], "pyright.log"),

@@ -1,0 +1,449 @@
+{
+  "scope": "synthetic SDK + SQLite synchronous durability; not Agent/eBPF overhead",
+  "pairs": [
+    {
+      "off": {
+        "enabled": false,
+        "wall_ns": 48383365,
+        "cpu_seconds": 0.0055110000000000055,
+        "peak_rss_kib": 16376,
+        "step_p50_ns": 1205437.5,
+        "step_p95_ns": 1271830,
+        "monitor": null,
+        "collector": null,
+        "profile": null
+      },
+      "on": {
+        "enabled": true,
+        "wall_ns": 2785728737,
+        "cpu_seconds": 0.11314500000000001,
+        "peak_rss_kib": 16868,
+        "step_p50_ns": 66695202.0,
+        "step_p95_ns": 108241530,
+        "monitor": {
+          "enabled": true,
+          "attempted_events": 160,
+          "failed_events": 0,
+          "emit_ns": 2722543062,
+          "serialized_bytes": 53480,
+          "complete": true,
+          "metric_errors": 0,
+          "strict": true
+        },
+        "collector": {
+          "accepted_events_this_process": 160,
+          "rejected_events_this_process": 0,
+          "collector_ns_this_process": 2713409084,
+          "storage_bytes": 529528,
+          "delivery": "synchronous-acknowledged",
+          "event_loss_rate": null,
+          "event_loss_note": "no claim about events never submitted by a producer"
+        },
+        "profile": {
+          "runs": 1,
+          "spans": 80,
+          "complete": true,
+          "warnings": [],
+          "groups": [
+            {
+              "semantic_path": [],
+              "kind": "phase",
+              "name": "tool_execution",
+              "model": null,
+              "calls": 40,
+              "runs": 1,
+              "errors": 0,
+              "inclusive_ns": 692580023,
+              "self_ns": 692580023,
+              "p50_ns": 17923071,
+              "p95_ns": 26394372,
+              "metrics": {
+                "executor.execution_ns": {
+                  "sum": 51553073,
+                  "samples": 40
+                }
+              }
+            },
+            {
+              "semantic_path": [],
+              "kind": "tool",
+              "name": "cpu-and-wait",
+              "model": null,
+              "calls": 40,
+              "runs": 1,
+              "errors": 0,
+              "inclusive_ns": 2015609431,
+              "self_ns": 1323029408,
+              "p50_ns": 49946900,
+              "p95_ns": 75079664,
+              "metrics": {}
+            }
+          ],
+          "completeness_scope": "received spans only; reconcile producer health separately",
+          "time_semantics": "inclusive sums are work, not elapsed wall time; self subtracts child union",
+          "unobserved": [
+            "transport unless instrumented",
+            "server timings unless provider reports"
+          ]
+        }
+      },
+      "wall_overhead_percent": 5657.616769730671
+    },
+    {
+      "on": {
+        "enabled": true,
+        "wall_ns": 2830159985,
+        "cpu_seconds": 0.10546399999999997,
+        "peak_rss_kib": 16876,
+        "step_p50_ns": 66729411.5,
+        "step_p95_ns": 91831349,
+        "monitor": {
+          "enabled": true,
+          "attempted_events": 160,
+          "failed_events": 0,
+          "emit_ns": 2766837657,
+          "serialized_bytes": 53480,
+          "complete": true,
+          "metric_errors": 0,
+          "strict": true
+        },
+        "collector": {
+          "accepted_events_this_process": 160,
+          "rejected_events_this_process": 0,
+          "collector_ns_this_process": 2758623661,
+          "storage_bytes": 527432,
+          "delivery": "synchronous-acknowledged",
+          "event_loss_rate": null,
+          "event_loss_note": "no claim about events never submitted by a producer"
+        },
+        "profile": {
+          "runs": 1,
+          "spans": 80,
+          "complete": true,
+          "warnings": [],
+          "groups": [
+            {
+              "semantic_path": [],
+              "kind": "phase",
+              "name": "tool_execution",
+              "model": null,
+              "calls": 40,
+              "runs": 1,
+              "errors": 0,
+              "inclusive_ns": 752239236,
+              "self_ns": 752239236,
+              "p50_ns": 17912921,
+              "p95_ns": 26344390,
+              "metrics": {
+                "executor.execution_ns": {
+                  "sum": 52141132,
+                  "samples": 40
+                }
+              }
+            },
+            {
+              "semantic_path": [],
+              "kind": "tool",
+              "name": "cpu-and-wait",
+              "model": null,
+              "calls": 40,
+              "runs": 1,
+              "errors": 0,
+              "inclusive_ns": 2209938375,
+              "self_ns": 1457699139,
+              "p50_ns": 49960551,
+              "p95_ns": 75071238,
+              "metrics": {}
+            }
+          ],
+          "completeness_scope": "received spans only; reconcile producer health separately",
+          "time_semantics": "inclusive sums are work, not elapsed wall time; self subtracts child union",
+          "unobserved": [
+            "transport unless instrumented",
+            "server timings unless provider reports"
+          ]
+        }
+      },
+      "off": {
+        "enabled": false,
+        "wall_ns": 49955862,
+        "cpu_seconds": 0.007365000000000007,
+        "peak_rss_kib": 16368,
+        "step_p50_ns": 1241246.0,
+        "step_p95_ns": 1308440,
+        "monitor": null,
+        "collector": null,
+        "profile": null
+      },
+      "wall_overhead_percent": 5565.321088844388
+    },
+    {
+      "off": {
+        "enabled": false,
+        "wall_ns": 47559470,
+        "cpu_seconds": 0.005015999999999996,
+        "peak_rss_kib": 16376,
+        "step_p50_ns": 1181919.5,
+        "step_p95_ns": 1260963,
+        "monitor": null,
+        "collector": null,
+        "profile": null
+      },
+      "on": {
+        "enabled": true,
+        "wall_ns": 2621032654,
+        "cpu_seconds": 0.11120400000000003,
+        "peak_rss_kib": 16876,
+        "step_p50_ns": 66702030.5,
+        "step_p95_ns": 83399005,
+        "monitor": {
+          "enabled": true,
+          "attempted_events": 160,
+          "failed_events": 0,
+          "emit_ns": 2557864302,
+          "serialized_bytes": 53480,
+          "complete": true,
+          "metric_errors": 0,
+          "strict": true
+        },
+        "collector": {
+          "accepted_events_this_process": 160,
+          "rejected_events_this_process": 0,
+          "collector_ns_this_process": 2549213616,
+          "storage_bytes": 531624,
+          "delivery": "synchronous-acknowledged",
+          "event_loss_rate": null,
+          "event_loss_note": "no claim about events never submitted by a producer"
+        },
+        "profile": {
+          "runs": 1,
+          "spans": 80,
+          "complete": true,
+          "warnings": [],
+          "groups": [
+            {
+              "semantic_path": [],
+              "kind": "phase",
+              "name": "tool_execution",
+              "model": null,
+              "calls": 40,
+              "runs": 1,
+              "errors": 0,
+              "inclusive_ns": 700665836,
+              "self_ns": 700665836,
+              "p50_ns": 17933533,
+              "p95_ns": 18126631,
+              "metrics": {
+                "executor.execution_ns": {
+                  "sum": 51403555,
+                  "samples": 40
+                }
+              }
+            },
+            {
+              "semantic_path": [],
+              "kind": "tool",
+              "name": "cpu-and-wait",
+              "model": null,
+              "calls": 40,
+              "runs": 1,
+              "errors": 0,
+              "inclusive_ns": 2042343542,
+              "self_ns": 1341677706,
+              "p50_ns": 49967649,
+              "p95_ns": 66878648,
+              "metrics": {}
+            }
+          ],
+          "completeness_scope": "received spans only; reconcile producer health separately",
+          "time_semantics": "inclusive sums are work, not elapsed wall time; self subtracts child union",
+          "unobserved": [
+            "transport unless instrumented",
+            "server timings unless provider reports"
+          ]
+        }
+      },
+      "wall_overhead_percent": 5411.063630439952
+    },
+    {
+      "on": {
+        "enabled": true,
+        "wall_ns": 2802522959,
+        "cpu_seconds": 0.113459,
+        "peak_rss_kib": 16872,
+        "step_p50_ns": 66714351.0,
+        "step_p95_ns": 91788872,
+        "monitor": {
+          "enabled": true,
+          "attempted_events": 160,
+          "failed_events": 0,
+          "emit_ns": 2739544660,
+          "serialized_bytes": 53480,
+          "complete": true,
+          "metric_errors": 0,
+          "strict": true
+        },
+        "collector": {
+          "accepted_events_this_process": 160,
+          "rejected_events_this_process": 0,
+          "collector_ns_this_process": 2730807452,
+          "storage_bytes": 536864,
+          "delivery": "synchronous-acknowledged",
+          "event_loss_rate": null,
+          "event_loss_note": "no claim about events never submitted by a producer"
+        },
+        "profile": {
+          "runs": 1,
+          "spans": 80,
+          "complete": true,
+          "warnings": [],
+          "groups": [
+            {
+              "semantic_path": [],
+              "kind": "phase",
+              "name": "tool_execution",
+              "model": null,
+              "calls": 40,
+              "runs": 1,
+              "errors": 0,
+              "inclusive_ns": 766250963,
+              "self_ns": 766250963,
+              "p50_ns": 17937001,
+              "p95_ns": 26340881,
+              "metrics": {
+                "executor.execution_ns": {
+                  "sum": 51618458,
+                  "samples": 40
+                }
+              }
+            },
+            {
+              "semantic_path": [],
+              "kind": "tool",
+              "name": "cpu-and-wait",
+              "model": null,
+              "calls": 40,
+              "runs": 1,
+              "errors": 0,
+              "inclusive_ns": 2115681821,
+              "self_ns": 1349430858,
+              "p50_ns": 49984566,
+              "p95_ns": 66751720,
+              "metrics": {}
+            }
+          ],
+          "completeness_scope": "received spans only; reconcile producer health separately",
+          "time_semantics": "inclusive sums are work, not elapsed wall time; self subtracts child union",
+          "unobserved": [
+            "transport unless instrumented",
+            "server timings unless provider reports"
+          ]
+        }
+      },
+      "off": {
+        "enabled": false,
+        "wall_ns": 51258009,
+        "cpu_seconds": 0.008354000000000009,
+        "peak_rss_kib": 16372,
+        "step_p50_ns": 1293286.5,
+        "step_p95_ns": 1326378,
+        "monitor": null,
+        "collector": null,
+        "profile": null
+      },
+      "wall_overhead_percent": 5367.483060061892
+    },
+    {
+      "off": {
+        "enabled": false,
+        "wall_ns": 51004548,
+        "cpu_seconds": 0.008079000000000006,
+        "peak_rss_kib": 16376,
+        "step_p50_ns": 1273190.5,
+        "step_p95_ns": 1326136,
+        "monitor": null,
+        "collector": null,
+        "profile": null
+      },
+      "on": {
+        "enabled": true,
+        "wall_ns": 2362169424,
+        "cpu_seconds": 0.103201,
+        "peak_rss_kib": 16868,
+        "step_p50_ns": 66655420.0,
+        "step_p95_ns": 83412893,
+        "monitor": {
+          "enabled": true,
+          "attempted_events": 160,
+          "failed_events": 0,
+          "emit_ns": 2300847278,
+          "serialized_bytes": 53480,
+          "complete": true,
+          "metric_errors": 0,
+          "strict": true
+        },
+        "collector": {
+          "accepted_events_this_process": 160,
+          "rejected_events_this_process": 0,
+          "collector_ns_this_process": 2292748504,
+          "storage_bytes": 521144,
+          "delivery": "synchronous-acknowledged",
+          "event_loss_rate": null,
+          "event_loss_note": "no claim about events never submitted by a producer"
+        },
+        "profile": {
+          "runs": 1,
+          "spans": 80,
+          "complete": true,
+          "warnings": [],
+          "groups": [
+            {
+              "semantic_path": [],
+              "kind": "phase",
+              "name": "tool_execution",
+              "model": null,
+              "calls": 40,
+              "runs": 1,
+              "errors": 0,
+              "inclusive_ns": 649949045,
+              "self_ns": 649949045,
+              "p50_ns": 17904623,
+              "p95_ns": 18055798,
+              "metrics": {
+                "executor.execution_ns": {
+                  "sum": 50186822,
+                  "samples": 40
+                }
+              }
+            },
+            {
+              "semantic_path": [],
+              "kind": "tool",
+              "name": "cpu-and-wait",
+              "model": null,
+              "calls": 40,
+              "runs": 1,
+              "errors": 0,
+              "inclusive_ns": 1772266206,
+              "self_ns": 1122317161,
+              "p50_ns": 49917575,
+              "p95_ns": 58315443,
+              "metrics": {}
+            }
+          ],
+          "completeness_scope": "received spans only; reconcile producer health separately",
+          "time_semantics": "inclusive sums are work, not elapsed wall time; self subtracts child union",
+          "unobserved": [
+            "transport unless instrumented",
+            "server timings unless provider reports"
+          ]
+        }
+      },
+      "wall_overhead_percent": 4531.291750688586
+    }
+  ],
+  "median_wall_overhead_percent": 5411.063630439952,
+  "clock_resolution_seconds": 1e-09,
+  "clock_error_bound_ns": null,
+  "clock_note": "resolution is not measured accuracy or cross-host synchronization"
+}

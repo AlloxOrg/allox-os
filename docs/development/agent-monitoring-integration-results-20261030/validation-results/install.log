@@ -1,0 +1,23 @@
+Obtaining file:///data/hy/Allox/agent-monitoring-main-20261030-v2
+  Checking if build backend supports build_editable: started
+  Checking if build backend supports build_editable: finished with status 'done'
+  Preparing editable metadata (pyproject.toml): started
+  Preparing editable metadata (pyproject.toml): finished with status 'done'
+Obtaining file:///data/hy/Allox/agent-monitoring-main-20261030-v2/plugins/agent-monitor
+  Checking if build backend supports build_editable: started
+  Checking if build backend supports build_editable: finished with status 'done'
+  Preparing editable metadata (pyproject.toml): started
+  Preparing editable metadata (pyproject.toml): finished with status 'done'
+Building wheels for collected packages: allox-os, allox-agent-monitor
+  Building editable for allox-os (pyproject.toml): started
+  Building editable for allox-os (pyproject.toml): finished with status 'done'
+  Created wheel for allox-os: filename=allox_os-0.1.0-py3-none-any.whl size=7199 sha256=cae72baa1e2bf123c7240b657f67e577b1cd86b7e1b63f5cb9d02d0cb0868233
+  Stored in directory: /tmp/pip-ephem-wheel-cache-boxa_n0s/wheels/82/93/c9/c07966149d473d7044c1344b0818a4ec2a826480ae3351cac2
+  Building editable for allox-agent-monitor (pyproject.toml): started
+  Building editable for allox-agent-monitor (pyproject.toml): finished with status 'done'
+  Created wheel for allox-agent-monitor: filename=allox_agent_monitor-0.1.0-py3-none-any.whl size=1474 sha256=daf3644f53c22441632d789661cfe7de5bedb7c3e5ef7e3a4d2b095b8c3dcfb6
+  Stored in directory: /tmp/pip-ephem-wheel-cache-boxa_n0s/wheels/70/a8/41/28aed13c74d583eb6df9d4aa31da0450ee3aa8833c877ee3fa
+Successfully built allox-os allox-agent-monitor
+Installing collected packages: allox-os, allox-agent-monitor
+
+Successfully installed allox-agent-monitor-0.1.0 allox-os-0.1.0

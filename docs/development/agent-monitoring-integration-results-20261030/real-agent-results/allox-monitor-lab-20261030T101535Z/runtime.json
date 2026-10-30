@@ -1,0 +1,78 @@
+{
+  "passed": false,
+  "model": "qwen3.8-27b-int4",
+  "runtime": "kata-allox-ebpf",
+  "provider_credential_in_guest": false,
+  "cpu_binding": "none; user override",
+  "protocol_bridge": "test-only Responses to Chat Completions",
+  "main_commit": "44977ad",
+  "snapshot_backend": "directory fixture; no rollback tested",
+  "container": "619d068caa94af7813ad93917662884fe93e67c640135c7922e5d5a71dce8485",
+  "container_exit_code": 1,
+  "test_container_removed": true,
+  "gateway_requests": [
+    {
+      "http_status": 200,
+      "upstream_http_status": 200,
+      "elapsed_ns": 3767258338,
+      "tool_names": [
+        "exec_command",
+        "write_stdin",
+        "update_plan",
+        "request_user_input",
+        "view_image",
+        "multi_agent_v1",
+        "get_goal",
+        "create_goal",
+        "update_goal",
+        "web_search"
+      ],
+      "response_output_types": [
+        "message"
+      ],
+      "upstream_error": null
+    },
+    {
+      "http_status": 200,
+      "upstream_http_status": 200,
+      "elapsed_ns": 1033362394,
+      "tool_names": [
+        "exec_command",
+        "write_stdin",
+        "update_plan",
+        "request_user_input",
+        "view_image",
+        "multi_agent_v1",
+        "get_goal",
+        "create_goal",
+        "update_goal",
+        "web_search"
+      ],
+      "response_output_types": [
+        "message"
+      ],
+      "upstream_error": null
+    },
+    {
+      "http_status": 200,
+      "upstream_http_status": 200,
+      "elapsed_ns": 734190569,
+      "tool_names": [
+        "exec_command",
+        "write_stdin",
+        "update_plan",
+        "request_user_input",
+        "view_image",
+        "multi_agent_v1",
+        "get_goal",
+        "create_goal",
+        "update_goal",
+        "web_search"
+      ],
+      "response_output_types": [
+        "message"
+      ],
+      "upstream_error": null
+    }
+  ]
+}

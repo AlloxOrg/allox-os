@@ -1,0 +1,181 @@
+{
+  "passed": true,
+  "kernel": "6.1.62",
+  "snapshot_backend": "directory fixture; no rollback tested",
+  "runs": [
+    {
+      "agent": "agent-a",
+      "session": "s1",
+      "run_id": "e024182ef5cd4301a4047c4d53acaf3a",
+      "state": "completed",
+      "probe": {
+        "agent": "agent-a",
+        "session": "s1",
+        "previous_identity_visible": false,
+        "child_result": 31249875000,
+        "management_token_absent": true,
+        "forged_identity_rejected": true,
+        "sdk_health": {
+          "enabled": true,
+          "attempted_events": 8,
+          "failed_events": 0,
+          "emit_ns": 36498279,
+          "serialized_bytes": 2335,
+          "complete": true,
+          "metric_errors": 0,
+          "strict": true
+        }
+      },
+      "span_count": 5,
+      "core_metrics": {
+        "cgroup.cpu_usage_usec": 353692
+      }
+    },
+    {
+      "agent": "agent-a",
+      "session": "s2",
+      "run_id": "1f62dd7c0dc8422682d9c5a0f6b01211",
+      "state": "completed",
+      "probe": {
+        "agent": "agent-a",
+        "session": "s2",
+        "previous_identity_visible": false,
+        "child_result": 31249875000,
+        "management_token_absent": true,
+        "forged_identity_rejected": true,
+        "sdk_health": {
+          "enabled": true,
+          "attempted_events": 8,
+          "failed_events": 0,
+          "emit_ns": 12166417,
+          "serialized_bytes": 2334,
+          "complete": true,
+          "metric_errors": 0,
+          "strict": true
+        }
+      },
+      "span_count": 5,
+      "core_metrics": {
+        "cgroup.cpu_usage_usec": 331962
+      }
+    },
+    {
+      "agent": "agent-b",
+      "session": "s1",
+      "run_id": "b5b3104dc006408491a2dd68f0424b76",
+      "state": "completed",
+      "probe": {
+        "agent": "agent-b",
+        "session": "s1",
+        "previous_identity_visible": false,
+        "child_result": 31249875000,
+        "management_token_absent": true,
+        "forged_identity_rejected": true,
+        "sdk_health": {
+          "enabled": true,
+          "attempted_events": 8,
+          "failed_events": 0,
+          "emit_ns": 8877795,
+          "serialized_bytes": 2334,
+          "complete": true,
+          "metric_errors": 0,
+          "strict": true
+        }
+      },
+      "span_count": 5,
+      "core_metrics": {
+        "cgroup.cpu_usage_usec": 299511
+      }
+    }
+  ],
+  "checks": {
+    "agent-a/s1": true,
+    "agent-a/s2": true,
+    "agent-b/s1": true,
+    "cross_session_profile": true,
+    "cross_session_profile_complete": true
+  },
+  "combined_profile": {
+    "runs": 2,
+    "spans": 8,
+    "complete": true,
+    "warnings": [],
+    "groups": [
+      {
+        "semantic_path": [
+          "contract"
+        ],
+        "kind": "phase",
+        "name": "tool_execution",
+        "model": null,
+        "calls": 2,
+        "runs": 2,
+        "errors": 0,
+        "inclusive_ns": 223624164,
+        "self_ns": 223624164,
+        "p50_ns": 96080824,
+        "p95_ns": 127543340,
+        "metrics": {
+          "executor.execution_ns": {
+            "sum": 219633705,
+            "samples": 2
+          }
+        }
+      },
+      {
+        "semantic_path": [
+          "contract"
+        ],
+        "kind": "run",
+        "name": "contract-run",
+        "model": null,
+        "calls": 2,
+        "runs": 2,
+        "errors": 0,
+        "inclusive_ns": 258750026,
+        "self_ns": 17786435,
+        "p50_ns": 106716915,
+        "p95_ns": 152033111,
+        "metrics": {}
+      },
+      {
+        "semantic_path": [
+          "contract"
+        ],
+        "kind": "tool",
+        "name": "expected-tool-error",
+        "model": null,
+        "calls": 2,
+        "runs": 2,
+        "errors": 2,
+        "inclusive_ns": 6043071,
+        "self_ns": 6043071,
+        "p50_ns": 2640625,
+        "p95_ns": 3402446,
+        "metrics": {}
+      },
+      {
+        "semantic_path": [
+          "contract"
+        ],
+        "kind": "tool",
+        "name": "probe",
+        "model": null,
+        "calls": 2,
+        "runs": 2,
+        "errors": 0,
+        "inclusive_ns": 234920520,
+        "self_ns": 11296356,
+        "p50_ns": 98882402,
+        "p95_ns": 136038118,
+        "metrics": {}
+      }
+    ],
+    "completeness_scope": "received spans only; reconcile producer health separately",
+    "time_semantics": "inclusive sums are work, not elapsed wall time; self subtracts child union",
+    "unobserved": [
+      "transport unless instrumented",
+      "server timings unless provider reports"
+    ]
+  }
+}

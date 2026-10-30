@@ -1,0 +1,3 @@
+Reading additional input from stdin...
+2026-10-30T10:16:21.068072Z ERROR codex_core::tools::router: error=unsupported call: shell
+2026-10-30T10:16:22.190577Z ERROR codex_core::tools::router: error=unsupported call: shell

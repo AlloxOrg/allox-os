@@ -1,4 +1,4 @@
-"""Real Codex/Qwen inside Kata + Bubblewrap; no provider credentials required."""
+"""Real Codex/Qwen inside Kata + Bubblewrap; provider credentials remain on host."""
 
 from __future__ import annotations
 
@@ -12,10 +12,12 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import urlsplit
 
-from allox.workspace.daemon import WorkspaceService
-from allox.workspace.store import WorkspaceStore
 from allox_agent_monitor.sdk import Tracer, payload, record_vllm_metrics
 
+from allox.workspace.daemon import WorkspaceService
+from allox.workspace.store import WorkspaceStore
+
+MODEL = os.environ.get("ALLOX_QWEN_MODEL", "Qwen3.5-4B-CPU-Test")
 
 class DirectoryBackend:
     """Execution-only fixture. This test does not claim Btrfs rollback coverage."""
@@ -40,12 +42,13 @@ class ModelProxy(BaseHTTPRequestHandler):
             if not 0 < size < 2 * 1024 * 1024:
                 raise ValueError("invalid model request size")
             request = json.loads(self.rfile.read(size))
-            request["model"] = "Qwen3.5-4B-CPU-Test"
+            streaming = bool(request.get("stream"))
+            request["model"] = MODEL
             request["stream"] = False
-            request["max_output_tokens"] = min(request.get("max_output_tokens") or 768, 768)
+            request["max_output_tokens"] = min(request.get("max_output_tokens") or 2048, 2048)
             request["chat_template_kwargs"] = {"enable_thinking": False}
             with server.tracer.span(
-                "Qwen3.5-4B-CPU-Test", "llm", model="Qwen3.5-4B-CPU-Test",
+                MODEL, "llm", model=MODEL,
                 parent_id=server.parent_id, semantic_path=["codex-qwen-smoke"],
                 input=payload(request),
             ) as span:
@@ -53,7 +56,8 @@ class ModelProxy(BaseHTTPRequestHandler):
                 conn = http.client.HTTPConnection(target.hostname, target.port, timeout=300)
                 started = time.perf_counter_ns()
                 conn.request("POST", target.path.rstrip("/") + "/responses",
-                             json.dumps(request).encode(), {"Content-Type": "application/json"})
+                             json.dumps(request).encode(), {"Content-Type": "application/json",
+                             "Authorization": "Bearer "+os.environ.get("ALLOX_GATEWAY_TOKEN", "")})
                 response = conn.getresponse()
                 data = response.read(4 * 1024 * 1024)
                 span.metric("client.request_ns", time.perf_counter_ns()-started)
@@ -71,10 +75,25 @@ class ModelProxy(BaseHTTPRequestHandler):
                 if response.status >= 400:
                     raise RuntimeError("model upstream rejected request")
             self.send_response(response.status)
-            self.send_header("Content-Type", "application/json")
-            self.send_header("Content-Length", str(len(data)))
-            self.end_headers()
-            self.wfile.write(data)
+            if streaming:
+                self.send_header("Content-Type", "text/event-stream")
+                self.end_headers()
+                events = [{"type": "response.created", "response": {**value, "output": [],
+                           "status": "in_progress"}}]
+                for index, item in enumerate(value.get("output", [])):
+                    events.append({"type": "response.output_item.added", "output_index": index,
+                                   "item": item})
+                    events.append({"type": "response.output_item.done", "output_index": index,
+                                   "item": item})
+                events.append({"type": "response.completed", "response": value})
+                for event in events:
+                    self.wfile.write(("event: "+event["type"]+"\ndata: "+json.dumps(event)+"\n\n").encode())
+                self.wfile.flush()
+            else:
+                self.send_header("Content-Type", "application/json")
+                self.send_header("Content-Length", str(len(data)))
+                self.end_headers()
+                self.wfile.write(data)
         except Exception as exc:  # noqa: BLE001 - do not expose prompts or infrastructure errors
             data = json.dumps({"error": {"message": "model proxy: " + type(exc).__name__}}).encode()
             self.send_response(502)
@@ -110,7 +129,7 @@ t.call_tool('resume-and-write',work)
 
 
 def main():
-    runtime = Path("/tmp/allox-qwen-monitor")
+    runtime = Path("/dev/shm/allox-qwen-monitor")
     runtime.mkdir()
     store = WorkspaceStore(runtime / "workspace", DirectoryBackend())
     store.initialize()
@@ -129,13 +148,13 @@ def main():
     proxy.tracer, proxy.requests, proxy.parent_id = tracer, [], None
     thread = threading.Thread(target=proxy.serve_forever, daemon=True)
     thread.start()
-    config = f'''model = "Qwen3.5-4B-CPU-Test"
+    config = f'''model = "{MODEL}"
 model_provider = "allox_qwen_cpu"
 approval_policy = "never"
 sandbox_mode = "danger-full-access"
 model_context_window = 16384
 [model_providers.allox_qwen_cpu]
-name = "Qwen local CPU"
+name = "Allox laboratory bridge"
 base_url = "http://127.0.0.1:{proxy.server_port}/v1"
 wire_api = "responses"
 requires_openai_auth = false
@@ -143,24 +162,26 @@ request_max_retries = 0
 stream_max_retries = 0
 '''
     (home / "config.toml").write_text(config)
-    environment = {"CODEX_HOME": "/workspace/.codex", "CODEX_QWEN_COMPAT": "1",
+    environment = {"CODEX_HOME": "/workspace/.codex",
                    "LD_LIBRARY_PATH": "/usr/local/lib/qwen-test"}
     report = {"passed": False, "kernel": os.uname().release,
               "snapshot_backend": "directory fixture; no rollback tested",
               "execution_boundary": "real Kata + Bubblewrap + cgroup v2",
-              "model": "Qwen3.5-4B-CPU-Test", "rounds": []}
+              "model": MODEL, "rounds": []}
     output = Path("/results")
     try:
         with tracer.span("codex-qwen-real-agent", "run", semantic_path=["codex-qwen-smoke"]):
             thread_id = None
             for index, prompt in enumerate((
-                "Use your shell tool to execute `python3 task.py` in /workspace now. "
+                ("Use the exec_command tool with cmd='python3 task.py', workdir='/workspace' now. "
+                "The argument name is cmd, a string; never use a command array or a tool named shell. "
+                "Use a real tool call, not XML or plain text describing a call. "
                 "Then read proof.json and report the sum. Do not merely describe a tool call. "
                 "Remember the conversation-only marker JADE_CRANE_926. Do not write this marker "
-                "to any file. Do not inspect environment, credentials, config or session logs.",
-                "Continue the previous task. Use your shell tool to run `python3 resume_task.py "
+                "to any file. Do not inspect environment, credentials, config or session logs."),
+                ("Continue the previous task. Use the exec_command tool with cmd to run `python3 resume_task.py "
                 "<marker>` using the conversation-only marker I gave you earlier as its argument. "
-                "Read resumed.json. Do not read config, session logs or any unrelated files.",
+                "Read resumed.json. Do not read config, session logs or any unrelated files."),
             )):
                 with tracer.span(f"turn-{index+1}", "turn", turn_id=f"turn-{index+1}") as turn:
                     proxy.parent_id = turn.span_id
@@ -213,7 +234,10 @@ stream_max_retries = 0
             "core_process_spans": sum(s["source"] == "allox-executor" for s in spans) == 2,
             "executor_internal_timing": any("executor.execution_ns" in s["metrics"] for s in spans),
             "all_received_spans_ended": all(s["status"] != "running" for s in spans),
+            "real_cgroup_cpu": all("cgroup.cpu_usage_usec" in s["metrics"]
+                for s in spans if s["source"] == "allox-executor"),
         }
+        (output / "trace.json").write_text(json.dumps(spans, indent=2))
         report["proof"], report["resumed"] = proof, resumed
         report["passed"] = all(report["checks"].values())
     except Exception as exc:  # noqa: BLE001 - record failure without dumping configuration

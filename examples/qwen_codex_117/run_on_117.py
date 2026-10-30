@@ -103,8 +103,8 @@ def main():
                 raise RuntimeError("required experiment artifact is missing")
             command += ["-v", f"{source}:{target}:ro"]
         command += ["-v", f"{result}:/results", "allox-ebpf-test:20260907", "sh", "-ec",
-            "sleep 10; python3 -m pip install -q --no-deps /dist/core/*.whl /dist/monitor/*.whl; "
-            "python3 -m allox.runtime.bootstrap; python3 /opt/guest_smoke.py"]
+            ("sleep 10; python3 -m pip install -q --no-deps /dist/core/*.whl /dist/monitor/*.whl; "
+            "python3 -m allox.runtime.bootstrap; python3 /opt/guest_smoke.py")]
         agent_container = output(command, timeout=90)
         for pattern in ("qemu-system.*sandbox-"+agent_container,
                         "containerd-shim-kata-v2-patched.*-id "+agent_container):

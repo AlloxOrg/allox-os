@@ -106,6 +106,10 @@ Session 身份，相同 trace ID 不会串线。跨 Agent 的全局查询尚未�
 
 ## 验证
 
+合并 system-effects main 后的真实 Kata、Codex/Qwen、跨 Session 身份与开销结果见
+[2026-10-30 集成实测](../../docs/development/agent-monitoring-integration-test-20261030.md)。
+其中明确区分已验证能力、仍需 SDK 埋点的范围、trace/clock 断点和不完整资源计数。
+
 在 117 的独立目录运行 `python3.10 scripts/validate_agent_monitor.py`：每个验证任务
 重新读取在线 CPU 并用 taskset 绑定最后 24 个逻辑核。输出位于 `validation-results/`。
 benchmark 是合成 CPU+等待负载，只测 SDK/SQLite 监控开销，不代表真实模型或 eBPF 开销。
