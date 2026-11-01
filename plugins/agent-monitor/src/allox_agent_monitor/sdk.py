@@ -2,17 +2,19 @@
 
 from __future__ import annotations
 
-import asyncio
 import hashlib
 import json
 import math
 import os
+import sys
 import threading
 import time
 import uuid
 from collections.abc import Callable
 from contextvars import ContextVar
 from typing import Any
+
+from allox_agent_monitor.clock import monotonic_domain
 
 _active: ContextVar[tuple[Any, Any] | None] = ContextVar("allox_monitor_span", default=None)
 _SECRET_KEYS = {"authorization", "api_key", "apikey", "password", "token", "secret"}
@@ -49,18 +51,23 @@ class Span:
         self.parent = active[1] if active and active[0] is tracer else None
         self.fields = {
             "trace_id": tracer.trace_id, "span_id": self.span_id,
-            "parent_id": self.parent.span_id if self.parent else None,
+            "parent_id": self.parent.span_id if self.parent else tracer.parent_id,
             "name": name, "kind": kind, "clock_id": tracer.clock_id,
-            "semantic_path": list(self.parent.fields["semantic_path"] if self.parent else ()),
-            "turn_id": self.parent.fields.get("turn_id") if self.parent else None,
+            "semantic_path": list(self.parent.fields["semantic_path"] if self.parent else tracer.semantic_path),
+            "turn_id": self.parent.fields.get("turn_id") if self.parent else tracer.turn_id,
             **fields,
         }
         self.metrics: dict[str, float] = {}
         self.result: dict | None = None
         self._entered = False
+        self._reported_error = None
+
+    def mark_error(self, error_type='RemoteToolError'):
+        self._reported_error = error_type
 
     @property
     def context(self) -> dict:
+        self.tracer.barrier()  # Exported references must already exist at the collector.
         return {"trace_id": self.tracer.trace_id, "span_id": self.span_id}
 
     def __enter__(self):
@@ -84,17 +91,20 @@ class Span:
     def __exit__(self, exc_type, exc, tb):
         ended = time.perf_counter_ns()
         _active.reset(self._token)
-        status = "ok" if exc is None else (
-            "cancelled" if isinstance(exc, asyncio.CancelledError) else "error"
+        status = ("error" if self._reported_error else "ok") if exc is None else (
+            "cancelled" if isinstance(exc, (GeneratorExit, getattr(
+                sys.modules.get('asyncio.exceptions'), 'CancelledError', GeneratorExit))) else "error"
         )
         event = {
             "event": "end", "trace_id": self.tracer.trace_id, "span_id": self.span_id,
             "clock_id": self.tracer.clock_id, "end_ns": ended, "status": status,
-            "result": self.result, "error_type": exc_type.__name__ if exc_type else None,
+            "result": self.result, "error_type": exc_type.__name__ if exc_type else self._reported_error,
             "metrics": self.metrics,
         }
         try:
             self.tracer.emit(event)
+            if self.tracer.delivery == 'background' and self.fields['kind'] in {'run', 'turn'}:
+                self.tracer.barrier()
         except Exception:
             if exc is None:
                 raise
@@ -107,9 +117,28 @@ class Tracer:
         self, emit: Callable[[dict], Any], *, trace_id: str | None = None,
         enabled: bool = True, capture_content: bool = False, strict: bool = False,
         batch_size: int = 1,
+        inherit_context: bool = True,
+        delivery: str = 'sync',
+        queue_capacity: int = 1024,
+        queue_bytes: int = 1024*1024,
+        flush_interval: float = .02,
+        export_timeout: float = 10,
     ) -> None:
-        self.trace_id = trace_id or uuid.uuid4().hex
-        self.clock_id = uuid.uuid4().hex
+        context = {}
+        raw = os.environ.get('ALLOX_MONITOR_CONTEXT', '') if inherit_context else ''
+        if raw:
+            if len(raw) > 8192:
+                raise ValueError('monitor context too large')
+            context = json.loads(raw)
+            if not isinstance(context, dict) or set(context) != {'trace_id', 'parent_id', 'semantic_path', 'turn_id'}:
+                raise ValueError('invalid monitor context')
+        if trace_id is not None and trace_id != context.get('trace_id'):
+            context = {}
+        self.trace_id = trace_id or context.get('trace_id') or uuid.uuid4().hex
+        self.parent_id = context.get('parent_id')
+        self.semantic_path = context.get('semantic_path', [])
+        self.turn_id = context.get('turn_id')
+        self.clock_id = monotonic_domain()
         self.enabled = enabled
         self.capture_content = capture_content
         self.strict = strict
@@ -123,9 +152,26 @@ class Tracer:
         self._emit_lock = threading.RLock()
         self._owner_pid = os.getpid()
         self.acknowledged = self.batch_requests = 0
+        if delivery not in {'sync', 'background'}:
+            raise ValueError('delivery must be sync or background')
+        self.delivery = delivery
+        self._background = None
+        if delivery == 'background' and enabled:
+            from allox_agent_monitor.background import BackgroundExporter
+            self._background = BackgroundExporter(emit, batch_size=batch_size, capacity=queue_capacity,
+                max_bytes=queue_bytes, interval=flush_interval, timeout=export_timeout)
 
     def emit(self, event: dict) -> None:
         if not self.enabled:
+            return
+        if self._background is not None:
+            if os.getpid() != self._owner_pid:
+                raise RuntimeError('create a new Tracer after fork')
+            try:
+                self._background.submit(event)
+            except Exception:
+                if self.strict:
+                    raise
             return
         if self.batch_size > 1:
             with self._emit_lock:
@@ -168,6 +214,15 @@ class Tracer:
 
     def flush(self) -> None:
         """Explicit durability barrier; no automatic retries after ambiguous delivery."""
+        if os.getpid() != self._owner_pid:
+            raise RuntimeError('create a new Tracer after fork')
+        if self._background is not None:
+            try:
+                self._background.flush()
+            except Exception:
+                if self.strict:
+                    raise
+            return
         with self._emit_lock:
             if os.getpid() != self._owner_pid:
                 raise RuntimeError("create a new Tracer after fork")
@@ -190,14 +245,37 @@ class Tracer:
                 self.emit_ns += time.perf_counter_ns()-started
 
     def close(self):
-        self.flush()
+        if os.getpid() != self._owner_pid:
+            raise RuntimeError('create a new Tracer after fork')
+        if self._background is not None:
+            try:
+                self._background.close()
+            except Exception:
+                if self.strict:
+                    raise
+        else:
+            self.flush()
+
+    def barrier(self):
+        """Fail-closed durability boundary, including in best-effort profiling mode."""
+        if self._background is not None:
+            self._background.flush()
+        else:
+            self.flush()
+        if not self.health()['complete']:
+            raise RuntimeError('monitoring durability barrier is incomplete')
+
+    def checkpoint(self, create_checkpoint: Callable, *args, **kwargs):
+        """Trusted integration helper; never invoke checkpoint creation before durable telemetry."""
+        self.barrier()
+        return create_checkpoint(*args, **kwargs)
 
     def __enter__(self):
         return self
 
     def __exit__(self, exc_type, exc, tb):
         try:
-            self.flush()
+            self.close()
         except Exception:
             if exc is None:
                 raise
@@ -214,11 +292,13 @@ class Tracer:
         with self.span(name, "tool", input=payload({"args": args, "kwargs": kwargs},
                                                  self.capture_content)) as outer:
             with self.phase("tool_execution") as execution:
+                cpu_started = time.thread_time_ns()
                 started = time.perf_counter_ns()
                 try:
                     result = function(*args, **kwargs)
                 finally:
                     execution.metric("executor.execution_ns", time.perf_counter_ns()-started)
+                    execution.metric("executor.thread_cpu_ns", time.thread_time_ns()-cpu_started)
             outer.set_result(result)
             return result
 
@@ -260,7 +340,56 @@ class Tracer:
             span.set_result(response)
             return response
 
+    def stream_model(self, model, function, *args, **kwargs):
+        with self.span(model, 'llm', model=model, input=payload(
+            {'args': args, 'kwargs': kwargs}, self.capture_content)) as span:
+            started = time.perf_counter_ns()
+            count = 0
+            stream = None
+            try:
+                stream = function(*args, **kwargs)
+                for chunk in stream:
+                    if count == 0:
+                        span.metric('client.first_chunk_ns', time.perf_counter_ns()-started)
+                    count += 1
+                    record_vllm_metrics(span, chunk)
+                    yield chunk
+            finally:
+                span.metric('client.request_ns', time.perf_counter_ns()-started)
+                span.metric('client.chunk_count', count)
+                close = getattr(stream, 'close', None)
+                if close:
+                    close()
+
+    async def astream_model(self, model, function, *args, **kwargs):
+        with self.span(model, 'llm', model=model, input=payload(
+            {'args': args, 'kwargs': kwargs}, self.capture_content)) as span:
+            started = time.perf_counter_ns()
+            count = 0
+            stream = None
+            try:
+                stream = function(*args, **kwargs)
+                if hasattr(stream, '__await__'):
+                    stream = await stream
+                async for chunk in stream:
+                    if count == 0:
+                        span.metric('client.first_chunk_ns', time.perf_counter_ns()-started)
+                    count += 1
+                    record_vllm_metrics(span, chunk)
+                    yield chunk
+            finally:
+                span.metric('client.request_ns', time.perf_counter_ns()-started)
+                span.metric('client.chunk_count', count)
+                close = getattr(stream, 'aclose', None)
+                if close:
+                    await close()
+
     def health(self) -> dict:
+        if self._background is not None:
+            result = self._background.health()
+            return {**result, 'enabled': self.enabled, 'delivery': self.delivery,
+                'batch_size': self.batch_size, 'metric_errors': self.metric_errors, 'strict': self.strict,
+                'complete': result['complete'] and self.metric_errors == 0}
         return {"enabled": self.enabled, "attempted_events": self.attempted,
                 "failed_events": self.failed, "emit_ns": self.emit_ns,
                 "serialized_bytes": self.wire_bytes,
@@ -277,15 +406,18 @@ def record_vllm_metrics(span: Span, response: Any) -> None:
         response = response.model_dump()
     if not isinstance(response, dict):
         return
+    if isinstance(response.get('response'), dict):
+        response = response['response']
     metrics = response.get("metrics")
     if isinstance(metrics, dict):
-        for name in ("queue_time_ms", "time_to_first_token_ms", "generation_time_ms"):
+        for name in ("queue_time_ms", "time_to_first_token_ms", "generation_time_ms",
+                     "mean_itl_ms", "tokens_per_second"):
             value = metrics.get(name)
             if value is not None:
                 _provider_metric(span, "provider." + name, value)
     usage = response.get("usage")
     if isinstance(usage, dict):
-        for name in ("prompt_tokens", "completion_tokens"):
+        for name in ("prompt_tokens", "completion_tokens", "input_tokens", "output_tokens"):
             if usage.get(name) is not None:
                 _provider_metric(span, "provider." + name, usage[name])
 

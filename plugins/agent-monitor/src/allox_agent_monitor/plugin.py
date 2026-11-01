@@ -2,14 +2,15 @@
 
 from __future__ import annotations
 
+import json
 import threading
 import time
-import uuid
 from pathlib import Path
 from typing import Any
 
 from allox.runtime.extensions import ExecutionContribution, SandboxMount
 from allox.workspace.store import WorkspaceError
+from allox_agent_monitor.clock import monotonic_domain
 from allox_agent_monitor.endpoint import SessionEndpoints
 from allox_agent_monitor.profile import profile
 from allox_agent_monitor.resources import delta, snapshot
@@ -44,7 +45,7 @@ class AgentMonitorFeature:
             raise WorkspaceError("monitor root must be outside workspace rollback storage")
         self.store = TraceStore(root)
         self.cgroups = context.cgroups
-        self.clock = uuid.uuid4().hex
+        self.clock = monotonic_domain()
         self._runs: dict[str, dict] = {}
         self._run_lock = threading.RLock()
         self._endpoints = SessionEndpoints(
@@ -62,6 +63,20 @@ class AgentMonitorFeature:
                                  "/run/allox/monitor-sdk")),
             metadata={"agent_monitor": True},
         )
+
+    def prepare_run_environment(self, agent, session, run_id, trace_context):
+        parent = trace_context or {}
+        trace = parent.get('trace_id', run_id)
+        fields = {}
+        if parent:
+            rows = self.store.spans(agent, session, trace)
+            matches = [r for r in rows if r['span_id'] == parent['span_id'] and r['status'] == 'running']
+            if not matches:
+                raise WorkspaceError('trace parent does not belong to this active Session')
+            fields = matches[0]
+        return {'ALLOX_MONITOR_CONTEXT': json.dumps({'trace_id': trace,
+            'parent_id': 'process-'+run_id, 'semantic_path': fields.get('semantic_path', ['system-execution']),
+            'turn_id': fields.get('turn_id')})}
 
     def dispatch(self, action: str, params: dict[str, Any]) -> Any:
         if action == "monitor.status":
@@ -88,6 +103,9 @@ class AgentMonitorFeature:
             return {"spans": rows}
         if action == "monitor.profile":
             return profile(rows)
+        if action == 'monitor.export':
+            from allox_agent_monitor.export import folded
+            return folded(rows, params.get('measure', 'calls'))
         raise WorkspaceError(f"unknown monitor action: {action}")
 
     def active_run_id(self, identity: tuple[str, str]) -> str:
@@ -110,7 +128,7 @@ class AgentMonitorFeature:
     def execution_started(self, row: dict) -> None:
         """Called after attribution, before SIGCONT. No action can run before this ack."""
         parent = row.get("trace_context") or {}
-        trace = parent.get("trace_id", uuid.uuid4().hex)
+        trace = parent.get("trace_id", row["run_id"])
         span = "process-" + row["run_id"]
         agent, session = row["agent_id"], row["session_id"]
         parent_fields = {}

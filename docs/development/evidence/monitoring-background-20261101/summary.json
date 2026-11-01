@@ -1,0 +1,588 @@
+{
+  "guest": {
+    "legacy": {
+      "session_ms": {
+        "off_mean": 1075.1539457,
+        "on_mean": 1731.8971587,
+        "extra_mean": 656.7432130000001,
+        "extra_95ci": [
+          528.8492087139422,
+          784.637217286058
+        ],
+        "ratio_of_means_percent": 61.08364440521257
+      },
+      "worker_ms": {
+        "off_mean": 1931.7739275000001,
+        "on_mean": 3279.64482,
+        "extra_mean": 1347.8708924999999,
+        "extra_95ci": [
+          1209.2214578161431,
+          1486.5203271838566
+        ],
+        "ratio_of_means_percent": 69.77373870266193
+      },
+      "tool_loop_including_flush_ms": {
+        "off_mean": 50.3199458,
+        "on_mean": 328.2865388,
+        "extra_mean": 277.966593,
+        "extra_95ci": [
+          190.48616742983484,
+          365.44701857016514
+        ],
+        "ratio_of_means_percent": 552.3984348170741
+      },
+      "loop_before_flush_ms": {
+        "off_mean": 50.3181126,
+        "on_mean": 328.273864,
+        "extra_mean": 277.9557514,
+        "extra_95ci": [
+          190.47646490682024,
+          365.43503789317975
+        ],
+        "ratio_of_means_percent": 552.3970137941939
+      },
+      "setup_ms": {
+        "off_mean": 62.6637263,
+        "on_mean": 382.2020611,
+        "extra_mean": 319.5383348,
+        "extra_95ci": [
+          277.4893382432722,
+          361.58733135672776
+        ],
+        "ratio_of_means_percent": 509.9255241704322
+      },
+      "sdk_import_init_ms": {
+        "off_mean": 0.0010966,
+        "on_mean": 132.752284,
+        "extra_mean": 132.7511874,
+        "extra_95ci": [
+          125.09138897930167,
+          140.4109858206983
+        ],
+        "ratio_of_means_percent": 12105707.404705454
+      },
+      "cpu_ms": {
+        "off_mean": 193.32359999999997,
+        "on_mean": 270.5509,
+        "extra_mean": 77.22730000000001,
+        "extra_95ci": [
+          60.62498516030308,
+          93.82961483969694
+        ],
+        "ratio_of_means_percent": 39.94716630561403
+      },
+      "daemon_peak_rss_kib": {
+        "off_mean": 22089.6,
+        "on_mean": 25088.8,
+        "extra_mean": 2999.2,
+        "extra_95ci": [
+          2410.359301736317,
+          3588.0406982636828
+        ],
+        "ratio_of_means_percent": 13.577430102853839
+      },
+      "workload_peak_rss_kib": {
+        "off_mean": 11205.6,
+        "on_mean": 15146,
+        "extra_mean": 3940.4,
+        "extra_95ci": [
+          3899.14403338265,
+          3981.6559666173503
+        ],
+        "ratio_of_means_percent": 35.16456057685442
+      },
+      "all_checks_passed": true,
+      "committed_transactions_mean": 7,
+      "events": 1620
+    },
+    "sync": {
+      "session_ms": {
+        "off_mean": 1075.1539457,
+        "on_mean": 1635.9343105,
+        "extra_mean": 560.7803648,
+        "extra_95ci": [
+          468.47220330570383,
+          653.0885262942962
+        ],
+        "ratio_of_means_percent": 52.15814600716489
+      },
+      "worker_ms": {
+        "off_mean": 1931.7739275000001,
+        "on_mean": 2939.0358035,
+        "extra_mean": 1007.2618759999999,
+        "extra_95ci": [
+          902.1705532342907,
+          1112.3531987657093
+        ],
+        "ratio_of_means_percent": 52.14180922834717
+      },
+      "tool_loop_including_flush_ms": {
+        "off_mean": 50.3199458,
+        "on_mean": 293.2884252,
+        "extra_mean": 242.9684794,
+        "extra_95ci": [
+          221.73571643226128,
+          264.2012423677387
+        ],
+        "ratio_of_means_percent": 482.8472597440675
+      },
+      "loop_before_flush_ms": {
+        "off_mean": 50.3181126,
+        "on_mean": 293.260921,
+        "extra_mean": 242.9428084,
+        "extra_95ci": [
+          221.70662572205308,
+          264.17899107794693
+        ],
+        "ratio_of_means_percent": 482.81383352204665
+      },
+      "setup_ms": {
+        "off_mean": 62.6637263,
+        "on_mean": 428.85959909999997,
+        "extra_mean": 366.1958728,
+        "extra_95ci": [
+          264.3458692656271,
+          468.04587633437296
+        ],
+        "ratio_of_means_percent": 584.3825358339725
+      },
+      "sdk_import_init_ms": {
+        "off_mean": 0.0010966,
+        "on_mean": 122.1771758,
+        "extra_mean": 122.1760792,
+        "extra_95ci": [
+          110.81383827641358,
+          133.53832012358643
+        ],
+        "ratio_of_means_percent": 11141353.200802479
+      },
+      "cpu_ms": {
+        "off_mean": 193.32359999999997,
+        "on_mean": 250.2242,
+        "extra_mean": 56.900600000000026,
+        "extra_95ci": [
+          44.09299444040245,
+          69.7082055595976
+        ],
+        "ratio_of_means_percent": 29.432826618167685
+      },
+      "daemon_peak_rss_kib": {
+        "off_mean": 22089.6,
+        "on_mean": 23917.2,
+        "extra_mean": 1827.6,
+        "extra_95ci": [
+          1711.7724561498503,
+          1943.4275438501495
+        ],
+        "ratio_of_means_percent": 8.273576705780105
+      },
+      "workload_peak_rss_kib": {
+        "off_mean": 11205.6,
+        "on_mean": 15156.8,
+        "extra_mean": 3951.2,
+        "extra_95ci": [
+          3901.240063629056,
+          4001.159936370944
+        ],
+        "ratio_of_means_percent": 35.26094095809238
+      },
+      "all_checks_passed": true,
+      "committed_transactions_mean": 7,
+      "events": 1620
+    },
+    "background": {
+      "session_ms": {
+        "off_mean": 1075.1539457,
+        "on_mean": 1731.6695128000001,
+        "extra_mean": 656.5155671000001,
+        "extra_95ci": [
+          492.1692366035047,
+          820.8618975964955
+        ],
+        "ratio_of_means_percent": 61.06247107455509
+      },
+      "worker_ms": {
+        "off_mean": 1931.7739275000001,
+        "on_mean": 3127.0267718,
+        "extra_mean": 1195.2528442999999,
+        "extra_95ci": [
+          908.3692178356889,
+          1482.1364707643108
+        ],
+        "ratio_of_means_percent": 61.87332934174306
+      },
+      "tool_loop_including_flush_ms": {
+        "off_mean": 50.3199458,
+        "on_mean": 362.8301532,
+        "extra_mean": 312.5102074,
+        "extra_95ci": [
+          138.57299413353022,
+          486.44742066646984
+        ],
+        "ratio_of_means_percent": 621.0463911111765
+      },
+      "loop_before_flush_ms": {
+        "off_mean": 50.3181126,
+        "on_mean": 61.0624003,
+        "extra_mean": 10.744287700000001,
+        "extra_95ci": [
+          8.053260001644954,
+          13.435315398355048
+        ],
+        "ratio_of_means_percent": 21.352723989094933
+      },
+      "setup_ms": {
+        "off_mean": 62.6637263,
+        "on_mean": 505.5460188,
+        "extra_mean": 442.8822925,
+        "extra_95ci": [
+          230.12219383397493,
+          655.642391166025
+        ],
+        "ratio_of_means_percent": 706.760224216031
+      },
+      "sdk_import_init_ms": {
+        "off_mean": 0.0010966,
+        "on_mean": 130.64190250000001,
+        "extra_mean": 130.6408059,
+        "extra_95ci": [
+          122.81211220881482,
+          138.46949959118518
+        ],
+        "ratio_of_means_percent": 11913259.70271749
+      },
+      "cpu_ms": {
+        "off_mean": 193.32359999999997,
+        "on_mean": 246.74989999999997,
+        "extra_mean": 53.42629999999998,
+        "extra_95ci": [
+          43.18781377645989,
+          63.66478622354008
+        ],
+        "ratio_of_means_percent": 27.63568441721549
+      },
+      "daemon_peak_rss_kib": {
+        "off_mean": 22089.6,
+        "on_mean": 23922,
+        "extra_mean": 1832.4,
+        "extra_95ci": [
+          1719.009381942025,
+          1945.7906180579753
+        ],
+        "ratio_of_means_percent": 8.295306388526736
+      },
+      "workload_peak_rss_kib": {
+        "off_mean": 11205.6,
+        "on_mean": 15352.8,
+        "extra_mean": 4147.2,
+        "extra_95ci": [
+          4086.9391870180034,
+          4207.460812981996
+        ],
+        "ratio_of_means_percent": 37.01006639537372
+      },
+      "all_checks_passed": true,
+      "committed_transactions_mean": 7,
+      "events": 1620
+    },
+    "background64": {
+      "session_ms": {
+        "off_mean": 1075.1539457,
+        "on_mean": 1503.0416964,
+        "extra_mean": 427.8877507,
+        "extra_95ci": [
+          343.66236808761903,
+          512.113133312381
+        ],
+        "ratio_of_means_percent": 39.79781243526159
+      },
+      "worker_ms": {
+        "off_mean": 1931.7739275000001,
+        "on_mean": 2765.8063544,
+        "extra_mean": 834.0324268999999,
+        "extra_95ci": [
+          655.2387338757641,
+          1012.8261199242357
+        ],
+        "ratio_of_means_percent": 43.17443231979845
+      },
+      "tool_loop_including_flush_ms": {
+        "off_mean": 50.3199458,
+        "on_mean": 176.1065564,
+        "extra_mean": 125.7866106,
+        "extra_95ci": [
+          114.10600373528575,
+          137.46721746471425
+        ],
+        "ratio_of_means_percent": 249.97366074269496
+      },
+      "loop_before_flush_ms": {
+        "off_mean": 50.3181126,
+        "on_mean": 61.5102234,
+        "extra_mean": 11.192110800000002,
+        "extra_95ci": [
+          8.627744833394488,
+          13.756476766605516
+        ],
+        "ratio_of_means_percent": 22.242707887258884
+      },
+      "setup_ms": {
+        "off_mean": 62.6637263,
+        "on_mean": 403.49734109999997,
+        "extra_mean": 340.8336148,
+        "extra_95ci": [
+          293.6262721710428,
+          388.04095742895726
+        ],
+        "ratio_of_means_percent": 543.9089484852419
+      },
+      "sdk_import_init_ms": {
+        "off_mean": 0.0010966,
+        "on_mean": 123.4632471,
+        "extra_mean": 123.46215049999999,
+        "extra_95ci": [
+          112.91289261138823,
+          134.01140838861176
+        ],
+        "ratio_of_means_percent": 11258631.269378077
+      },
+      "cpu_ms": {
+        "off_mean": 193.32359999999997,
+        "on_mean": 242.0567,
+        "extra_mean": 48.73310000000002,
+        "extra_95ci": [
+          37.55763180300657,
+          59.90856819699347
+        ],
+        "ratio_of_means_percent": 25.20804495674611
+      },
+      "daemon_peak_rss_kib": {
+        "off_mean": 22089.6,
+        "on_mean": 23956,
+        "extra_mean": 1866.4,
+        "extra_95ci": [
+          1742.5795554619958,
+          1990.2204445380044
+        ],
+        "ratio_of_means_percent": 8.449224974648706
+      },
+      "workload_peak_rss_kib": {
+        "off_mean": 11205.6,
+        "on_mean": 15403.2,
+        "extra_mean": 4197.6,
+        "extra_95ci": [
+          4158.827922456895,
+          4236.372077543106
+        ],
+        "ratio_of_means_percent": 37.459841507817515
+      },
+      "all_checks_passed": true,
+      "committed_transactions_mean": 5,
+      "events": 1620
+    }
+  },
+  "micro_sync": {
+    "off_mean": 49.1369162,
+    "on_mean": 195.5800843,
+    "extra_mean": 146.4431681,
+    "extra_95ci": [
+      134.35915546645984,
+      158.52718073354018
+    ],
+    "ratio_of_means_percent": 298.0308481385733
+  },
+  "micro_background": {
+    "off_mean": 49.5019879,
+    "on_mean": 148.2766889,
+    "extra_mean": 98.77470100000001,
+    "extra_95ci": [
+      89.124602987864,
+      108.42479901213602
+    ],
+    "ratio_of_means_percent": 199.53683718629006
+  },
+  "direct_background64_minus_legacy": {
+    "session_ms": {
+      "off_mean": 1731.8971587,
+      "on_mean": 1503.0416964,
+      "extra_mean": -228.85546230000003,
+      "extra_95ci": [
+        -391.4410438052966,
+        -66.26988079470345
+      ],
+      "ratio_of_means_percent": -13.214148493192512
+    },
+    "worker_ms": {
+      "off_mean": 3279.64482,
+      "on_mean": 2765.8063544,
+      "extra_mean": -513.8384656000001,
+      "extra_95ci": [
+        -722.825255017406,
+        -304.85167618259413
+      ],
+      "ratio_of_means_percent": -15.6675034584995
+    },
+    "tool_loop_including_flush_ms": {
+      "off_mean": 328.2865388,
+      "on_mean": 176.1065564,
+      "extra_mean": -152.1799824,
+      "extra_95ci": [
+        -238.88885130216573,
+        -65.47111349783428
+      ],
+      "ratio_of_means_percent": -46.35583991846577
+    },
+    "loop_before_flush_ms": {
+      "off_mean": 328.273864,
+      "on_mean": 61.5102234,
+      "extra_mean": -266.76364060000003,
+      "extra_95ci": [
+        -354.7876542583729,
+        -178.73962694162714
+      ],
+      "ratio_of_means_percent": -81.26252798486571
+    },
+    "setup_ms": {
+      "off_mean": 382.2020611,
+      "on_mean": 403.49734109999997,
+      "extra_mean": 21.29528,
+      "extra_95ci": [
+        -48.376997810002166,
+        90.96755781000218
+      ],
+      "ratio_of_means_percent": 5.571733427787096
+    },
+    "sdk_import_init_ms": {
+      "off_mean": 132.752284,
+      "on_mean": 123.4632471,
+      "extra_mean": -9.289036900000005,
+      "extra_95ci": [
+        -22.79611967781585,
+        4.21804587781584
+      ],
+      "ratio_of_means_percent": -6.997270871814154
+    },
+    "cpu_ms": {
+      "off_mean": 270.5509,
+      "on_mean": 242.0567,
+      "extra_mean": -28.494199999999992,
+      "extra_95ci": [
+        -45.23899975893704,
+        -11.749400241062943
+      ],
+      "ratio_of_means_percent": -10.531918393174822
+    },
+    "daemon_peak_rss_kib": {
+      "off_mean": 25088.8,
+      "on_mean": 23956,
+      "extra_mean": -1132.8,
+      "extra_95ci": [
+        -1605.2520054499382,
+        -660.3479945500616
+      ],
+      "ratio_of_means_percent": -4.515162144064277
+    },
+    "workload_peak_rss_kib": {
+      "off_mean": 15146,
+      "on_mean": 15403.2,
+      "extra_mean": 257.2,
+      "extra_95ci": [
+        225.30652777451968,
+        289.0934722254803
+      ],
+      "ratio_of_means_percent": 1.6981381222765046
+    }
+  },
+  "direct_background64_minus_background32": {
+    "session_ms": {
+      "off_mean": 1731.6695128000001,
+      "on_mean": 1503.0416964,
+      "extra_mean": -228.62781640000006,
+      "extra_95ci": [
+        -420.6907111935801,
+        -36.56492160642003
+      ],
+      "ratio_of_means_percent": -13.202739593787927
+    },
+    "worker_ms": {
+      "off_mean": 3127.0267718,
+      "on_mean": 2765.8063544,
+      "extra_mean": -361.2204174,
+      "extra_95ci": [
+        -748.4682814929606,
+        26.027446692960723
+      ],
+      "ratio_of_means_percent": -11.551561395557597
+    },
+    "tool_loop_including_flush_ms": {
+      "off_mean": 362.8301532,
+      "on_mean": 176.1065564,
+      "extra_mean": -186.7235968,
+      "extra_95ci": [
+        -357.65135072092585,
+        -15.795842879074115
+      ],
+      "ratio_of_means_percent": -51.46308683365515
+    },
+    "loop_before_flush_ms": {
+      "off_mean": 61.0624003,
+      "on_mean": 61.5102234,
+      "extra_mean": 0.44782309999999936,
+      "extra_95ci": [
+        -3.4455011385740546,
+        4.3411473385740535
+      ],
+      "ratio_of_means_percent": 0.733386008083281
+    },
+    "setup_ms": {
+      "off_mean": 505.5460188,
+      "on_mean": 403.49734109999997,
+      "extra_mean": -102.0486777,
+      "extra_95ci": [
+        -333.5279686759503,
+        129.43061327595035
+      ],
+      "ratio_of_means_percent": -20.185833515657002
+    },
+    "sdk_import_init_ms": {
+      "off_mean": 130.64190250000001,
+      "on_mean": 123.4632471,
+      "extra_mean": -7.178655400000002,
+      "extra_95ci": [
+        -22.548140563109648,
+        8.190829763109646
+      ],
+      "ratio_of_means_percent": -5.494910333229419
+    },
+    "cpu_ms": {
+      "off_mean": 246.74989999999997,
+      "on_mean": 242.0567,
+      "extra_mean": -4.693199999999959,
+      "extra_95ci": [
+        -15.73375195647079,
+        6.347351956470873
+      ],
+      "ratio_of_means_percent": -1.9020068498507903
+    },
+    "daemon_peak_rss_kib": {
+      "off_mean": 23922,
+      "on_mean": 23956,
+      "extra_mean": 34,
+      "extra_95ci": [
+        13.890681063159995,
+        54.109318936840005
+      ],
+      "ratio_of_means_percent": 0.14212858456650324
+    },
+    "workload_peak_rss_kib": {
+      "off_mean": 15352.8,
+      "on_mean": 15403.2,
+      "extra_mean": 50.4,
+      "extra_95ci": [
+        16.03109205219743,
+        84.76890794780257
+      ],
+      "ratio_of_means_percent": 0.3282788807253523
+    }
+  }
+}

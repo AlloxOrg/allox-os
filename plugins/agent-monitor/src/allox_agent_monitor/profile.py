@@ -28,6 +28,7 @@ def profile(spans: list[dict]) -> dict:
     groups: dict[tuple, list] = defaultdict(list)
     self_times = {}
     warnings = []
+    timing = defaultdict(list)
     for row in spans:
         key = (*trace_key(row), row["span_id"])
         if row["end_ns"] is None:
@@ -47,6 +48,14 @@ def profile(spans: list[dict]) -> dict:
         if not valid:
             warnings.append({"span_id": row["span_id"], "reason": "child timing incomplete"})
         groups[(tuple(row["semantic_path"]), row["kind"], row["name"], row["model"])].append(row)
+        group_key = (tuple(row['semantic_path']), row['kind'], row['name'], row['model'])
+        if row['kind'] == 'tool':
+            internal = [c['metrics']['executor.execution_ns'] for c in children[key]
+                        if c['kind'] == 'phase' and c['clock_id'] == row['clock_id']
+                        and 'executor.execution_ns' in c['metrics']]
+            if len(internal) == 1 and internal[0] <= row['duration_ns']:
+                timing[group_key].append({'executor_internal_ns': internal[0],
+                    'non_execution_ns': row['duration_ns']-internal[0]})
     results = []
     for (semantic, kind, name, model), rows in sorted(groups.items(), key=lambda item: str(item[0])):
         durations = [row["duration_ns"] for row in rows]
@@ -62,6 +71,7 @@ def profile(spans: list[dict]) -> dict:
             "inclusive_ns": sum(durations),
             "self_ns": sum(exclusive) if all(v is not None for v in exclusive) else None,
             "p50_ns": percentile(durations, .5), "p95_ns": percentile(durations, .95),
+            'timing_samples': timing[(semantic, kind, name, model)],
             "metrics": {name: {("max" if "peak" in name else "sum"):
                                max(values) if "peak" in name else sum(values),
                                "samples": len(values)}

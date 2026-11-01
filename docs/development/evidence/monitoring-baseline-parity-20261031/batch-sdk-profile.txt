@@ -1,0 +1,41 @@
+         66484 function calls (66353 primitive calls) in 0.318 seconds
+
+   Ordered by: cumulative time
+   List reduced from 307 to 35 due to restriction <35>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        1    0.001    0.001    0.318    0.318 /data/hy/Allox/monitoring-parity-20261031-v1/source/examples/monitoring_benchmark.py:23(worker)
+       40    0.001    0.000    0.224    0.006 /data/hy/Allox/monitoring-parity-20261031-v1/source/plugins/agent-monitor/src/allox_agent_monitor/sdk.py:234(call_tool)
+      160    0.003    0.000    0.149    0.001 /data/hy/Allox/monitoring-parity-20261031-v1/source/plugins/agent-monitor/src/allox_agent_monitor/sdk.py:149(emit)
+       80    0.001    0.000    0.140    0.002 /data/hy/Allox/monitoring-parity-20261031-v1/source/plugins/agent-monitor/src/allox_agent_monitor/sdk.py:91(__exit__)
+        6    0.000    0.000    0.132    0.022 /data/hy/Allox/monitoring-parity-20261031-v1/source/plugins/agent-monitor/src/allox_agent_monitor/sdk.py:191(flush)
+        5    0.000    0.000    0.132    0.026 /data/hy/Allox/monitoring-parity-20261031-v1/source/examples/monitoring_benchmark.py:26(<lambda>)
+        5    0.000    0.000    0.132    0.026 /data/hy/Allox/monitoring-parity-20261031-v1/source/plugins/agent-monitor/src/allox_agent_monitor/store.py:56(ingest)
+        5    0.001    0.000    0.132    0.026 /data/hy/Allox/monitoring-parity-20261031-v1/source/plugins/agent-monitor/src/allox_agent_monitor/store.py:145(ingest_batch)
+        5    0.088    0.018    0.088    0.018 {method '__exit__' of 'sqlite3.Connection' objects}
+        1    0.048    0.048    0.065    0.065 /data/hy/Allox/monitoring-parity-20261031-v1/source/plugins/agent-monitor/src/allox_agent_monitor/store.py:38(__init__)
+       40    0.000    0.000    0.064    0.002 /data/hy/Allox/monitoring-parity-20261031-v1/source/examples/monitoring_benchmark.py:56(workload)
+       40    0.043    0.001    0.043    0.001 {built-in method time.sleep}
+      160    0.006    0.000    0.040    0.000 /data/hy/Allox/monitoring-parity-20261031-v1/source/plugins/agent-monitor/src/allox_agent_monitor/store.py:72(_ingest)
+      444    0.027    0.000    0.027    0.000 {method 'execute' of 'sqlite3.Connection' objects}
+      565    0.003    0.000    0.022    0.000 /usr/local/lib/python3.10/json/__init__.py:183(dumps)
+       49    0.009    0.000    0.021    0.000 {built-in method builtins.sum}
+        1    0.000    0.000    0.019    0.019 /data/hy/Allox/monitoring-parity-20261031-v1/source/plugins/agent-monitor/src/allox_agent_monitor/store.py:252(close)
+        1    0.019    0.019    0.019    0.019 {method 'close' of 'sqlite3.Connection' objects}
+      565    0.003    0.000    0.019    0.000 /usr/local/lib/python3.10/json/encoder.py:182(encode)
+      565    0.015    0.000    0.015    0.000 /usr/local/lib/python3.10/json/encoder.py:204(iterencode)
+      360    0.001    0.000    0.013    0.000 /usr/local/lib/python3.10/json/__init__.py:299(loads)
+    40040    0.011    0.000    0.011    0.000 /data/hy/Allox/monitoring-parity-20261031-v1/source/examples/monitoring_benchmark.py:57(<genexpr>)
+      360    0.002    0.000    0.010    0.000 /usr/local/lib/python3.10/json/decoder.py:332(decode)
+       80    0.001    0.000    0.010    0.000 /data/hy/Allox/monitoring-parity-20261031-v1/source/plugins/agent-monitor/src/allox_agent_monitor/sdk.py:73(__enter__)
+       80    0.003    0.000    0.007    0.000 /data/hy/Allox/monitoring-parity-20261031-v1/source/plugins/agent-monitor/src/allox_agent_monitor/store.py:176(_validate_start)
+      360    0.007    0.000    0.007    0.000 /usr/local/lib/python3.10/json/decoder.py:343(raw_decode)
+       80    0.001    0.000    0.004    0.000 /data/hy/Allox/monitoring-parity-20261031-v1/source/plugins/agent-monitor/src/allox_agent_monitor/sdk.py:23(payload)
+        1    0.000    0.000    0.003    0.003 /data/hy/Allox/monitoring-parity-20261031-v1/source/plugins/agent-monitor/src/allox_agent_monitor/store.py:224(spans)
+      802    0.001    0.000    0.003    0.000 /data/hy/Allox/monitoring-parity-20261031-v1/source/plugins/agent-monitor/src/allox_agent_monitor/store.py:31(identifier)
+       80    0.000    0.000    0.003    0.000 /data/hy/Allox/monitoring-parity-20261031-v1/source/plugins/agent-monitor/src/allox_agent_monitor/sdk.py:228(span)
+       80    0.001    0.000    0.003    0.000 /data/hy/Allox/monitoring-parity-20261031-v1/source/plugins/agent-monitor/src/allox_agent_monitor/sdk.py:47(__init__)
+        1    0.000    0.000    0.003    0.003 /data/hy/Allox/monitoring-parity-20261031-v1/source/plugins/agent-monitor/src/allox_agent_monitor/store.py:235(<listcomp>)
+      802    0.001    0.000    0.002    0.000 /data/hy/Allox/monitoring-parity-20261031-v1/source/src/allox/workspace/store.py:34(validate_id)
+        1    0.000    0.000    0.002    0.002 /usr/local/lib/python3.10/tempfile.py:794(__init__)
+       81    0.000    0.000    0.002    0.000 /usr/local/lib/python3.10/uuid.py:713(uuid4)

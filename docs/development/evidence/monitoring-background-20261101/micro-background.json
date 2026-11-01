@@ -1,0 +1,2729 @@
+{
+  "scope": "synthetic SDK + SQLite synchronous durability; not Agent/eBPF overhead",
+  "pairs": [
+    {
+      "off": {
+        "enabled": false,
+        "wall_ns": 49401339,
+        "cpu_seconds": 0.00645400000000001,
+        "peak_rss_kib": 12204,
+        "step_p50_ns": 1228587.5,
+        "step_p95_ns": 1294260,
+        "monitor": null,
+        "collector": null,
+        "profile": null
+      },
+      "on": {
+        "enabled": true,
+        "wall_ns": 140909917,
+        "cpu_seconds": 0.068904,
+        "peak_rss_kib": 13336,
+        "step_p50_ns": 1737154.5,
+        "step_p95_ns": 2014295,
+        "monitor": {
+          "attempted_events": 160,
+          "acknowledged_events": 160,
+          "failed_events": 0,
+          "pending_events": 0,
+          "pending_bytes": 0,
+          "complete": true,
+          "serialized_bytes": 57400,
+          "emit_ns": 125331551,
+          "batch_requests": 5,
+          "queue_wait_ns": 987263,
+          "queue_full_waits": 0,
+          "queue_capacity": 1024,
+          "queue_bytes_limit": 1048576,
+          "peak_pending_events": 128,
+          "peak_pending_bytes": 45920,
+          "worker_alive": false,
+          "closed": true,
+          "export_failed": false,
+          "durability": "only acknowledged events; memory queue is not crash durable",
+          "enabled": true,
+          "delivery": "background",
+          "batch_size": 32,
+          "metric_errors": 0,
+          "strict": true
+        },
+        "collector": {
+          "accepted_events_this_process": 160,
+          "rejected_events_this_process": 0,
+          "collector_ns_this_process": 121860170,
+          "storage_bytes": 161680,
+          "delivery": "synchronous-acknowledged",
+          "event_loss_rate": null,
+          "committed_transactions_this_process": 5,
+          "event_loss_note": "no claim about events never submitted by a producer"
+        },
+        "profile": {
+          "runs": 1,
+          "spans": 80,
+          "complete": true,
+          "warnings": [],
+          "groups": [
+            {
+              "semantic_path": [],
+              "kind": "phase",
+              "name": "tool_execution",
+              "model": null,
+              "calls": 40,
+              "runs": 1,
+              "errors": 0,
+              "inclusive_ns": 55701738,
+              "self_ns": 55701738,
+              "p50_ns": 1352338,
+              "p95_ns": 1520659,
+              "timing_samples": [],
+              "metrics": {
+                "executor.execution_ns": {
+                  "sum": 52750127,
+                  "samples": 40
+                },
+                "executor.thread_cpu_ns": {
+                  "sum": 8743706,
+                  "samples": 40
+                }
+              }
+            },
+            {
+              "semantic_path": [],
+              "kind": "tool",
+              "name": "cpu-and-wait",
+              "model": null,
+              "calls": 40,
+              "runs": 1,
+              "errors": 0,
+              "inclusive_ns": 64995082,
+              "self_ns": 9293344,
+              "p50_ns": 1578702,
+              "p95_ns": 1853404,
+              "timing_samples": [
+                {
+                  "executor_internal_ns": 1288337,
+                  "non_execution_ns": 834787
+                },
+                {
+                  "executor_internal_ns": 1300701,
+                  "non_execution_ns": 300137
+                },
+                {
+                  "executor_internal_ns": 1309269,
+                  "non_execution_ns": 296541
+                },
+                {
+                  "executor_internal_ns": 1302160,
+                  "non_execution_ns": 297630
+                },
+                {
+                  "executor_internal_ns": 1292120,
+                  "non_execution_ns": 341129
+                },
+                {
+                  "executor_internal_ns": 1270341,
+                  "non_execution_ns": 322606
+                },
+                {
+                  "executor_internal_ns": 1274222,
+                  "non_execution_ns": 286328
+                },
+                {
+                  "executor_internal_ns": 1275814,
+                  "non_execution_ns": 276831
+                },
+                {
+                  "executor_internal_ns": 1554163,
+                  "non_execution_ns": 299241
+                },
+                {
+                  "executor_internal_ns": 1311934,
+                  "non_execution_ns": 282306
+                },
+                {
+                  "executor_internal_ns": 1378652,
+                  "non_execution_ns": 285111
+                },
+                {
+                  "executor_internal_ns": 1291898,
+                  "non_execution_ns": 284716
+                },
+                {
+                  "executor_internal_ns": 1304969,
+                  "non_execution_ns": 273733
+                },
+                {
+                  "executor_internal_ns": 1323424,
+                  "non_execution_ns": 300450
+                },
+                {
+                  "executor_internal_ns": 1247771,
+                  "non_execution_ns": 256407
+                },
+                {
+                  "executor_internal_ns": 1273893,
+                  "non_execution_ns": 271033
+                },
+                {
+                  "executor_internal_ns": 1271840,
+                  "non_execution_ns": 292586
+                },
+                {
+                  "executor_internal_ns": 1299350,
+                  "non_execution_ns": 262739
+                },
+                {
+                  "executor_internal_ns": 1290127,
+                  "non_execution_ns": 459983
+                },
+                {
+                  "executor_internal_ns": 1278223,
+                  "non_execution_ns": 318859
+                },
+                {
+                  "executor_internal_ns": 1272619,
+                  "non_execution_ns": 280089
+                },
+                {
+                  "executor_internal_ns": 1276527,
+                  "non_execution_ns": 300481
+                },
+                {
+                  "executor_internal_ns": 1278736,
+                  "non_execution_ns": 309196
+                },
+                {
+                  "executor_internal_ns": 1276949,
+                  "non_execution_ns": 314803
+                },
+                {
+                  "executor_internal_ns": 1275481,
+                  "non_execution_ns": 291617
+                },
+                {
+                  "executor_internal_ns": 1274154,
+                  "non_execution_ns": 279404
+                },
+                {
+                  "executor_internal_ns": 1272214,
+                  "non_execution_ns": 277108
+                },
+                {
+                  "executor_internal_ns": 2272617,
+                  "non_execution_ns": 274094
+                },
+                {
+                  "executor_internal_ns": 1272520,
+                  "non_execution_ns": 308408
+                },
+                {
+                  "executor_internal_ns": 1327480,
+                  "non_execution_ns": 271802
+                },
+                {
+                  "executor_internal_ns": 1320278,
+                  "non_execution_ns": 281226
+                },
+                {
+                  "executor_internal_ns": 1259064,
+                  "non_execution_ns": 250479
+                },
+                {
+                  "executor_internal_ns": 1355268,
+                  "non_execution_ns": 250284
+                },
+                {
+                  "executor_internal_ns": 1280809,
+                  "non_execution_ns": 308883
+                },
+                {
+                  "executor_internal_ns": 1274092,
+                  "non_execution_ns": 293997
+                },
+                {
+                  "executor_internal_ns": 1268639,
+                  "non_execution_ns": 301597
+                },
+                {
+                  "executor_internal_ns": 1269394,
+                  "non_execution_ns": 266440
+                },
+                {
+                  "executor_internal_ns": 1266740,
+                  "non_execution_ns": 299840
+                },
+                {
+                  "executor_internal_ns": 1259294,
+                  "non_execution_ns": 285021
+                },
+                {
+                  "executor_internal_ns": 1258044,
+                  "non_execution_ns": 257033
+                }
+              ],
+              "metrics": {}
+            }
+          ],
+          "completeness_scope": "received spans only; reconcile producer health separately",
+          "time_semantics": "inclusive sums are work, not elapsed wall time; self subtracts child union",
+          "unobserved": [
+            "transport unless instrumented",
+            "server timings unless provider reports"
+          ]
+        }
+      },
+      "wall_overhead_percent": 185.23501559340323
+    },
+    {
+      "on": {
+        "enabled": true,
+        "wall_ns": 157616000,
+        "cpu_seconds": 0.06498899999999999,
+        "peak_rss_kib": 13344,
+        "step_p50_ns": 1642406.5,
+        "step_p95_ns": 1992775,
+        "monitor": {
+          "attempted_events": 160,
+          "acknowledged_events": 160,
+          "failed_events": 0,
+          "pending_events": 0,
+          "pending_bytes": 0,
+          "complete": true,
+          "serialized_bytes": 57400,
+          "emit_ns": 142015442,
+          "batch_requests": 5,
+          "queue_wait_ns": 837444,
+          "queue_full_waits": 0,
+          "queue_capacity": 1024,
+          "queue_bytes_limit": 1048576,
+          "peak_pending_events": 128,
+          "peak_pending_bytes": 45920,
+          "worker_alive": false,
+          "closed": true,
+          "export_failed": false,
+          "durability": "only acknowledged events; memory queue is not crash durable",
+          "enabled": true,
+          "delivery": "background",
+          "batch_size": 32,
+          "metric_errors": 0,
+          "strict": true
+        },
+        "collector": {
+          "accepted_events_this_process": 160,
+          "rejected_events_this_process": 0,
+          "collector_ns_this_process": 138461609,
+          "storage_bytes": 160632,
+          "delivery": "synchronous-acknowledged",
+          "event_loss_rate": null,
+          "committed_transactions_this_process": 5,
+          "event_loss_note": "no claim about events never submitted by a producer"
+        },
+        "profile": {
+          "runs": 1,
+          "spans": 80,
+          "complete": true,
+          "warnings": [],
+          "groups": [
+            {
+              "semantic_path": [],
+              "kind": "phase",
+              "name": "tool_execution",
+              "model": null,
+              "calls": 40,
+              "runs": 1,
+              "errors": 0,
+              "inclusive_ns": 55135726,
+              "self_ns": 55135726,
+              "p50_ns": 1327210,
+              "p95_ns": 1465868,
+              "timing_samples": [],
+              "metrics": {
+                "executor.execution_ns": {
+                  "sum": 52433551,
+                  "samples": 40
+                },
+                "executor.thread_cpu_ns": {
+                  "sum": 8218496,
+                  "samples": 40
+                }
+              }
+            },
+            {
+              "semantic_path": [],
+              "kind": "tool",
+              "name": "cpu-and-wait",
+              "model": null,
+              "calls": 40,
+              "runs": 1,
+              "errors": 0,
+              "inclusive_ns": 63179885,
+              "self_ns": 8044159,
+              "p50_ns": 1516605,
+              "p95_ns": 1830763,
+              "timing_samples": [
+                {
+                  "executor_internal_ns": 1287042,
+                  "non_execution_ns": 814929
+                },
+                {
+                  "executor_internal_ns": 1260090,
+                  "non_execution_ns": 262651
+                },
+                {
+                  "executor_internal_ns": 1274002,
+                  "non_execution_ns": 312975
+                },
+                {
+                  "executor_internal_ns": 1282097,
+                  "non_execution_ns": 306671
+                },
+                {
+                  "executor_internal_ns": 1290662,
+                  "non_execution_ns": 267209
+                },
+                {
+                  "executor_internal_ns": 1340028,
+                  "non_execution_ns": 284442
+                },
+                {
+                  "executor_internal_ns": 1285034,
+                  "non_execution_ns": 299577
+                },
+                {
+                  "executor_internal_ns": 1304634,
+                  "non_execution_ns": 293907
+                },
+                {
+                  "executor_internal_ns": 1514658,
+                  "non_execution_ns": 316105
+                },
+                {
+                  "executor_internal_ns": 1296003,
+                  "non_execution_ns": 243691
+                },
+                {
+                  "executor_internal_ns": 1354520,
+                  "non_execution_ns": 292304
+                },
+                {
+                  "executor_internal_ns": 1276730,
+                  "non_execution_ns": 284171
+                },
+                {
+                  "executor_internal_ns": 1313117,
+                  "non_execution_ns": 276714
+                },
+                {
+                  "executor_internal_ns": 1309064,
+                  "non_execution_ns": 231552
+                },
+                {
+                  "executor_internal_ns": 1237611,
+                  "non_execution_ns": 274429
+                },
+                {
+                  "executor_internal_ns": 1255417,
+                  "non_execution_ns": 207483
+                },
+                {
+                  "executor_internal_ns": 1260338,
+                  "non_execution_ns": 191176
+                },
+                {
+                  "executor_internal_ns": 1266409,
+                  "non_execution_ns": 237282
+                },
+                {
+                  "executor_internal_ns": 1249128,
+                  "non_execution_ns": 394859
+                },
+                {
+                  "executor_internal_ns": 1272971,
+                  "non_execution_ns": 240079
+                },
+                {
+                  "executor_internal_ns": 1268595,
+                  "non_execution_ns": 255258
+                },
+                {
+                  "executor_internal_ns": 1269033,
+                  "non_execution_ns": 235298
+                },
+                {
+                  "executor_internal_ns": 1268692,
+                  "non_execution_ns": 260264
+                },
+                {
+                  "executor_internal_ns": 1257287,
+                  "non_execution_ns": 240427
+                },
+                {
+                  "executor_internal_ns": 1272147,
+                  "non_execution_ns": 242251
+                },
+                {
+                  "executor_internal_ns": 1257822,
+                  "non_execution_ns": 227372
+                },
+                {
+                  "executor_internal_ns": 1245019,
+                  "non_execution_ns": 212874
+                },
+                {
+                  "executor_internal_ns": 1260649,
+                  "non_execution_ns": 226769
+                },
+                {
+                  "executor_internal_ns": 2473732,
+                  "non_execution_ns": 270426
+                },
+                {
+                  "executor_internal_ns": 1314851,
+                  "non_execution_ns": 233698
+                },
+                {
+                  "executor_internal_ns": 1254910,
+                  "non_execution_ns": 250076
+                },
+                {
+                  "executor_internal_ns": 1316157,
+                  "non_execution_ns": 260588
+                },
+                {
+                  "executor_internal_ns": 1229763,
+                  "non_execution_ns": 216990
+                },
+                {
+                  "executor_internal_ns": 1326137,
+                  "non_execution_ns": 190468
+                },
+                {
+                  "executor_internal_ns": 1252614,
+                  "non_execution_ns": 221606
+                },
+                {
+                  "executor_internal_ns": 1235714,
+                  "non_execution_ns": 223628
+                },
+                {
+                  "executor_internal_ns": 1267010,
+                  "non_execution_ns": 233538
+                },
+                {
+                  "executor_internal_ns": 1231661,
+                  "non_execution_ns": 224570
+                },
+                {
+                  "executor_internal_ns": 1258150,
+                  "non_execution_ns": 230440
+                },
+                {
+                  "executor_internal_ns": 1244053,
+                  "non_execution_ns": 257587
+                }
+              ],
+              "metrics": {}
+            }
+          ],
+          "completeness_scope": "received spans only; reconcile producer health separately",
+          "time_semantics": "inclusive sums are work, not elapsed wall time; self subtracts child union",
+          "unobserved": [
+            "transport unless instrumented",
+            "server timings unless provider reports"
+          ]
+        }
+      },
+      "off": {
+        "enabled": false,
+        "wall_ns": 51166053,
+        "cpu_seconds": 0.008141999999999996,
+        "peak_rss_kib": 12204,
+        "step_p50_ns": 1282932.0,
+        "step_p95_ns": 1323280,
+        "monitor": null,
+        "collector": null,
+        "profile": null
+      },
+      "wall_overhead_percent": 208.0479942433707
+    },
+    {
+      "off": {
+        "enabled": false,
+        "wall_ns": 51256733,
+        "cpu_seconds": 0.008157999999999992,
+        "peak_rss_kib": 12204,
+        "step_p50_ns": 1290337.0,
+        "step_p95_ns": 1319130,
+        "monitor": null,
+        "collector": null,
+        "profile": null
+      },
+      "on": {
+        "enabled": true,
+        "wall_ns": 157824992,
+        "cpu_seconds": 0.06919599999999998,
+        "peak_rss_kib": 13336,
+        "step_p50_ns": 1733951.0,
+        "step_p95_ns": 1875992,
+        "monitor": {
+          "attempted_events": 160,
+          "acknowledged_events": 160,
+          "failed_events": 0,
+          "pending_events": 0,
+          "pending_bytes": 0,
+          "complete": true,
+          "serialized_bytes": 57400,
+          "emit_ns": 142458892,
+          "batch_requests": 5,
+          "queue_wait_ns": 841646,
+          "queue_full_waits": 0,
+          "queue_capacity": 1024,
+          "queue_bytes_limit": 1048576,
+          "peak_pending_events": 128,
+          "peak_pending_bytes": 45920,
+          "worker_alive": false,
+          "closed": true,
+          "export_failed": false,
+          "durability": "only acknowledged events; memory queue is not crash durable",
+          "enabled": true,
+          "delivery": "background",
+          "batch_size": 32,
+          "metric_errors": 0,
+          "strict": true
+        },
+        "collector": {
+          "accepted_events_this_process": 160,
+          "rejected_events_this_process": 0,
+          "collector_ns_this_process": 139092332,
+          "storage_bytes": 161680,
+          "delivery": "synchronous-acknowledged",
+          "event_loss_rate": null,
+          "committed_transactions_this_process": 5,
+          "event_loss_note": "no claim about events never submitted by a producer"
+        },
+        "profile": {
+          "runs": 1,
+          "spans": 80,
+          "complete": true,
+          "warnings": [],
+          "groups": [
+            {
+              "semantic_path": [],
+              "kind": "phase",
+              "name": "tool_execution",
+              "model": null,
+              "calls": 40,
+              "runs": 1,
+              "errors": 0,
+              "inclusive_ns": 55778657,
+              "self_ns": 55778657,
+              "p50_ns": 1364565,
+              "p95_ns": 1471710,
+              "timing_samples": [],
+              "metrics": {
+                "executor.execution_ns": {
+                  "sum": 52900069,
+                  "samples": 40
+                },
+                "executor.thread_cpu_ns": {
+                  "sum": 9217379,
+                  "samples": 40
+                }
+              }
+            },
+            {
+              "semantic_path": [],
+              "kind": "tool",
+              "name": "cpu-and-wait",
+              "model": null,
+              "calls": 40,
+              "runs": 1,
+              "errors": 0,
+              "inclusive_ns": 64523311,
+              "self_ns": 8744654,
+              "p50_ns": 1583366,
+              "p95_ns": 1713567,
+              "timing_samples": [
+                {
+                  "executor_internal_ns": 1322843,
+                  "non_execution_ns": 745492
+                },
+                {
+                  "executor_internal_ns": 1293743,
+                  "non_execution_ns": 291653
+                },
+                {
+                  "executor_internal_ns": 1292557,
+                  "non_execution_ns": 267406
+                },
+                {
+                  "executor_internal_ns": 1312607,
+                  "non_execution_ns": 331766
+                },
+                {
+                  "executor_internal_ns": 1285307,
+                  "non_execution_ns": 315706
+                },
+                {
+                  "executor_internal_ns": 1284130,
+                  "non_execution_ns": 273338
+                },
+                {
+                  "executor_internal_ns": 1273213,
+                  "non_execution_ns": 247205
+                },
+                {
+                  "executor_internal_ns": 1256535,
+                  "non_execution_ns": 234853
+                },
+                {
+                  "executor_internal_ns": 1291471,
+                  "non_execution_ns": 241365
+                },
+                {
+                  "executor_internal_ns": 1314346,
+                  "non_execution_ns": 235349
+                },
+                {
+                  "executor_internal_ns": 1340869,
+                  "non_execution_ns": 309662
+                },
+                {
+                  "executor_internal_ns": 1300657,
+                  "non_execution_ns": 268658
+                },
+                {
+                  "executor_internal_ns": 1296440,
+                  "non_execution_ns": 286926
+                },
+                {
+                  "executor_internal_ns": 1289003,
+                  "non_execution_ns": 267010
+                },
+                {
+                  "executor_internal_ns": 1295006,
+                  "non_execution_ns": 310167
+                },
+                {
+                  "executor_internal_ns": 1279215,
+                  "non_execution_ns": 255407
+                },
+                {
+                  "executor_internal_ns": 1283706,
+                  "non_execution_ns": 243471
+                },
+                {
+                  "executor_internal_ns": 1299019,
+                  "non_execution_ns": 312700
+                },
+                {
+                  "executor_internal_ns": 1283613,
+                  "non_execution_ns": 426415
+                },
+                {
+                  "executor_internal_ns": 1274561,
+                  "non_execution_ns": 267659
+                },
+                {
+                  "executor_internal_ns": 1306219,
+                  "non_execution_ns": 297961
+                },
+                {
+                  "executor_internal_ns": 1300994,
+                  "non_execution_ns": 289913
+                },
+                {
+                  "executor_internal_ns": 1294362,
+                  "non_execution_ns": 294976
+                },
+                {
+                  "executor_internal_ns": 1298282,
+                  "non_execution_ns": 292739
+                },
+                {
+                  "executor_internal_ns": 1307094,
+                  "non_execution_ns": 304825
+                },
+                {
+                  "executor_internal_ns": 1295362,
+                  "non_execution_ns": 294292
+                },
+                {
+                  "executor_internal_ns": 1294946,
+                  "non_execution_ns": 292510
+                },
+                {
+                  "executor_internal_ns": 2473105,
+                  "non_execution_ns": 300679
+                },
+                {
+                  "executor_internal_ns": 1308396,
+                  "non_execution_ns": 300490
+                },
+                {
+                  "executor_internal_ns": 1382451,
+                  "non_execution_ns": 331116
+                },
+                {
+                  "executor_internal_ns": 1369209,
+                  "non_execution_ns": 285442
+                },
+                {
+                  "executor_internal_ns": 1310047,
+                  "non_execution_ns": 330038
+                },
+                {
+                  "executor_internal_ns": 1241785,
+                  "non_execution_ns": 222361
+                },
+                {
+                  "executor_internal_ns": 1306346,
+                  "non_execution_ns": 224763
+                },
+                {
+                  "executor_internal_ns": 1267566,
+                  "non_execution_ns": 268148
+                },
+                {
+                  "executor_internal_ns": 1250047,
+                  "non_execution_ns": 213154
+                },
+                {
+                  "executor_internal_ns": 1253329,
+                  "non_execution_ns": 214952
+                },
+                {
+                  "executor_internal_ns": 1251172,
+                  "non_execution_ns": 248986
+                },
+                {
+                  "executor_internal_ns": 1267947,
+                  "non_execution_ns": 217465
+                },
+                {
+                  "executor_internal_ns": 1252569,
+                  "non_execution_ns": 266224
+                }
+              ],
+              "metrics": {}
+            }
+          ],
+          "completeness_scope": "received spans only; reconcile producer health separately",
+          "time_semantics": "inclusive sums are work, not elapsed wall time; self subtracts child union",
+          "unobserved": [
+            "transport unless instrumented",
+            "server timings unless provider reports"
+          ]
+        }
+      },
+      "wall_overhead_percent": 207.9107519396525
+    },
+    {
+      "on": {
+        "enabled": true,
+        "wall_ns": 156425253,
+        "cpu_seconds": 0.069047,
+        "peak_rss_kib": 13344,
+        "step_p50_ns": 1736971.5,
+        "step_p95_ns": 1892648,
+        "monitor": {
+          "attempted_events": 160,
+          "acknowledged_events": 160,
+          "failed_events": 0,
+          "pending_events": 0,
+          "pending_bytes": 0,
+          "complete": true,
+          "serialized_bytes": 57400,
+          "emit_ns": 140932687,
+          "batch_requests": 5,
+          "queue_wait_ns": 867122,
+          "queue_full_waits": 0,
+          "queue_capacity": 1024,
+          "queue_bytes_limit": 1048576,
+          "peak_pending_events": 128,
+          "peak_pending_bytes": 45920,
+          "worker_alive": false,
+          "closed": true,
+          "export_failed": false,
+          "durability": "only acknowledged events; memory queue is not crash durable",
+          "enabled": true,
+          "delivery": "background",
+          "batch_size": 32,
+          "metric_errors": 0,
+          "strict": true
+        },
+        "collector": {
+          "accepted_events_this_process": 160,
+          "rejected_events_this_process": 0,
+          "collector_ns_this_process": 137423890,
+          "storage_bytes": 161680,
+          "delivery": "synchronous-acknowledged",
+          "event_loss_rate": null,
+          "committed_transactions_this_process": 5,
+          "event_loss_note": "no claim about events never submitted by a producer"
+        },
+        "profile": {
+          "runs": 1,
+          "spans": 80,
+          "complete": true,
+          "warnings": [],
+          "groups": [
+            {
+              "semantic_path": [],
+              "kind": "phase",
+              "name": "tool_execution",
+              "model": null,
+              "calls": 40,
+              "runs": 1,
+              "errors": 0,
+              "inclusive_ns": 55291224,
+              "self_ns": 55291224,
+              "p50_ns": 1363726,
+              "p95_ns": 1503146,
+              "timing_samples": [],
+              "metrics": {
+                "executor.execution_ns": {
+                  "sum": 52436903,
+                  "samples": 40
+                },
+                "executor.thread_cpu_ns": {
+                  "sum": 9308930,
+                  "samples": 40
+                }
+              }
+            },
+            {
+              "semantic_path": [],
+              "kind": "tool",
+              "name": "cpu-and-wait",
+              "model": null,
+              "calls": 40,
+              "runs": 1,
+              "errors": 0,
+              "inclusive_ns": 64126565,
+              "self_ns": 8835341,
+              "p50_ns": 1587971,
+              "p95_ns": 1750793,
+              "timing_samples": [
+                {
+                  "executor_internal_ns": 1288227,
+                  "non_execution_ns": 795001
+                },
+                {
+                  "executor_internal_ns": 1268129,
+                  "non_execution_ns": 242818
+                },
+                {
+                  "executor_internal_ns": 1298513,
+                  "non_execution_ns": 307610
+                },
+                {
+                  "executor_internal_ns": 1297972,
+                  "non_execution_ns": 315971
+                },
+                {
+                  "executor_internal_ns": 1275876,
+                  "non_execution_ns": 280201
+                },
+                {
+                  "executor_internal_ns": 1258042,
+                  "non_execution_ns": 312912
+                },
+                {
+                  "executor_internal_ns": 1297256,
+                  "non_execution_ns": 302981
+                },
+                {
+                  "executor_internal_ns": 1294428,
+                  "non_execution_ns": 294430
+                },
+                {
+                  "executor_internal_ns": 1470335,
+                  "non_execution_ns": 280458
+                },
+                {
+                  "executor_internal_ns": 1267407,
+                  "non_execution_ns": 231824
+                },
+                {
+                  "executor_internal_ns": 1296969,
+                  "non_execution_ns": 236867
+                },
+                {
+                  "executor_internal_ns": 1326636,
+                  "non_execution_ns": 242964
+                },
+                {
+                  "executor_internal_ns": 1290781,
+                  "non_execution_ns": 245617
+                },
+                {
+                  "executor_internal_ns": 1305779,
+                  "non_execution_ns": 303453
+                },
+                {
+                  "executor_internal_ns": 1279652,
+                  "non_execution_ns": 268537
+                },
+                {
+                  "executor_internal_ns": 1272474,
+                  "non_execution_ns": 231004
+                },
+                {
+                  "executor_internal_ns": 1290894,
+                  "non_execution_ns": 278417
+                },
+                {
+                  "executor_internal_ns": 1287508,
+                  "non_execution_ns": 229530
+                },
+                {
+                  "executor_internal_ns": 1274263,
+                  "non_execution_ns": 422312
+                },
+                {
+                  "executor_internal_ns": 1286766,
+                  "non_execution_ns": 241284
+                },
+                {
+                  "executor_internal_ns": 1306986,
+                  "non_execution_ns": 296597
+                },
+                {
+                  "executor_internal_ns": 1296276,
+                  "non_execution_ns": 291695
+                },
+                {
+                  "executor_internal_ns": 1297597,
+                  "non_execution_ns": 318670
+                },
+                {
+                  "executor_internal_ns": 1298372,
+                  "non_execution_ns": 297100
+                },
+                {
+                  "executor_internal_ns": 1313420,
+                  "non_execution_ns": 300630
+                },
+                {
+                  "executor_internal_ns": 1292592,
+                  "non_execution_ns": 278618
+                },
+                {
+                  "executor_internal_ns": 1295055,
+                  "non_execution_ns": 297987
+                },
+                {
+                  "executor_internal_ns": 1590854,
+                  "non_execution_ns": 289154
+                },
+                {
+                  "executor_internal_ns": 1417068,
+                  "non_execution_ns": 292077
+                },
+                {
+                  "executor_internal_ns": 1408756,
+                  "non_execution_ns": 304297
+                },
+                {
+                  "executor_internal_ns": 1309334,
+                  "non_execution_ns": 327152
+                },
+                {
+                  "executor_internal_ns": 1351780,
+                  "non_execution_ns": 268940
+                },
+                {
+                  "executor_internal_ns": 1283800,
+                  "non_execution_ns": 258231
+                },
+                {
+                  "executor_internal_ns": 1300192,
+                  "non_execution_ns": 304367
+                },
+                {
+                  "executor_internal_ns": 1292843,
+                  "non_execution_ns": 280850
+                },
+                {
+                  "executor_internal_ns": 1286435,
+                  "non_execution_ns": 234603
+                },
+                {
+                  "executor_internal_ns": 1294017,
+                  "non_execution_ns": 232119
+                },
+                {
+                  "executor_internal_ns": 1311458,
+                  "non_execution_ns": 297340
+                },
+                {
+                  "executor_internal_ns": 1274585,
+                  "non_execution_ns": 230668
+                },
+                {
+                  "executor_internal_ns": 1287576,
+                  "non_execution_ns": 224376
+                }
+              ],
+              "metrics": {}
+            }
+          ],
+          "completeness_scope": "received spans only; reconcile producer health separately",
+          "time_semantics": "inclusive sums are work, not elapsed wall time; self subtracts child union",
+          "unobserved": [
+            "transport unless instrumented",
+            "server timings unless provider reports"
+          ]
+        }
+      },
+      "off": {
+        "enabled": false,
+        "wall_ns": 50069918,
+        "cpu_seconds": 0.007267000000000006,
+        "peak_rss_kib": 12468,
+        "step_p50_ns": 1252316.0,
+        "step_p95_ns": 1305993,
+        "monitor": null,
+        "collector": null,
+        "profile": null
+      },
+      "wall_overhead_percent": 212.41363926339966
+    },
+    {
+      "off": {
+        "enabled": false,
+        "wall_ns": 49778078,
+        "cpu_seconds": 0.006659999999999991,
+        "peak_rss_kib": 12468,
+        "step_p50_ns": 1230334.0,
+        "step_p95_ns": 1320616,
+        "monitor": null,
+        "collector": null,
+        "profile": null
+      },
+      "on": {
+        "enabled": true,
+        "wall_ns": 140666155,
+        "cpu_seconds": 0.06690700000000002,
+        "peak_rss_kib": 13348,
+        "step_p50_ns": 1682997.0,
+        "step_p95_ns": 2190217,
+        "monitor": {
+          "attempted_events": 160,
+          "acknowledged_events": 160,
+          "failed_events": 0,
+          "pending_events": 0,
+          "pending_bytes": 0,
+          "complete": true,
+          "serialized_bytes": 57400,
+          "emit_ns": 124777920,
+          "batch_requests": 5,
+          "queue_wait_ns": 875709,
+          "queue_full_waits": 0,
+          "queue_capacity": 1024,
+          "queue_bytes_limit": 1048576,
+          "peak_pending_events": 128,
+          "peak_pending_bytes": 45920,
+          "worker_alive": false,
+          "closed": true,
+          "export_failed": false,
+          "durability": "only acknowledged events; memory queue is not crash durable",
+          "enabled": true,
+          "delivery": "background",
+          "batch_size": 32,
+          "metric_errors": 0,
+          "strict": true
+        },
+        "collector": {
+          "accepted_events_this_process": 160,
+          "rejected_events_this_process": 0,
+          "collector_ns_this_process": 121455071,
+          "storage_bytes": 162728,
+          "delivery": "synchronous-acknowledged",
+          "event_loss_rate": null,
+          "committed_transactions_this_process": 5,
+          "event_loss_note": "no claim about events never submitted by a producer"
+        },
+        "profile": {
+          "runs": 1,
+          "spans": 80,
+          "complete": true,
+          "warnings": [],
+          "groups": [
+            {
+              "semantic_path": [],
+              "kind": "phase",
+              "name": "tool_execution",
+              "model": null,
+              "calls": 40,
+              "runs": 1,
+              "errors": 0,
+              "inclusive_ns": 55451746,
+              "self_ns": 55451746,
+              "p50_ns": 1342527,
+              "p95_ns": 1509444,
+              "timing_samples": [],
+              "metrics": {
+                "executor.execution_ns": {
+                  "sum": 52588132,
+                  "samples": 40
+                },
+                "executor.thread_cpu_ns": {
+                  "sum": 8597891,
+                  "samples": 40
+                }
+              }
+            },
+            {
+              "semantic_path": [],
+              "kind": "tool",
+              "name": "cpu-and-wait",
+              "model": null,
+              "calls": 40,
+              "runs": 1,
+              "errors": 0,
+              "inclusive_ns": 64110099,
+              "self_ns": 8658353,
+              "p50_ns": 1547480,
+              "p95_ns": 2028804,
+              "timing_samples": [
+                {
+                  "executor_internal_ns": 1293670,
+                  "non_execution_ns": 847558
+                },
+                {
+                  "executor_internal_ns": 1284456,
+                  "non_execution_ns": 320864
+                },
+                {
+                  "executor_internal_ns": 1314754,
+                  "non_execution_ns": 326372
+                },
+                {
+                  "executor_internal_ns": 1335133,
+                  "non_execution_ns": 317963
+                },
+                {
+                  "executor_internal_ns": 1300794,
+                  "non_execution_ns": 288275
+                },
+                {
+                  "executor_internal_ns": 1260956,
+                  "non_execution_ns": 286524
+                },
+                {
+                  "executor_internal_ns": 1296309,
+                  "non_execution_ns": 302727
+                },
+                {
+                  "executor_internal_ns": 1289122,
+                  "non_execution_ns": 298121
+                },
+                {
+                  "executor_internal_ns": 1692600,
+                  "non_execution_ns": 336204
+                },
+                {
+                  "executor_internal_ns": 1329818,
+                  "non_execution_ns": 301698
+                },
+                {
+                  "executor_internal_ns": 1326230,
+                  "non_execution_ns": 306770
+                },
+                {
+                  "executor_internal_ns": 1342979,
+                  "non_execution_ns": 331843
+                },
+                {
+                  "executor_internal_ns": 1294402,
+                  "non_execution_ns": 301482
+                },
+                {
+                  "executor_internal_ns": 1281049,
+                  "non_execution_ns": 294123
+                },
+                {
+                  "executor_internal_ns": 1235809,
+                  "non_execution_ns": 233882
+                },
+                {
+                  "executor_internal_ns": 1253889,
+                  "non_execution_ns": 223168
+                },
+                {
+                  "executor_internal_ns": 1272784,
+                  "non_execution_ns": 261737
+                },
+                {
+                  "executor_internal_ns": 1234534,
+                  "non_execution_ns": 208959
+                },
+                {
+                  "executor_internal_ns": 1262253,
+                  "non_execution_ns": 419696
+                },
+                {
+                  "executor_internal_ns": 1382466,
+                  "non_execution_ns": 358218
+                },
+                {
+                  "executor_internal_ns": 1265154,
+                  "non_execution_ns": 210219
+                },
+                {
+                  "executor_internal_ns": 1282806,
+                  "non_execution_ns": 279750
+                },
+                {
+                  "executor_internal_ns": 1288551,
+                  "non_execution_ns": 270384
+                },
+                {
+                  "executor_internal_ns": 1260785,
+                  "non_execution_ns": 244967
+                },
+                {
+                  "executor_internal_ns": 1260205,
+                  "non_execution_ns": 266341
+                },
+                {
+                  "executor_internal_ns": 1258243,
+                  "non_execution_ns": 254782
+                },
+                {
+                  "executor_internal_ns": 1260381,
+                  "non_execution_ns": 244241
+                },
+                {
+                  "executor_internal_ns": 2221308,
+                  "non_execution_ns": 255728
+                },
+                {
+                  "executor_internal_ns": 1268015,
+                  "non_execution_ns": 295353
+                },
+                {
+                  "executor_internal_ns": 1287366,
+                  "non_execution_ns": 255137
+                },
+                {
+                  "executor_internal_ns": 1271295,
+                  "non_execution_ns": 222477
+                },
+                {
+                  "executor_internal_ns": 1330766,
+                  "non_execution_ns": 272711
+                },
+                {
+                  "executor_internal_ns": 1283659,
+                  "non_execution_ns": 230329
+                },
+                {
+                  "executor_internal_ns": 1233762,
+                  "non_execution_ns": 281940
+                },
+                {
+                  "executor_internal_ns": 1255857,
+                  "non_execution_ns": 223307
+                },
+                {
+                  "executor_internal_ns": 1236119,
+                  "non_execution_ns": 218371
+                },
+                {
+                  "executor_internal_ns": 1248487,
+                  "non_execution_ns": 229875
+                },
+                {
+                  "executor_internal_ns": 1248492,
+                  "non_execution_ns": 238037
+                },
+                {
+                  "executor_internal_ns": 1290887,
+                  "non_execution_ns": 231127
+                },
+                {
+                  "executor_internal_ns": 1251987,
+                  "non_execution_ns": 230707
+                }
+              ],
+              "metrics": {}
+            }
+          ],
+          "completeness_scope": "received spans only; reconcile producer health separately",
+          "time_semantics": "inclusive sums are work, not elapsed wall time; self subtracts child union",
+          "unobserved": [
+            "transport unless instrumented",
+            "server timings unless provider reports"
+          ]
+        }
+      },
+      "wall_overhead_percent": 182.58655346234943
+    },
+    {
+      "on": {
+        "enabled": true,
+        "wall_ns": 124334526,
+        "cpu_seconds": 0.052911,
+        "peak_rss_kib": 13324,
+        "step_p50_ns": 1490930.5,
+        "step_p95_ns": 1658536,
+        "monitor": {
+          "attempted_events": 160,
+          "acknowledged_events": 160,
+          "failed_events": 0,
+          "pending_events": 0,
+          "pending_bytes": 0,
+          "complete": true,
+          "serialized_bytes": 57400,
+          "emit_ns": 111298267,
+          "batch_requests": 5,
+          "queue_wait_ns": 562764,
+          "queue_full_waits": 0,
+          "queue_capacity": 1024,
+          "queue_bytes_limit": 1048576,
+          "peak_pending_events": 128,
+          "peak_pending_bytes": 45920,
+          "worker_alive": false,
+          "closed": true,
+          "export_failed": false,
+          "durability": "only acknowledged events; memory queue is not crash durable",
+          "enabled": true,
+          "delivery": "background",
+          "batch_size": 32,
+          "metric_errors": 0,
+          "strict": true
+        },
+        "collector": {
+          "accepted_events_this_process": 160,
+          "rejected_events_this_process": 0,
+          "collector_ns_this_process": 108541050,
+          "storage_bytes": 160632,
+          "delivery": "synchronous-acknowledged",
+          "event_loss_rate": null,
+          "committed_transactions_this_process": 5,
+          "event_loss_note": "no claim about events never submitted by a producer"
+        },
+        "profile": {
+          "runs": 1,
+          "spans": 80,
+          "complete": true,
+          "warnings": [],
+          "groups": [
+            {
+              "semantic_path": [],
+              "kind": "phase",
+              "name": "tool_execution",
+              "model": null,
+              "calls": 40,
+              "runs": 1,
+              "errors": 0,
+              "inclusive_ns": 51047678,
+              "self_ns": 51047678,
+              "p50_ns": 1255966,
+              "p95_ns": 1379383,
+              "timing_samples": [],
+              "metrics": {
+                "executor.execution_ns": {
+                  "sum": 49087837,
+                  "samples": 40
+                },
+                "executor.thread_cpu_ns": {
+                  "sum": 6248243,
+                  "samples": 40
+                }
+              }
+            },
+            {
+              "semantic_path": [],
+              "kind": "tool",
+              "name": "cpu-and-wait",
+              "model": null,
+              "calls": 40,
+              "runs": 1,
+              "errors": 0,
+              "inclusive_ns": 56972936,
+              "self_ns": 5925258,
+              "p50_ns": 1391483,
+              "p95_ns": 1555072,
+              "timing_samples": [
+                {
+                  "executor_internal_ns": 1170892,
+                  "non_execution_ns": 504976
+                },
+                {
+                  "executor_internal_ns": 1185004,
+                  "non_execution_ns": 169935
+                },
+                {
+                  "executor_internal_ns": 1173152,
+                  "non_execution_ns": 156951
+                },
+                {
+                  "executor_internal_ns": 1319817,
+                  "non_execution_ns": 235255
+                },
+                {
+                  "executor_internal_ns": 1204844,
+                  "non_execution_ns": 181682
+                },
+                {
+                  "executor_internal_ns": 1166069,
+                  "non_execution_ns": 174230
+                },
+                {
+                  "executor_internal_ns": 1165756,
+                  "non_execution_ns": 206899
+                },
+                {
+                  "executor_internal_ns": 1195250,
+                  "non_execution_ns": 221498
+                },
+                {
+                  "executor_internal_ns": 1207211,
+                  "non_execution_ns": 186227
+                },
+                {
+                  "executor_internal_ns": 1199640,
+                  "non_execution_ns": 147758
+                },
+                {
+                  "executor_internal_ns": 1204699,
+                  "non_execution_ns": 152534
+                },
+                {
+                  "executor_internal_ns": 1221321,
+                  "non_execution_ns": 157415
+                },
+                {
+                  "executor_internal_ns": 1226086,
+                  "non_execution_ns": 165397
+                },
+                {
+                  "executor_internal_ns": 1173167,
+                  "non_execution_ns": 157759
+                },
+                {
+                  "executor_internal_ns": 1164793,
+                  "non_execution_ns": 184311
+                },
+                {
+                  "executor_internal_ns": 1206730,
+                  "non_execution_ns": 167176
+                },
+                {
+                  "executor_internal_ns": 1195706,
+                  "non_execution_ns": 164989
+                },
+                {
+                  "executor_internal_ns": 1242249,
+                  "non_execution_ns": 174962
+                },
+                {
+                  "executor_internal_ns": 1224308,
+                  "non_execution_ns": 315546
+                },
+                {
+                  "executor_internal_ns": 1208496,
+                  "non_execution_ns": 177991
+                },
+                {
+                  "executor_internal_ns": 1212708,
+                  "non_execution_ns": 175901
+                },
+                {
+                  "executor_internal_ns": 1224726,
+                  "non_execution_ns": 226376
+                },
+                {
+                  "executor_internal_ns": 1201093,
+                  "non_execution_ns": 180766
+                },
+                {
+                  "executor_internal_ns": 1242811,
+                  "non_execution_ns": 174624
+                },
+                {
+                  "executor_internal_ns": 1199833,
+                  "non_execution_ns": 178678
+                },
+                {
+                  "executor_internal_ns": 1211518,
+                  "non_execution_ns": 152854
+                },
+                {
+                  "executor_internal_ns": 1190250,
+                  "non_execution_ns": 146034
+                },
+                {
+                  "executor_internal_ns": 1576608,
+                  "non_execution_ns": 163431
+                },
+                {
+                  "executor_internal_ns": 1333052,
+                  "non_execution_ns": 219987
+                },
+                {
+                  "executor_internal_ns": 1237174,
+                  "non_execution_ns": 180016
+                },
+                {
+                  "executor_internal_ns": 1277990,
+                  "non_execution_ns": 203146
+                },
+                {
+                  "executor_internal_ns": 1285154,
+                  "non_execution_ns": 229585
+                },
+                {
+                  "executor_internal_ns": 1243167,
+                  "non_execution_ns": 238146
+                },
+                {
+                  "executor_internal_ns": 1232481,
+                  "non_execution_ns": 197193
+                },
+                {
+                  "executor_internal_ns": 1241506,
+                  "non_execution_ns": 163576
+                },
+                {
+                  "executor_internal_ns": 1223126,
+                  "non_execution_ns": 228236
+                },
+                {
+                  "executor_internal_ns": 1213866,
+                  "non_execution_ns": 181326
+                },
+                {
+                  "executor_internal_ns": 1238207,
+                  "non_execution_ns": 287882
+                },
+                {
+                  "executor_internal_ns": 1220638,
+                  "non_execution_ns": 164480
+                },
+                {
+                  "executor_internal_ns": 1226739,
+                  "non_execution_ns": 189371
+                }
+              ],
+              "metrics": {}
+            }
+          ],
+          "completeness_scope": "received spans only; reconcile producer health separately",
+          "time_semantics": "inclusive sums are work, not elapsed wall time; self subtracts child union",
+          "unobserved": [
+            "transport unless instrumented",
+            "server timings unless provider reports"
+          ]
+        }
+      },
+      "off": {
+        "enabled": false,
+        "wall_ns": 47725216,
+        "cpu_seconds": 0.0048410000000000085,
+        "peak_rss_kib": 12468,
+        "step_p50_ns": 1186720.5,
+        "step_p95_ns": 1289215,
+        "monitor": null,
+        "collector": null,
+        "profile": null
+      },
+      "wall_overhead_percent": 160.5216621754001
+    },
+    {
+      "off": {
+        "enabled": false,
+        "wall_ns": 48406379,
+        "cpu_seconds": 0.005575999999999996,
+        "peak_rss_kib": 12468,
+        "step_p50_ns": 1192194.5,
+        "step_p95_ns": 1299347,
+        "monitor": null,
+        "collector": null,
+        "profile": null
+      },
+      "on": {
+        "enabled": true,
+        "wall_ns": 132491560,
+        "cpu_seconds": 0.06613299999999998,
+        "peak_rss_kib": 13344,
+        "step_p50_ns": 1692682.0,
+        "step_p95_ns": 1929901,
+        "monitor": {
+          "attempted_events": 160,
+          "acknowledged_events": 160,
+          "failed_events": 0,
+          "pending_events": 0,
+          "pending_bytes": 0,
+          "complete": true,
+          "serialized_bytes": 57400,
+          "emit_ns": 116962475,
+          "batch_requests": 5,
+          "queue_wait_ns": 824222,
+          "queue_full_waits": 0,
+          "queue_capacity": 1024,
+          "queue_bytes_limit": 1048576,
+          "peak_pending_events": 128,
+          "peak_pending_bytes": 45920,
+          "worker_alive": false,
+          "closed": true,
+          "export_failed": false,
+          "durability": "only acknowledged events; memory queue is not crash durable",
+          "enabled": true,
+          "delivery": "background",
+          "batch_size": 32,
+          "metric_errors": 0,
+          "strict": true
+        },
+        "collector": {
+          "accepted_events_this_process": 160,
+          "rejected_events_this_process": 0,
+          "collector_ns_this_process": 113528714,
+          "storage_bytes": 161680,
+          "delivery": "synchronous-acknowledged",
+          "event_loss_rate": null,
+          "committed_transactions_this_process": 5,
+          "event_loss_note": "no claim about events never submitted by a producer"
+        },
+        "profile": {
+          "runs": 1,
+          "spans": 80,
+          "complete": true,
+          "warnings": [],
+          "groups": [
+            {
+              "semantic_path": [],
+              "kind": "phase",
+              "name": "tool_execution",
+              "model": null,
+              "calls": 40,
+              "runs": 1,
+              "errors": 0,
+              "inclusive_ns": 54601105,
+              "self_ns": 54601105,
+              "p50_ns": 1345784,
+              "p95_ns": 1455418,
+              "timing_samples": [],
+              "metrics": {
+                "executor.execution_ns": {
+                  "sum": 51864547,
+                  "samples": 40
+                },
+                "executor.thread_cpu_ns": {
+                  "sum": 8884322,
+                  "samples": 40
+                }
+              }
+            },
+            {
+              "semantic_path": [],
+              "kind": "tool",
+              "name": "cpu-and-wait",
+              "model": null,
+              "calls": 40,
+              "runs": 1,
+              "errors": 0,
+              "inclusive_ns": 62925106,
+              "self_ns": 8324001,
+              "p50_ns": 1552332,
+              "p95_ns": 1786222,
+              "timing_samples": [
+                {
+                  "executor_internal_ns": 1294060,
+                  "non_execution_ns": 737324
+                },
+                {
+                  "executor_internal_ns": 1348430,
+                  "non_execution_ns": 315562
+                },
+                {
+                  "executor_internal_ns": 1304311,
+                  "non_execution_ns": 297127
+                },
+                {
+                  "executor_internal_ns": 1287740,
+                  "non_execution_ns": 264592
+                },
+                {
+                  "executor_internal_ns": 1281567,
+                  "non_execution_ns": 277244
+                },
+                {
+                  "executor_internal_ns": 1293562,
+                  "non_execution_ns": 317247
+                },
+                {
+                  "executor_internal_ns": 1261851,
+                  "non_execution_ns": 298039
+                },
+                {
+                  "executor_internal_ns": 1261314,
+                  "non_execution_ns": 323306
+                },
+                {
+                  "executor_internal_ns": 1491361,
+                  "non_execution_ns": 294861
+                },
+                {
+                  "executor_internal_ns": 1332583,
+                  "non_execution_ns": 243731
+                },
+                {
+                  "executor_internal_ns": 1370864,
+                  "non_execution_ns": 301200
+                },
+                {
+                  "executor_internal_ns": 1321713,
+                  "non_execution_ns": 238197
+                },
+                {
+                  "executor_internal_ns": 1329821,
+                  "non_execution_ns": 264207
+                },
+                {
+                  "executor_internal_ns": 1381135,
+                  "non_execution_ns": 257748
+                },
+                {
+                  "executor_internal_ns": 1261690,
+                  "non_execution_ns": 240469
+                },
+                {
+                  "executor_internal_ns": 1269952,
+                  "non_execution_ns": 223684
+                },
+                {
+                  "executor_internal_ns": 1312926,
+                  "non_execution_ns": 253847
+                },
+                {
+                  "executor_internal_ns": 1282916,
+                  "non_execution_ns": 255590
+                },
+                {
+                  "executor_internal_ns": 1256559,
+                  "non_execution_ns": 375563
+                },
+                {
+                  "executor_internal_ns": 1275451,
+                  "non_execution_ns": 202645
+                },
+                {
+                  "executor_internal_ns": 1275818,
+                  "non_execution_ns": 245177
+                },
+                {
+                  "executor_internal_ns": 1274191,
+                  "non_execution_ns": 261377
+                },
+                {
+                  "executor_internal_ns": 1258608,
+                  "non_execution_ns": 256348
+                },
+                {
+                  "executor_internal_ns": 1262772,
+                  "non_execution_ns": 289119
+                },
+                {
+                  "executor_internal_ns": 1230254,
+                  "non_execution_ns": 272063
+                },
+                {
+                  "executor_internal_ns": 1307456,
+                  "non_execution_ns": 294676
+                },
+                {
+                  "executor_internal_ns": 1312947,
+                  "non_execution_ns": 329008
+                },
+                {
+                  "executor_internal_ns": 1289259,
+                  "non_execution_ns": 260161
+                },
+                {
+                  "executor_internal_ns": 1531046,
+                  "non_execution_ns": 263072
+                },
+                {
+                  "executor_internal_ns": 1330468,
+                  "non_execution_ns": 254748
+                },
+                {
+                  "executor_internal_ns": 1241856,
+                  "non_execution_ns": 266627
+                },
+                {
+                  "executor_internal_ns": 1255816,
+                  "non_execution_ns": 225314
+                },
+                {
+                  "executor_internal_ns": 1333285,
+                  "non_execution_ns": 198121
+                },
+                {
+                  "executor_internal_ns": 1270270,
+                  "non_execution_ns": 236269
+                },
+                {
+                  "executor_internal_ns": 1248053,
+                  "non_execution_ns": 219107
+                },
+                {
+                  "executor_internal_ns": 1294184,
+                  "non_execution_ns": 270670
+                },
+                {
+                  "executor_internal_ns": 1233941,
+                  "non_execution_ns": 223718
+                },
+                {
+                  "executor_internal_ns": 1233429,
+                  "non_execution_ns": 220971
+                },
+                {
+                  "executor_internal_ns": 1228964,
+                  "non_execution_ns": 254093
+                },
+                {
+                  "executor_internal_ns": 1232124,
+                  "non_execution_ns": 237737
+                }
+              ],
+              "metrics": {}
+            }
+          ],
+          "completeness_scope": "received spans only; reconcile producer health separately",
+          "time_semantics": "inclusive sums are work, not elapsed wall time; self subtracts child union",
+          "unobserved": [
+            "transport unless instrumented",
+            "server timings unless provider reports"
+          ]
+        }
+      },
+      "wall_overhead_percent": 173.70681868189314
+    },
+    {
+      "on": {
+        "enabled": true,
+        "wall_ns": 149134418,
+        "cpu_seconds": 0.06593399999999996,
+        "peak_rss_kib": 13348,
+        "step_p50_ns": 1738708.0,
+        "step_p95_ns": 2080636,
+        "monitor": {
+          "attempted_events": 160,
+          "acknowledged_events": 160,
+          "failed_events": 0,
+          "pending_events": 0,
+          "pending_bytes": 0,
+          "complete": true,
+          "serialized_bytes": 57400,
+          "emit_ns": 133133370,
+          "batch_requests": 5,
+          "queue_wait_ns": 967109,
+          "queue_full_waits": 0,
+          "queue_capacity": 1024,
+          "queue_bytes_limit": 1048576,
+          "peak_pending_events": 128,
+          "peak_pending_bytes": 45920,
+          "worker_alive": false,
+          "closed": true,
+          "export_failed": false,
+          "durability": "only acknowledged events; memory queue is not crash durable",
+          "enabled": true,
+          "delivery": "background",
+          "batch_size": 32,
+          "metric_errors": 0,
+          "strict": true
+        },
+        "collector": {
+          "accepted_events_this_process": 160,
+          "rejected_events_this_process": 0,
+          "collector_ns_this_process": 130092330,
+          "storage_bytes": 162728,
+          "delivery": "synchronous-acknowledged",
+          "event_loss_rate": null,
+          "committed_transactions_this_process": 5,
+          "event_loss_note": "no claim about events never submitted by a producer"
+        },
+        "profile": {
+          "runs": 1,
+          "spans": 80,
+          "complete": true,
+          "warnings": [],
+          "groups": [
+            {
+              "semantic_path": [],
+              "kind": "phase",
+              "name": "tool_execution",
+              "model": null,
+              "calls": 40,
+              "runs": 1,
+              "errors": 0,
+              "inclusive_ns": 55813175,
+              "self_ns": 55813175,
+              "p50_ns": 1367531,
+              "p95_ns": 1544273,
+              "timing_samples": [],
+              "metrics": {
+                "executor.execution_ns": {
+                  "sum": 52833213,
+                  "samples": 40
+                },
+                "executor.thread_cpu_ns": {
+                  "sum": 9352896,
+                  "samples": 40
+                }
+              }
+            },
+            {
+              "semantic_path": [],
+              "kind": "tool",
+              "name": "cpu-and-wait",
+              "model": null,
+              "calls": 40,
+              "runs": 1,
+              "errors": 0,
+              "inclusive_ns": 64898497,
+              "self_ns": 9085322,
+              "p50_ns": 1588457,
+              "p95_ns": 1929634,
+              "timing_samples": [
+                {
+                  "executor_internal_ns": 1326160,
+                  "non_execution_ns": 912490
+                },
+                {
+                  "executor_internal_ns": 1315323,
+                  "non_execution_ns": 347263
+                },
+                {
+                  "executor_internal_ns": 1324896,
+                  "non_execution_ns": 321080
+                },
+                {
+                  "executor_internal_ns": 1293521,
+                  "non_execution_ns": 271515
+                },
+                {
+                  "executor_internal_ns": 1292520,
+                  "non_execution_ns": 324622
+                },
+                {
+                  "executor_internal_ns": 1318009,
+                  "non_execution_ns": 332782
+                },
+                {
+                  "executor_internal_ns": 1299437,
+                  "non_execution_ns": 308466
+                },
+                {
+                  "executor_internal_ns": 1299623,
+                  "non_execution_ns": 308435
+                },
+                {
+                  "executor_internal_ns": 1604029,
+                  "non_execution_ns": 325605
+                },
+                {
+                  "executor_internal_ns": 1284447,
+                  "non_execution_ns": 282904
+                },
+                {
+                  "executor_internal_ns": 1359734,
+                  "non_execution_ns": 297470
+                },
+                {
+                  "executor_internal_ns": 1354605,
+                  "non_execution_ns": 318569
+                },
+                {
+                  "executor_internal_ns": 1316694,
+                  "non_execution_ns": 250306
+                },
+                {
+                  "executor_internal_ns": 1308180,
+                  "non_execution_ns": 253336
+                },
+                {
+                  "executor_internal_ns": 1285831,
+                  "non_execution_ns": 261304
+                },
+                {
+                  "executor_internal_ns": 1293899,
+                  "non_execution_ns": 271106
+                },
+                {
+                  "executor_internal_ns": 1275719,
+                  "non_execution_ns": 246875
+                },
+                {
+                  "executor_internal_ns": 1305783,
+                  "non_execution_ns": 236150
+                },
+                {
+                  "executor_internal_ns": 1293473,
+                  "non_execution_ns": 471663
+                },
+                {
+                  "executor_internal_ns": 1296624,
+                  "non_execution_ns": 283838
+                },
+                {
+                  "executor_internal_ns": 1295450,
+                  "non_execution_ns": 292356
+                },
+                {
+                  "executor_internal_ns": 1309100,
+                  "non_execution_ns": 288888
+                },
+                {
+                  "executor_internal_ns": 1305647,
+                  "non_execution_ns": 283996
+                },
+                {
+                  "executor_internal_ns": 1304749,
+                  "non_execution_ns": 282580
+                },
+                {
+                  "executor_internal_ns": 1293764,
+                  "non_execution_ns": 306869
+                },
+                {
+                  "executor_internal_ns": 1305476,
+                  "non_execution_ns": 292034
+                },
+                {
+                  "executor_internal_ns": 1297405,
+                  "non_execution_ns": 292404
+                },
+                {
+                  "executor_internal_ns": 1696164,
+                  "non_execution_ns": 299373
+                },
+                {
+                  "executor_internal_ns": 1340980,
+                  "non_execution_ns": 309927
+                },
+                {
+                  "executor_internal_ns": 1283767,
+                  "non_execution_ns": 233344
+                },
+                {
+                  "executor_internal_ns": 1283820,
+                  "non_execution_ns": 247424
+                },
+                {
+                  "executor_internal_ns": 1378942,
+                  "non_execution_ns": 272002
+                },
+                {
+                  "executor_internal_ns": 1342744,
+                  "non_execution_ns": 304297
+                },
+                {
+                  "executor_internal_ns": 1266365,
+                  "non_execution_ns": 239577
+                },
+                {
+                  "executor_internal_ns": 1267986,
+                  "non_execution_ns": 224964
+                },
+                {
+                  "executor_internal_ns": 1281104,
+                  "non_execution_ns": 282727
+                },
+                {
+                  "executor_internal_ns": 1275622,
+                  "non_execution_ns": 235792
+                },
+                {
+                  "executor_internal_ns": 1284803,
+                  "non_execution_ns": 247287
+                },
+                {
+                  "executor_internal_ns": 1305327,
+                  "non_execution_ns": 283130
+                },
+                {
+                  "executor_internal_ns": 1265491,
+                  "non_execution_ns": 220534
+                }
+              ],
+              "metrics": {}
+            }
+          ],
+          "completeness_scope": "received spans only; reconcile producer health separately",
+          "time_semantics": "inclusive sums are work, not elapsed wall time; self subtracts child union",
+          "unobserved": [
+            "transport unless instrumented",
+            "server timings unless provider reports"
+          ]
+        }
+      },
+      "off": {
+        "enabled": false,
+        "wall_ns": 49021413,
+        "cpu_seconds": 0.006035999999999991,
+        "peak_rss_kib": 12468,
+        "step_p50_ns": 1215621.0,
+        "step_p95_ns": 1303067,
+        "monitor": null,
+        "collector": null,
+        "profile": null
+      },
+      "wall_overhead_percent": 204.22300964682515
+    },
+    {
+      "off": {
+        "enabled": false,
+        "wall_ns": 47982677,
+        "cpu_seconds": 0.005072999999999991,
+        "peak_rss_kib": 12468,
+        "step_p50_ns": 1191300.0,
+        "step_p95_ns": 1281150,
+        "monitor": null,
+        "collector": null,
+        "profile": null
+      },
+      "on": {
+        "enabled": true,
+        "wall_ns": 149267321,
+        "cpu_seconds": 0.07201500000000001,
+        "peak_rss_kib": 13340,
+        "step_p50_ns": 1741303.0,
+        "step_p95_ns": 2112026,
+        "monitor": {
+          "attempted_events": 160,
+          "acknowledged_events": 160,
+          "failed_events": 0,
+          "pending_events": 0,
+          "pending_bytes": 0,
+          "complete": true,
+          "serialized_bytes": 57400,
+          "emit_ns": 133444307,
+          "batch_requests": 5,
+          "queue_wait_ns": 995227,
+          "queue_full_waits": 0,
+          "queue_capacity": 1024,
+          "queue_bytes_limit": 1048576,
+          "peak_pending_events": 128,
+          "peak_pending_bytes": 45920,
+          "worker_alive": false,
+          "closed": true,
+          "export_failed": false,
+          "durability": "only acknowledged events; memory queue is not crash durable",
+          "enabled": true,
+          "delivery": "background",
+          "batch_size": 32,
+          "metric_errors": 0,
+          "strict": true
+        },
+        "collector": {
+          "accepted_events_this_process": 160,
+          "rejected_events_this_process": 0,
+          "collector_ns_this_process": 129789783,
+          "storage_bytes": 162728,
+          "delivery": "synchronous-acknowledged",
+          "event_loss_rate": null,
+          "committed_transactions_this_process": 5,
+          "event_loss_note": "no claim about events never submitted by a producer"
+        },
+        "profile": {
+          "runs": 1,
+          "spans": 80,
+          "complete": true,
+          "warnings": [],
+          "groups": [
+            {
+              "semantic_path": [],
+              "kind": "phase",
+              "name": "tool_execution",
+              "model": null,
+              "calls": 40,
+              "runs": 1,
+              "errors": 0,
+              "inclusive_ns": 55967133,
+              "self_ns": 55967133,
+              "p50_ns": 1364343,
+              "p95_ns": 1528742,
+              "timing_samples": [],
+              "metrics": {
+                "executor.execution_ns": {
+                  "sum": 52954019,
+                  "samples": 40
+                },
+                "executor.thread_cpu_ns": {
+                  "sum": 9203892,
+                  "samples": 40
+                }
+              }
+            },
+            {
+              "semantic_path": [],
+              "kind": "tool",
+              "name": "cpu-and-wait",
+              "model": null,
+              "calls": 40,
+              "runs": 1,
+              "errors": 0,
+              "inclusive_ns": 65280918,
+              "self_ns": 9313785,
+              "p50_ns": 1591418,
+              "p95_ns": 1959557,
+              "timing_samples": [
+                {
+                  "executor_internal_ns": 1291296,
+                  "non_execution_ns": 823969
+                },
+                {
+                  "executor_internal_ns": 1289280,
+                  "non_execution_ns": 335509
+                },
+                {
+                  "executor_internal_ns": 1283123,
+                  "non_execution_ns": 271386
+                },
+                {
+                  "executor_internal_ns": 1308373,
+                  "non_execution_ns": 325806
+                },
+                {
+                  "executor_internal_ns": 1306183,
+                  "non_execution_ns": 341890
+                },
+                {
+                  "executor_internal_ns": 1274904,
+                  "non_execution_ns": 294036
+                },
+                {
+                  "executor_internal_ns": 1315943,
+                  "non_execution_ns": 308133
+                },
+                {
+                  "executor_internal_ns": 1302595,
+                  "non_execution_ns": 317256
+                },
+                {
+                  "executor_internal_ns": 1635414,
+                  "non_execution_ns": 324143
+                },
+                {
+                  "executor_internal_ns": 1341892,
+                  "non_execution_ns": 313808
+                },
+                {
+                  "executor_internal_ns": 1361723,
+                  "non_execution_ns": 270101
+                },
+                {
+                  "executor_internal_ns": 1339885,
+                  "non_execution_ns": 251533
+                },
+                {
+                  "executor_internal_ns": 1285900,
+                  "non_execution_ns": 249981
+                },
+                {
+                  "executor_internal_ns": 1350936,
+                  "non_execution_ns": 314763
+                },
+                {
+                  "executor_internal_ns": 1274023,
+                  "non_execution_ns": 269683
+                },
+                {
+                  "executor_internal_ns": 1270710,
+                  "non_execution_ns": 263466
+                },
+                {
+                  "executor_internal_ns": 1294251,
+                  "non_execution_ns": 273861
+                },
+                {
+                  "executor_internal_ns": 1295768,
+                  "non_execution_ns": 283308
+                },
+                {
+                  "executor_internal_ns": 1293646,
+                  "non_execution_ns": 469501
+                },
+                {
+                  "executor_internal_ns": 1298077,
+                  "non_execution_ns": 299604
+                },
+                {
+                  "executor_internal_ns": 1298463,
+                  "non_execution_ns": 246859
+                },
+                {
+                  "executor_internal_ns": 1315213,
+                  "non_execution_ns": 307499
+                },
+                {
+                  "executor_internal_ns": 1293187,
+                  "non_execution_ns": 287892
+                },
+                {
+                  "executor_internal_ns": 1291120,
+                  "non_execution_ns": 301339
+                },
+                {
+                  "executor_internal_ns": 1306263,
+                  "non_execution_ns": 295450
+                },
+                {
+                  "executor_internal_ns": 1289680,
+                  "non_execution_ns": 286541
+                },
+                {
+                  "executor_internal_ns": 1289564,
+                  "non_execution_ns": 284785
+                },
+                {
+                  "executor_internal_ns": 1868295,
+                  "non_execution_ns": 321604
+                },
+                {
+                  "executor_internal_ns": 1328345,
+                  "non_execution_ns": 299050
+                },
+                {
+                  "executor_internal_ns": 1320576,
+                  "non_execution_ns": 295250
+                },
+                {
+                  "executor_internal_ns": 1355939,
+                  "non_execution_ns": 308579
+                },
+                {
+                  "executor_internal_ns": 1284084,
+                  "non_execution_ns": 282055
+                },
+                {
+                  "executor_internal_ns": 1303328,
+                  "non_execution_ns": 283614
+                },
+                {
+                  "executor_internal_ns": 1350408,
+                  "non_execution_ns": 283007
+                },
+                {
+                  "executor_internal_ns": 1298324,
+                  "non_execution_ns": 282851
+                },
+                {
+                  "executor_internal_ns": 1275632,
+                  "non_execution_ns": 283701
+                },
+                {
+                  "executor_internal_ns": 1275644,
+                  "non_execution_ns": 268246
+                },
+                {
+                  "executor_internal_ns": 1278618,
+                  "non_execution_ns": 292560
+                },
+                {
+                  "executor_internal_ns": 1241185,
+                  "non_execution_ns": 249965
+                },
+                {
+                  "executor_internal_ns": 1276229,
+                  "non_execution_ns": 264315
+                }
+              ],
+              "metrics": {}
+            }
+          ],
+          "completeness_scope": "received spans only; reconcile producer health separately",
+          "time_semantics": "inclusive sums are work, not elapsed wall time; self subtracts child union",
+          "unobserved": [
+            "transport unless instrumented",
+            "server timings unless provider reports"
+          ]
+        }
+      },
+      "wall_overhead_percent": 211.08585500554707
+    },
+    {
+      "on": {
+        "enabled": true,
+        "wall_ns": 174096747,
+        "cpu_seconds": 0.07073499999999999,
+        "peak_rss_kib": 13352,
+        "step_p50_ns": 1762105.5,
+        "step_p95_ns": 1859565,
+        "monitor": {
+          "attempted_events": 160,
+          "acknowledged_events": 160,
+          "failed_events": 0,
+          "pending_events": 0,
+          "pending_bytes": 0,
+          "complete": true,
+          "serialized_bytes": 57400,
+          "emit_ns": 158492561,
+          "batch_requests": 5,
+          "queue_wait_ns": 902168,
+          "queue_full_waits": 0,
+          "queue_capacity": 1024,
+          "queue_bytes_limit": 1048576,
+          "peak_pending_events": 160,
+          "peak_pending_bytes": 57400,
+          "worker_alive": false,
+          "closed": true,
+          "export_failed": false,
+          "durability": "only acknowledged events; memory queue is not crash durable",
+          "enabled": true,
+          "delivery": "background",
+          "batch_size": 32,
+          "metric_errors": 0,
+          "strict": true
+        },
+        "collector": {
+          "accepted_events_this_process": 160,
+          "rejected_events_this_process": 0,
+          "collector_ns_this_process": 154970533,
+          "storage_bytes": 161680,
+          "delivery": "synchronous-acknowledged",
+          "event_loss_rate": null,
+          "committed_transactions_this_process": 5,
+          "event_loss_note": "no claim about events never submitted by a producer"
+        },
+        "profile": {
+          "runs": 1,
+          "spans": 80,
+          "complete": true,
+          "warnings": [],
+          "groups": [
+            {
+              "semantic_path": [],
+              "kind": "phase",
+              "name": "tool_execution",
+              "model": null,
+              "calls": 40,
+              "runs": 1,
+              "errors": 0,
+              "inclusive_ns": 55369512,
+              "self_ns": 55369512,
+              "p50_ns": 1372696,
+              "p95_ns": 1466625,
+              "timing_samples": [],
+              "metrics": {
+                "executor.execution_ns": {
+                  "sum": 52424119,
+                  "samples": 40
+                },
+                "executor.thread_cpu_ns": {
+                  "sum": 9614877,
+                  "samples": 40
+                }
+              }
+            },
+            {
+              "semantic_path": [],
+              "kind": "tool",
+              "name": "cpu-and-wait",
+              "model": null,
+              "calls": 40,
+              "runs": 1,
+              "errors": 0,
+              "inclusive_ns": 64702063,
+              "self_ns": 9332551,
+              "p50_ns": 1607460,
+              "p95_ns": 1689827,
+              "timing_samples": [
+                {
+                  "executor_internal_ns": 1282143,
+                  "non_execution_ns": 703708
+                },
+                {
+                  "executor_internal_ns": 1279701,
+                  "non_execution_ns": 310215
+                },
+                {
+                  "executor_internal_ns": 1298747,
+                  "non_execution_ns": 318116
+                },
+                {
+                  "executor_internal_ns": 1293967,
+                  "non_execution_ns": 291029
+                },
+                {
+                  "executor_internal_ns": 1281302,
+                  "non_execution_ns": 262875
+                },
+                {
+                  "executor_internal_ns": 1326103,
+                  "non_execution_ns": 348826
+                },
+                {
+                  "executor_internal_ns": 1299787,
+                  "non_execution_ns": 323729
+                },
+                {
+                  "executor_internal_ns": 1319039,
+                  "non_execution_ns": 292241
+                },
+                {
+                  "executor_internal_ns": 1518108,
+                  "non_execution_ns": 299577
+                },
+                {
+                  "executor_internal_ns": 1349218,
+                  "non_execution_ns": 278122
+                },
+                {
+                  "executor_internal_ns": 1349224,
+                  "non_execution_ns": 300369
+                },
+                {
+                  "executor_internal_ns": 1375345,
+                  "non_execution_ns": 297021
+                },
+                {
+                  "executor_internal_ns": 1303917,
+                  "non_execution_ns": 303543
+                },
+                {
+                  "executor_internal_ns": 1352250,
+                  "non_execution_ns": 244737
+                },
+                {
+                  "executor_internal_ns": 1276899,
+                  "non_execution_ns": 233066
+                },
+                {
+                  "executor_internal_ns": 1294477,
+                  "non_execution_ns": 285833
+                },
+                {
+                  "executor_internal_ns": 1279761,
+                  "non_execution_ns": 280973
+                },
+                {
+                  "executor_internal_ns": 1263853,
+                  "non_execution_ns": 235184
+                },
+                {
+                  "executor_internal_ns": 1297632,
+                  "non_execution_ns": 354896
+                },
+                {
+                  "executor_internal_ns": 1288788,
+                  "non_execution_ns": 292616
+                },
+                {
+                  "executor_internal_ns": 1320748,
+                  "non_execution_ns": 293428
+                },
+                {
+                  "executor_internal_ns": 1313593,
+                  "non_execution_ns": 306523
+                },
+                {
+                  "executor_internal_ns": 1324857,
+                  "non_execution_ns": 299842
+                },
+                {
+                  "executor_internal_ns": 1327250,
+                  "non_execution_ns": 356703
+                },
+                {
+                  "executor_internal_ns": 1308933,
+                  "non_execution_ns": 371303
+                },
+                {
+                  "executor_internal_ns": 1320710,
+                  "non_execution_ns": 316390
+                },
+                {
+                  "executor_internal_ns": 1264769,
+                  "non_execution_ns": 284093
+                },
+                {
+                  "executor_internal_ns": 1264927,
+                  "non_execution_ns": 229413
+                },
+                {
+                  "executor_internal_ns": 1253325,
+                  "non_execution_ns": 214978
+                },
+                {
+                  "executor_internal_ns": 1317747,
+                  "non_execution_ns": 357506
+                },
+                {
+                  "executor_internal_ns": 1276568,
+                  "non_execution_ns": 292029
+                },
+                {
+                  "executor_internal_ns": 1314244,
+                  "non_execution_ns": 368538
+                },
+                {
+                  "executor_internal_ns": 1310794,
+                  "non_execution_ns": 283029
+                },
+                {
+                  "executor_internal_ns": 1305979,
+                  "non_execution_ns": 284217
+                },
+                {
+                  "executor_internal_ns": 1371989,
+                  "non_execution_ns": 317838
+                },
+                {
+                  "executor_internal_ns": 1332480,
+                  "non_execution_ns": 281778
+                },
+                {
+                  "executor_internal_ns": 1292974,
+                  "non_execution_ns": 294861
+                },
+                {
+                  "executor_internal_ns": 1299325,
+                  "non_execution_ns": 299931
+                },
+                {
+                  "executor_internal_ns": 1282827,
+                  "non_execution_ns": 299422
+                },
+                {
+                  "executor_internal_ns": 1289819,
+                  "non_execution_ns": 269446
+                }
+              ],
+              "metrics": {}
+            }
+          ],
+          "completeness_scope": "received spans only; reconcile producer health separately",
+          "time_semantics": "inclusive sums are work, not elapsed wall time; self subtracts child union",
+          "unobserved": [
+            "transport unless instrumented",
+            "server timings unless provider reports"
+          ]
+        }
+      },
+      "off": {
+        "enabled": false,
+        "wall_ns": 50212073,
+        "cpu_seconds": 0.0074109999999999975,
+        "peak_rss_kib": 12468,
+        "step_p50_ns": 1263070.0,
+        "step_p95_ns": 1309084,
+        "monitor": null,
+        "collector": null,
+        "profile": null
+      },
+      "wall_overhead_percent": 246.72288276168163
+    }
+  ],
+  "median_wall_overhead_percent": 206.06688079323882,
+  "clock_resolution_seconds": 1e-09,
+  "clock_error_bound_ns": null,
+  "clock_note": "resolution is not measured accuracy or cross-host synchronization"
+}

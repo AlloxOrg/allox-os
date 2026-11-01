@@ -405,6 +405,9 @@ class ProcessTrackingService:
                 if contribution is not None:
                     # Trusted feature variables win over caller-supplied values.
                     execution_environment.update(dict(contribution.environment))
+                if self.features is not None:
+                    execution_environment.update(self.features.prepare_run_environment(
+                        agent_id, session_id, run_id, trace_context))
                 lifecycle_enabled = bool(
                     self.features is not None
                     and self.features.execution_lifecycle_enabled

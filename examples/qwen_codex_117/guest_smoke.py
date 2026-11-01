@@ -47,9 +47,12 @@ class ModelProxy(BaseHTTPRequestHandler):
             request["stream"] = False
             request["max_output_tokens"] = min(request.get("max_output_tokens") or 2048, 2048)
             request["chat_template_kwargs"] = {"enable_thinking": False}
+            active = [r for r in server.service.processes.list_runs('qwen', 's1')
+                      if r['state'] == 'running']
+            parent_id = active[0].get('monitor_span_id', server.parent_id) if len(active) == 1 else server.parent_id
             with server.tracer.span(
                 MODEL, "llm", model=MODEL,
-                parent_id=server.parent_id, semantic_path=["codex-qwen-smoke"],
+                parent_id=parent_id, semantic_path=["codex-qwen-smoke"],
                 input=payload(request),
             ) as span:
                 target = urlsplit(os.environ["ALLOX_QWEN_UPSTREAM"])
@@ -146,6 +149,7 @@ def main():
         "agent_id": "qwen", "session_id": "s1", "event": event}), strict=True)
     proxy = ThreadingHTTPServer(("127.0.0.1", 0), ModelProxy)
     proxy.tracer, proxy.requests, proxy.parent_id = tracer, [], None
+    proxy.service = service
     thread = threading.Thread(target=proxy.serve_forever, daemon=True)
     thread.start()
     config = f'''model = "{MODEL}"
@@ -236,6 +240,10 @@ stream_max_retries = 0
             "all_received_spans_ended": all(s["status"] != "running" for s in spans),
             "real_cgroup_cpu": all("cgroup.cpu_usage_usec" in s["metrics"]
                 for s in spans if s["source"] == "allox-executor"),
+            "single_trace": len({s['trace_id'] for s in spans}) == 1,
+            "same_clock_domain": len({s['clock_id'] for s in spans}) == 1,
+            "profile_complete": service.dispatch('monitor.profile', {
+                'agent_id': 'qwen', 'session_id': 's1'})['complete'],
         }
         (output / "trace.json").write_text(json.dumps(spans, indent=2))
         report["proof"], report["resumed"] = proof, resumed

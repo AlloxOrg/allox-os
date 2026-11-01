@@ -108,6 +108,8 @@ class TraceStore:
                     raise WorkspaceError("duplicate span end")
                 if row["source"] != source:
                     raise WorkspaceError("span source mismatch")
+                if source == 'session-sdk' and row.get('process_run_id') != process_run_id:
+                    raise WorkspaceError('span process run mismatch')
                 ended = event.get("end_ns")
                 if type(ended) is not int or ended < row["start_ns"]:
                     raise WorkspaceError("invalid monotonic end time")

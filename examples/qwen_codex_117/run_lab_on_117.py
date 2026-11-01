@@ -16,7 +16,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import urlsplit
 
-ROOT = Path('/data/hy/Allox/agent-monitoring-main-20261030-v2')
+ROOT = Path('/data/hy/Allox/monitoring-parity-20261031-v1/source')
 
 
 def chat_request(request, model):

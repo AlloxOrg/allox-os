@@ -321,6 +321,19 @@ class FeatureManager:
             metadata=metadata,
         )
 
+    def prepare_run_environment(self, agent_id, session_id, run_id, trace_context):
+        environment = {}
+        for feature in self._features:
+            callback = getattr(feature, "prepare_run_environment", None)
+            if callback is not None:
+                for key, value in callback(agent_id, session_id, run_id, trace_context).items():
+                    if not isinstance(key, str) or not isinstance(value, str):
+                        raise WorkspaceError("invalid feature run environment")
+                    if key in environment and environment[key] != value:
+                        raise WorkspaceError("feature run environment conflict")
+                    environment[key] = value
+        return environment
+
     def start_execution(self, context: ExecutionStartContext) -> ActiveFeatureExecutions:
         """Start opt-in hooks after Core has stopped, attached and frozen the run."""
         entries: list[tuple[str, int, FeatureExecutionHandle]] = []

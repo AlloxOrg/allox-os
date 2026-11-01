@@ -1,4 +1,4 @@
-# Agent monitoring and profiling (first slice)
+# Agent monitoring and profiling
 
 独立 wheel：`allox-agent-monitor`，默认不安装、不启用。基于 Plugin API 1 扩展，
 不依赖 LangChain、特定模型 SDK 或 system-effects 实验分支。
@@ -38,6 +38,33 @@ SDK 缓冲最多 64 个事件、单批不超过 64 KiB；没有周期性自动 f
 `health()` 明确报告 pending/acknowledged，pending 或未确认时 complete=false。
 strict 模式在批量发送/flush 时报告错误，不保证每次入队立即获知远端故障。没有自动重试不确定的 ACK，
 避免重复执行/重复 span。需要每一步立刻可见、逐事件崩溃证据的场景应继续用默认同步模式。
+
+### 可选后台 profiling 模式
+
+```python
+with Tracer(emit_session, strict=True, batch_size=64,
+            delivery="background", queue_capacity=1024,
+            queue_bytes=1024 * 1024, flush_interval=0.02) as tracer:
+    tracer.call_tool("work", process)
+    tracer.barrier()  # 等待之前已提交事件取得 FULL commit 的 ACK
+```
+
+仅普通应用层 profiling 可选用此模式；默认 `delivery="sync"` 和 Core/安全记录的可靠路径不变。
+后台 worker 按批量阈值或最长等待间隔尝试导出，不在每次 action 中等待磁盘。
+时间间隔不是最大持久化延迟承诺：慢磁盘、排队和调度仍可能延后 ACK。
+队列上限同时包含排队及在途事件的条数、编码字节；不是整个进程 RSS 上限。
+满队列施加背压，`export_timeout`（默认 10 秒）到期明确计失败，不静默丢事件。
+发送失败不自动重试不确定 ACK，流进入失败状态，防止后续 end 越过丢失的 start。
+
+`health()` 区分 pending、acknowledged、failed、在途字节、队列峰值、背压等待和 worker 状态；
+入队成功不等于持久化成功。进程崩溃/SIGKILL 可丢失内存队列，服务端无法统计从未收到的数据。
+`close()`/context 正常退出排空并停止线程；必须先等待应用自己的并行子任务，禁止复用 fork 前的 Tracer。
+
+`barrier()` 即使在 best-effort 模式也会在不完整/失败时抛错；跨进程 `.context` 和后台模式的
+run/turn span 结束均使用此屏障。受信任编排层可调用 `tracer.checkpoint(create_checkpoint, ...)`，
+只有该 Tracer 先前已提交事件确认完成才调用 checkpoint 函数。它**不是全局自动拦截器**，
+不能替其他 Tracer、其他进程或未接入 SDK 的 Agent 排空缓存，也不会为 Agent 增加管理权限。
+
 
 ```bash
 pip install ./plugins/agent-monitor
@@ -79,7 +106,27 @@ with tracer.span("fix-test", "run", semantic_path=["coding", "repair"]):
 框架有独立队列/审批环节时，在外层 tool span 内用 `tracer.phase("approval")`、
 `tracer.phase("executor_queue")`；在执行器内部用 `phase("tool_execution")`。
 `call_tool` 只适合真正执行工具实现的 callable，不能用包住 RPC 客户端的时长冒充远端执行时间。
-MCP 初始化和工具发现同样需要在对应客户端操作周围明确埋点；本版不会自动拦截 MCP SDK。
+MCP 初始化和工具发现可使用下面的显式 adapter；不自动拦截或替换 MCP SDK。
+
+### 流式模型与 MCP
+
+```python
+from allox_agent_monitor.mcp import TracedMCPClient
+
+client = TracedMCPClient(existing_async_mcp_client, tracer)
+await client.initialize()
+await client.list_tools()
+result = await client.call_tool("sum", arguments={"a": 1, "b": 2})
+
+async for chunk in tracer.astream_model("qwen", create_async_stream, **request):
+    consume(chunk)
+# 同步流使用 stream_model；提前停止时调用 close()/aclose()，正常结束后 flush。
+```
+
+MCP wrapper 记录初始化、发现、调用的客户端请求时间；不把客户端时间标成远端工具执行时间。
+`isError=True` 的 MCP 返回值保留原样，tool span 标记 error。这里不是完整 ProMCP 六阶段编排器。
+流式 wrapper 记录 `client.first_chunk_ns`、流的生命周期与最终 usage/metrics；首个 chunk 可能是元数据，
+不是服务端首 token。生命周期包含消费者暂停时间，不等于纯推理时间。缺失服务端排队/推理指标仍 unknown。
 
 与 Allox 命令关联时，在工具 span 内调用：
 
@@ -96,21 +143,34 @@ semantic_path/name/model 合并。当前查询最多 10,000 个 span；超限显
 `monitor.profile` 可提供 `session_ids` 列表聚合同一 Agent 的多条 Session；关联键保留
 Session 身份，相同 trace ID 不会串线。跨 Agent 的全局查询尚未提供。
 
+`process.start` 通过可选 feature hook 向沙箱注入 `ALLOX_MONITOR_CONTEXT`；SDK 默认继承
+Core process span、trace、turn 和语义路径。可信变量覆盖调用者传入的同名环境变量；parent 必须是
+当前 Agent/Session 内仍在运行的 span。`action.context` 在导出引用前 flush，确保 collector 已有父记录。
+`Tracer(inherit_context=False)` 可关闭继承，显式不同 trace_id 不继承原父节点。
+
+`monitor.export` 增加 `measure=calls|self_ns|tokens` 的 folded stack 导出（`data` 字段）。
+这是显式 semantic_path 的火焰图输入，不是自动语义识别或 pprof protobuf。缺失 token usage、
+未结束 span、不足以计算 self time 的时钟关系会报告 skipped/incomplete，不补零。
+
 ## 可信度与尚未完成的部分
 
 - 框架记录标为 `framework-sdk`，执行器记录标为 `allox-executor`。前者不是内核证据。
   HTTP ingest 不能伪造或结束 Core process span。
 - 沙箱 socket 上报标为 `session-sdk`，`process_run_id` 由 collector 绑定到唯一活跃的
-  Core run，不采信 Agent 自报。Agent 自己建立的 trace 与 Core trace 可通过此 ID 连接。
+  Core run，不采信 Agent 自报。默认 trace context 将 SDK span 挂到对应 Core process span；
+  同一 Session 的后续 run 不能结束先前 run 的 SDK span。
 - 进程记录包含 run ID；启用 process-tree 后可用 `process.events` 查看 fork/exec/exit。
   文件读写/网络对象级事件尚未接入本插件；后续通过 system-effects adapter 关联。
 - 资源计数覆盖整个 Session cgroup，不把它重复分配给并行的模型/工具子步骤。
   memory peak 使用 max 聚合；block I/O 不等于全部文件访问字节，page cache 访问另计。
 - 不同 clock ID 不做时间戳减法。跨机器父子 span 的 self time 为 unknown；
   时钟分辨率不是实际误差上界，尚未建立跨机器时钟校准。
+  Linux 上通过 boot ID + time namespace 区分 CLOCK_MONOTONIC 域；真正 procfs 中两个 time
+  namespace 条目均缺失时按该内核未启用 TIME_NS 处理。读取失败或非 Linux 时保守地分配独立 ID。
+  依赖正常、未伪造的 procfs；SDK 时间戳仍是应用层证据，不是安全可信的内核时间证明。
 - 服务端指标按 [vLLM v0.25 文档](https://docs.vllm.ai/en/v0.25.0/features/per_request_metrics/)
   读取 queue、TTFT、generation；generation 是 decode，不包含 prefill。
-  流式响应需框架把最终 usage/metrics chunk 交给 `record_vllm_metrics`。
+  流式 wrapper 自动处理收到的最终 usage/metrics chunk；服务端不返回则仍未知。
 - SQLite 是同步有界事件写入，不宣称零开销。发送失败在 SDK health 暴露；collector
   不知道从未发送的事件，因此 loss rate 是 unknown 而非 0。
   首轮 117 的毫秒级合成负载已暴露 FULL 同步落盘的高延迟，下一步需要批处理/异步
@@ -119,7 +179,7 @@ Session 身份，相同 trace ID 不会串线。跨 Agent 的全局查询尚未�
   当前无自动语义任务识别，semantic_path 由框架显式提供。
 - 可观测性失败：SDK 默认 best-effort，`strict=True` 失败即抛错。Core hooks 则 fail-closed，
   finalization 失败会保留 execution lease，不能把监控失败当成安全完成。
-- 本版还没有现成 LangChain/MCP callback adapter、UI、完整 eBPF
+- 本版还没有现成 LangChain callback adapter、UI、完整 eBPF
   overhead/事件丢失实验，也不涉及 rollback/权限策略改动。
 
 ## 验证

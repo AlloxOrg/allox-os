@@ -1,0 +1,168 @@
+[
+  {
+    "agent_id": "a",
+    "session_id": "s1",
+    "trace_id": "d2e94293bdda42408b0ee31dee8d2fe4",
+    "span_id": "c12a72e5cafb48d580287c41482c8188",
+    "parent_id": null,
+    "kind": "run",
+    "name": "controlled-agent",
+    "start_ns": 9944816587,
+    "clock_id": "linux-34bfd90ace7e4981ae1e1a9e14f0be2b-no-timens",
+    "turn_id": null,
+    "parallel_group": null,
+    "loop_id": null,
+    "iteration": null,
+    "model": null,
+    "input": null,
+    "links": [],
+    "semantic_path": [
+      "smoke"
+    ],
+    "status": "ok",
+    "end_ns": 11202162764,
+    "duration_ns": 1257346177,
+    "metrics": {},
+    "source": "framework-sdk",
+    "process_run_id": null,
+    "result": null,
+    "error_type": null
+  },
+  {
+    "agent_id": "a",
+    "session_id": "s1",
+    "trace_id": "d2e94293bdda42408b0ee31dee8d2fe4",
+    "span_id": "175cc5be358b4335ae57fb9c05ede45b",
+    "parent_id": "c12a72e5cafb48d580287c41482c8188",
+    "kind": "turn",
+    "name": "action",
+    "start_ns": 9945751836,
+    "clock_id": "linux-34bfd90ace7e4981ae1e1a9e14f0be2b-no-timens",
+    "turn_id": "t1",
+    "parallel_group": null,
+    "loop_id": null,
+    "iteration": null,
+    "model": null,
+    "input": null,
+    "links": [],
+    "semantic_path": [
+      "smoke"
+    ],
+    "status": "ok",
+    "end_ns": 11201693864,
+    "duration_ns": 1255942028,
+    "metrics": {},
+    "source": "framework-sdk",
+    "process_run_id": null,
+    "result": null,
+    "error_type": null
+  },
+  {
+    "agent_id": "a",
+    "session_id": "s1",
+    "trace_id": "d2e94293bdda42408b0ee31dee8d2fe4",
+    "span_id": "process-07bbe1e5ddcf47958e881873700f0b0c",
+    "parent_id": "175cc5be358b4335ae57fb9c05ede45b",
+    "kind": "process",
+    "name": "allox.execution",
+    "start_ns": 10670968419,
+    "clock_id": "linux-34bfd90ace7e4981ae1e1a9e14f0be2b-no-timens",
+    "turn_id": "t1",
+    "parallel_group": null,
+    "loop_id": null,
+    "iteration": null,
+    "model": null,
+    "input": null,
+    "links": [],
+    "semantic_path": [
+      "smoke"
+    ],
+    "status": "ok",
+    "end_ns": 11199007518,
+    "duration_ns": 528039099,
+    "metrics": {
+      "cgroup.cpu_usage_usec": 178095
+    },
+    "source": "allox-executor",
+    "process_run_id": "07bbe1e5ddcf47958e881873700f0b0c",
+    "result": {
+      "run_id": "07bbe1e5ddcf47958e881873700f0b0c",
+      "root_exit_code": 0,
+      "resource_scope": "whole Session cgroup, not one nested span",
+      "events": "query process.events when process-tree is enabled",
+      "unavailable_counters": [
+        "cgroup.io_read_bytes",
+        "cgroup.io_write_bytes",
+        "cgroup.memory_peak_bytes"
+      ]
+    },
+    "error_type": null
+  },
+  {
+    "agent_id": "a",
+    "session_id": "s1",
+    "trace_id": "d2e94293bdda42408b0ee31dee8d2fe4",
+    "span_id": "3f659968014245888daf0f8c307a8886",
+    "parent_id": "process-07bbe1e5ddcf47958e881873700f0b0c",
+    "kind": "tool",
+    "name": "subprocess-and-socket",
+    "start_ns": 10999240027,
+    "clock_id": "linux-34bfd90ace7e4981ae1e1a9e14f0be2b-no-timens",
+    "turn_id": "t1",
+    "parallel_group": null,
+    "loop_id": null,
+    "iteration": null,
+    "model": null,
+    "input": {
+      "bytes": 26,
+      "sha256": "ddcb0ace97c5704824a4e6a1624cbedfd89afd84f67ef88f47fdf2f4c816bfed"
+    },
+    "links": [],
+    "semantic_path": [
+      "smoke"
+    ],
+    "status": "ok",
+    "end_ns": 11102738437,
+    "duration_ns": 103498410,
+    "metrics": {},
+    "source": "session-sdk",
+    "process_run_id": "07bbe1e5ddcf47958e881873700f0b0c",
+    "result": {
+      "bytes": 77,
+      "sha256": "ab70e244a06ebcb8256981dfecfce098f235df9a351ee110b046c89e02340709"
+    },
+    "error_type": null
+  },
+  {
+    "agent_id": "a",
+    "session_id": "s1",
+    "trace_id": "d2e94293bdda42408b0ee31dee8d2fe4",
+    "span_id": "33426680d19e481e82b34883b6e4bf5e",
+    "parent_id": "3f659968014245888daf0f8c307a8886",
+    "kind": "phase",
+    "name": "tool_execution",
+    "start_ns": 10999917390,
+    "clock_id": "linux-34bfd90ace7e4981ae1e1a9e14f0be2b-no-timens",
+    "turn_id": "t1",
+    "parallel_group": null,
+    "loop_id": null,
+    "iteration": null,
+    "model": null,
+    "input": null,
+    "links": [],
+    "semantic_path": [
+      "smoke"
+    ],
+    "status": "ok",
+    "end_ns": 11102374934,
+    "duration_ns": 102457544,
+    "metrics": {
+      "executor.execution_ns": 102009432,
+      "executor.thread_cpu_ns": 1547696
+    },
+    "source": "session-sdk",
+    "process_run_id": "07bbe1e5ddcf47958e881873700f0b0c",
+    "result": null,
+    "error_type": null
+  }
+]

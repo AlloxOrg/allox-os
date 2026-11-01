@@ -9,6 +9,7 @@ import socketserver
 import struct
 import tempfile
 import threading
+import time
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, cast
 
@@ -96,7 +97,22 @@ class SessionEndpoints:
     def close(self):
         with self._lock:
             for server in self._servers.values():
-                server.shutdown()
+                # Wake serve_forever's selector instead of waiting its default 500 ms.
+                # Keep the normal authenticated handler; the wake request has no event.
+                stopper = threading.Thread(target=server.shutdown, daemon=True)
+                stopper.start()
+                deadline = time.monotonic()+2
+                while stopper.is_alive():
+                    try:
+                        with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as wake:
+                            wake.settimeout(.1)
+                            wake.connect(server.server_address)
+                            wake.sendall(b'{}\n')
+                    except OSError:
+                        pass
+                    stopper.join(.01)
+                    if time.monotonic() >= deadline and stopper.is_alive():
+                        raise WorkspaceError('monitor endpoint did not shut down')
                 server.server_close()
             self._servers.clear()
             if self._directory:

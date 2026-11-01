@@ -1,0 +1,429 @@
+{
+  "passed": true,
+  "kernel": "6.1.62",
+  "scope": "Kata + Bubblewrap + cgroup + session socket; controlled Python, no LLM/BPF/rollback",
+  "sessions": [
+    {
+      "agent": "a",
+      "session": "s1",
+      "checks": {
+        "identity": true,
+        "one_trace": true,
+        "one_clock": true,
+        "core_parent": true,
+        "sdk_run_bound": true,
+        "all_ended": true,
+        "profile_complete": true,
+        "semantic_inherited": true,
+        "actual_subprocess_socket": true,
+        "resource_cpu": true,
+        "background_drained": true
+      },
+      "span_count": 5,
+      "profile": {
+        "runs": 1,
+        "spans": 5,
+        "complete": true,
+        "warnings": [],
+        "groups": [
+          {
+            "semantic_path": [
+              "smoke"
+            ],
+            "kind": "phase",
+            "name": "tool_execution",
+            "model": null,
+            "calls": 1,
+            "runs": 1,
+            "errors": 0,
+            "inclusive_ns": 102457544,
+            "self_ns": 102457544,
+            "p50_ns": 102457544,
+            "p95_ns": 102457544,
+            "timing_samples": [],
+            "metrics": {
+              "executor.execution_ns": {
+                "sum": 102009432,
+                "samples": 1
+              },
+              "executor.thread_cpu_ns": {
+                "sum": 1547696,
+                "samples": 1
+              }
+            }
+          },
+          {
+            "semantic_path": [
+              "smoke"
+            ],
+            "kind": "process",
+            "name": "allox.execution",
+            "model": null,
+            "calls": 1,
+            "runs": 1,
+            "errors": 0,
+            "inclusive_ns": 528039099,
+            "self_ns": 424540689,
+            "p50_ns": 528039099,
+            "p95_ns": 528039099,
+            "timing_samples": [],
+            "metrics": {
+              "cgroup.cpu_usage_usec": {
+                "sum": 178095,
+                "samples": 1
+              }
+            }
+          },
+          {
+            "semantic_path": [
+              "smoke"
+            ],
+            "kind": "run",
+            "name": "controlled-agent",
+            "model": null,
+            "calls": 1,
+            "runs": 1,
+            "errors": 0,
+            "inclusive_ns": 1257346177,
+            "self_ns": 1404149,
+            "p50_ns": 1257346177,
+            "p95_ns": 1257346177,
+            "timing_samples": [],
+            "metrics": {}
+          },
+          {
+            "semantic_path": [
+              "smoke"
+            ],
+            "kind": "tool",
+            "name": "subprocess-and-socket",
+            "model": null,
+            "calls": 1,
+            "runs": 1,
+            "errors": 0,
+            "inclusive_ns": 103498410,
+            "self_ns": 1040866,
+            "p50_ns": 103498410,
+            "p95_ns": 103498410,
+            "timing_samples": [
+              {
+                "executor_internal_ns": 102009432,
+                "non_execution_ns": 1488978
+              }
+            ],
+            "metrics": {}
+          },
+          {
+            "semantic_path": [
+              "smoke"
+            ],
+            "kind": "turn",
+            "name": "action",
+            "model": null,
+            "calls": 1,
+            "runs": 1,
+            "errors": 0,
+            "inclusive_ns": 1255942028,
+            "self_ns": 727902929,
+            "p50_ns": 1255942028,
+            "p95_ns": 1255942028,
+            "timing_samples": [],
+            "metrics": {}
+          }
+        ],
+        "completeness_scope": "received spans only; reconcile producer health separately",
+        "time_semantics": "inclusive sums are work, not elapsed wall time; self subtracts child union",
+        "unobserved": [
+          "transport unless instrumented",
+          "server timings unless provider reports"
+        ]
+      }
+    },
+    {
+      "agent": "a",
+      "session": "s2",
+      "checks": {
+        "identity": true,
+        "one_trace": true,
+        "one_clock": true,
+        "core_parent": true,
+        "sdk_run_bound": true,
+        "all_ended": true,
+        "profile_complete": true,
+        "semantic_inherited": true,
+        "actual_subprocess_socket": true,
+        "resource_cpu": true,
+        "background_drained": true
+      },
+      "span_count": 5,
+      "profile": {
+        "runs": 1,
+        "spans": 5,
+        "complete": true,
+        "warnings": [],
+        "groups": [
+          {
+            "semantic_path": [
+              "smoke"
+            ],
+            "kind": "phase",
+            "name": "tool_execution",
+            "model": null,
+            "calls": 1,
+            "runs": 1,
+            "errors": 0,
+            "inclusive_ns": 103723920,
+            "self_ns": 103723920,
+            "p50_ns": 103723920,
+            "p95_ns": 103723920,
+            "timing_samples": [],
+            "metrics": {
+              "executor.execution_ns": {
+                "sum": 103512283,
+                "samples": 1
+              },
+              "executor.thread_cpu_ns": {
+                "sum": 1090783,
+                "samples": 1
+              }
+            }
+          },
+          {
+            "semantic_path": [
+              "smoke"
+            ],
+            "kind": "process",
+            "name": "allox.execution",
+            "model": null,
+            "calls": 1,
+            "runs": 1,
+            "errors": 0,
+            "inclusive_ns": 641806603,
+            "self_ns": 536968278,
+            "p50_ns": 641806603,
+            "p95_ns": 641806603,
+            "timing_samples": [],
+            "metrics": {
+              "cgroup.cpu_usage_usec": {
+                "sum": 187429,
+                "samples": 1
+              }
+            }
+          },
+          {
+            "semantic_path": [
+              "smoke"
+            ],
+            "kind": "run",
+            "name": "controlled-agent",
+            "model": null,
+            "calls": 1,
+            "runs": 1,
+            "errors": 0,
+            "inclusive_ns": 1313907545,
+            "self_ns": 1066815,
+            "p50_ns": 1313907545,
+            "p95_ns": 1313907545,
+            "timing_samples": [],
+            "metrics": {}
+          },
+          {
+            "semantic_path": [
+              "smoke"
+            ],
+            "kind": "tool",
+            "name": "subprocess-and-socket",
+            "model": null,
+            "calls": 1,
+            "runs": 1,
+            "errors": 0,
+            "inclusive_ns": 104838325,
+            "self_ns": 1114405,
+            "p50_ns": 104838325,
+            "p95_ns": 104838325,
+            "timing_samples": [
+              {
+                "executor_internal_ns": 103512283,
+                "non_execution_ns": 1326042
+              }
+            ],
+            "metrics": {}
+          },
+          {
+            "semantic_path": [
+              "smoke"
+            ],
+            "kind": "turn",
+            "name": "action",
+            "model": null,
+            "calls": 1,
+            "runs": 1,
+            "errors": 0,
+            "inclusive_ns": 1312840730,
+            "self_ns": 671034127,
+            "p50_ns": 1312840730,
+            "p95_ns": 1312840730,
+            "timing_samples": [],
+            "metrics": {}
+          }
+        ],
+        "completeness_scope": "received spans only; reconcile producer health separately",
+        "time_semantics": "inclusive sums are work, not elapsed wall time; self subtracts child union",
+        "unobserved": [
+          "transport unless instrumented",
+          "server timings unless provider reports"
+        ]
+      }
+    },
+    {
+      "agent": "b",
+      "session": "s1",
+      "checks": {
+        "identity": true,
+        "one_trace": true,
+        "one_clock": true,
+        "core_parent": true,
+        "sdk_run_bound": true,
+        "all_ended": true,
+        "profile_complete": true,
+        "semantic_inherited": true,
+        "actual_subprocess_socket": true,
+        "resource_cpu": true,
+        "background_drained": true
+      },
+      "span_count": 5,
+      "profile": {
+        "runs": 1,
+        "spans": 5,
+        "complete": true,
+        "warnings": [],
+        "groups": [
+          {
+            "semantic_path": [
+              "smoke"
+            ],
+            "kind": "phase",
+            "name": "tool_execution",
+            "model": null,
+            "calls": 1,
+            "runs": 1,
+            "errors": 0,
+            "inclusive_ns": 88143578,
+            "self_ns": 88143578,
+            "p50_ns": 88143578,
+            "p95_ns": 88143578,
+            "timing_samples": [],
+            "metrics": {
+              "executor.execution_ns": {
+                "sum": 87976763,
+                "samples": 1
+              },
+              "executor.thread_cpu_ns": {
+                "sum": 1161955,
+                "samples": 1
+              }
+            }
+          },
+          {
+            "semantic_path": [
+              "smoke"
+            ],
+            "kind": "process",
+            "name": "allox.execution",
+            "model": null,
+            "calls": 1,
+            "runs": 1,
+            "errors": 0,
+            "inclusive_ns": 582887048,
+            "self_ns": 493988822,
+            "p50_ns": 582887048,
+            "p95_ns": 582887048,
+            "timing_samples": [],
+            "metrics": {
+              "cgroup.cpu_usage_usec": {
+                "sum": 205957,
+                "samples": 1
+              }
+            }
+          },
+          {
+            "semantic_path": [
+              "smoke"
+            ],
+            "kind": "run",
+            "name": "controlled-agent",
+            "model": null,
+            "calls": 1,
+            "runs": 1,
+            "errors": 0,
+            "inclusive_ns": 1236982358,
+            "self_ns": 1596303,
+            "p50_ns": 1236982358,
+            "p95_ns": 1236982358,
+            "timing_samples": [],
+            "metrics": {}
+          },
+          {
+            "semantic_path": [
+              "smoke"
+            ],
+            "kind": "tool",
+            "name": "subprocess-and-socket",
+            "model": null,
+            "calls": 1,
+            "runs": 1,
+            "errors": 0,
+            "inclusive_ns": 88898226,
+            "self_ns": 754648,
+            "p50_ns": 88898226,
+            "p95_ns": 88898226,
+            "timing_samples": [
+              {
+                "executor_internal_ns": 87976763,
+                "non_execution_ns": 921463
+              }
+            ],
+            "metrics": {}
+          },
+          {
+            "semantic_path": [
+              "smoke"
+            ],
+            "kind": "turn",
+            "name": "action",
+            "model": null,
+            "calls": 1,
+            "runs": 1,
+            "errors": 0,
+            "inclusive_ns": 1235386055,
+            "self_ns": 652499007,
+            "p50_ns": 1235386055,
+            "p95_ns": 1235386055,
+            "timing_samples": [],
+            "metrics": {}
+          }
+        ],
+        "completeness_scope": "received spans only; reconcile producer health separately",
+        "time_semantics": "inclusive sums are work, not elapsed wall time; self subtracts child union",
+        "unobserved": [
+          "transport unless instrumented",
+          "server timings unless provider reports"
+        ]
+      }
+    }
+  ],
+  "clock_environment": {
+    "implementation": "clock_gettime(CLOCK_MONOTONIC)",
+    "namespace_names": [
+      "cgroup",
+      "ipc",
+      "mnt",
+      "net",
+      "pid",
+      "pid_for_children",
+      "user",
+      "uts"
+    ],
+    "boot_id_readable": true
+  }
+}
