@@ -7,7 +7,7 @@ import json
 import secrets
 import threading
 import uuid
-from collections.abc import Iterator
+from collections.abc import Callable, Iterator
 from contextlib import contextmanager, nullcontext
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -24,7 +24,7 @@ if TYPE_CHECKING:
 class ExecutionRegistry:
     """Prevent checkpoint/rollback while a Session command is active."""
 
-    def __init__(self) -> None:
+    def __init__(self, admission_guard: Callable[[str, str], None] | None = None) -> None:
         self._lock = threading.Lock()
         self._leases: dict[str, tuple[str, str]] = {}
         self._recovery_leases: set[str] = set()
@@ -32,6 +32,11 @@ class ExecutionRegistry:
         self._background: dict[tuple[str, str], dict[str, dict[str, str]]] = {}
         self._resets: dict[str, tuple[str, str]] = {}
         self._share_readers: dict[tuple[str, str], int] = {}
+        self._admission_guard = admission_guard
+
+    def _require_ready(self, key: tuple[str, str]) -> None:
+        if self._admission_guard is not None:
+            self._admission_guard(*key)
 
     def acquire(
         self, agent_id: str, session_id: str, *, recovery: bool = False
@@ -40,6 +45,7 @@ class ExecutionRegistry:
         if not isinstance(recovery, bool):
             raise WorkspaceError("execution recovery reservation must be a boolean")
         with self._lock:
+            self._require_ready(key)
             if key in self._mutating:
                 raise WorkspaceError(f"session is being checkpointed or restored: {agent_id}/{session_id}")
             if key in self._leases.values():
@@ -72,6 +78,7 @@ class ExecutionRegistry:
         if not sandbox_id or not execution_id:
             raise WorkspaceError("background execution requires sandbox_id and execution_id")
         with self._lock:
+            self._require_ready(key)
             if key in self._mutating:
                 raise WorkspaceError(f"session is being restored: {agent_id}/{session_id}")
             if any(
@@ -89,6 +96,7 @@ class ExecutionRegistry:
         """Fence a Session and return its persistent executions for termination."""
         key = (validate_id("agent", agent_id), validate_id("session", session_id))
         with self._lock:
+            self._require_ready(key)
             if self._share_readers.get(key):
                 raise WorkspaceError("session has active share reads")
             if key in self._mutating:
@@ -115,6 +123,7 @@ class ExecutionRegistry:
     def reset_mutation(self, token: str, agent_id: str, session_id: str) -> Iterator[None]:
         key = (validate_id("agent", agent_id), validate_id("session", session_id))
         with self._lock:
+            self._require_ready(key)
             if self._resets.get(token) != key or key not in self._mutating:
                 raise WorkspaceError("invalid runtime reset token for session")
         yield
@@ -123,6 +132,7 @@ class ExecutionRegistry:
     def mutation(self, agent_id: str, session_id: str) -> Iterator[None]:
         key = (validate_id("agent", agent_id), validate_id("session", session_id))
         with self._lock:
+            self._require_ready(key)
             if self._share_readers.get(key):
                 raise WorkspaceError("session has active share reads")
             if key in self._mutating:
@@ -149,6 +159,7 @@ class ExecutionRegistry:
             return
         key = (validate_id("agent", agent_id), validate_id("session", session_id))
         with self._lock:
+            self._require_ready(key)
             if key in self._mutating:
                 raise WorkspaceError("session is being checkpointed or restored")
             if any(
@@ -185,12 +196,16 @@ class WorkspaceService:
         network_socket_root: Path = Path("/dev/shm/allox-network"),
         monitor_root: Path | None = None,
         monitor_socket_root: Path = Path("/dev/shm/allox-monitor"),
+        session_memory: bool = False,
         system_effects_config: dict[str, Any] | None = None,
         process_service_factory=None,
         feature_factories=None,
     ):
         self.store = store
-        self.executions = ExecutionRegistry()
+        self.executions = ExecutionRegistry(store.require_memory_ready)
+        if type(session_memory) is not bool:
+            raise WorkspaceError("session_memory must be a boolean")
+        self.session_memory = session_memory
         self.features: FeatureManager | None = None
         self.processes: ProcessTrackingService | None = None
         self.process_tracking = process_tracking.strip().lower()
@@ -300,6 +315,25 @@ class WorkspaceService:
 
         if self.features is not None and self.features.handles(action):
             return self.features.dispatch(action, params)
+
+        if action in {"memory.read", "memory.write", "memory.restore"}:
+            if not self.session_memory:
+                raise WorkspaceError("Session memory is not enabled")
+            agent_id = self._required(params, "agent_id")
+            session_id = self._required(params, "session_id")
+            if action == "memory.read":
+                with self.executions.share_access(agent_id, session_id, write=False):
+                    return self.store.memory_read(agent_id, session_id)
+            with self.executions.mutation(agent_id, session_id):
+                revision = params.get("expected_revision")
+                if action == "memory.write":
+                    return self.store.memory_write(
+                        agent_id, session_id, params.get("state"), expected_revision=revision,
+                    )
+                return self.store.memory_restore(
+                    agent_id, session_id, self._required(params, "checkpoint_id"),
+                    expected_revision=revision,
+                )
 
         if action.startswith("process."):
             if action == "process.status":
@@ -434,6 +468,13 @@ class WorkspaceService:
                     metadata = params.get("metadata")
                     if metadata is not None and not isinstance(metadata, dict):
                         raise WorkspaceError("metadata must be an object")
+                    checkpoint_options: dict[str, Any] = {}
+                    if "memory_state" in params or "expected_memory_revision" in params:
+                        if not self.session_memory:
+                            raise WorkspaceError("Session memory is not enabled")
+                        checkpoint_options["memory_update"] = (
+                            params.get("memory_state"), params.get("expected_memory_revision"),
+                        )
                     return self.store.create_checkpoint(
                         agent_id,
                         session_id,
@@ -442,6 +483,7 @@ class WorkspaceService:
                         message=message,
                         pinned=self._boolean(params, "pinned", False),
                         metadata=metadata,
+                        **checkpoint_options,
                     )
                 if action == "checkpoint.delete":
                     checkpoint_id = self._required(params, "checkpoint_id")
@@ -460,6 +502,10 @@ class WorkspaceService:
                     isinstance(num_ancestors, bool) or not isinstance(num_ancestors, int)
                 ):
                     raise WorkspaceError("num_ancestors must be an integer")
+                memory_options: dict[str, Any] = (
+                    {"restore_memory": self._boolean(params, "restore_memory", True)}
+                    if "restore_memory" in params else {}
+                )
                 result = self.store.rollback(
                     agent_id,
                     session_id,
@@ -467,6 +513,7 @@ class WorkspaceService:
                     num_ancestors=num_ancestors,
                     scrub_runtime=self._boolean(params, "scrub_runtime", True),
                     origin=origin,
+                    **memory_options,
                 )
                 if terminate:
                     result["terminated_process_runs"] = stopped
@@ -479,6 +526,8 @@ class WorkspaceHTTPServer(ThreadingHTTPServer):
     daemon_threads = True
 
     def __init__(self, address, service: WorkspaceService, token: str):
+        if service.session_memory and not token:
+            raise WorkspaceError("Session memory requires an authenticated management endpoint")
         if {"session-share", "agent-monitor"}.intersection(service.feature_names) and not token:
             raise WorkspaceError("share/monitor tools require an authenticated management endpoint")
         super().__init__(address, WorkspaceRequestHandler)
@@ -549,6 +598,8 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--root", required=True, help="Btrfs workspace store root")
     parser.add_argument("--listen", default="127.0.0.1:8092")
     parser.add_argument("--token", default="", help="Bearer token (prefer ALLOX_WORKSPACE_TOKEN)")
+    parser.add_argument("--session-memory", action="store_true",
+                        help="Enable authenticated Session logical memory RPCs")
     parser.add_argument("--monitor-root", type=Path, default=None,
                         help="Enable agent-monitor; durable traces outside workspace store")
     parser.add_argument("--monitor-socket-root", type=Path, default=Path("/dev/shm/allox-monitor"),
@@ -809,6 +860,8 @@ def main(argv: list[str] | None = None) -> int:
         raise SystemExit("--share-tools requires ALLOX_WORKSPACE_TOKEN for the management API")
     if args.monitor_root is not None and not token:
         raise SystemExit("--monitor-root requires ALLOX_WORKSPACE_TOKEN for the management API")
+    if args.session_memory and not token:
+        raise SystemExit("--session-memory requires ALLOX_WORKSPACE_TOKEN for the management API")
     if system_effects_config is not None and not token:
         raise SystemExit(
             "--system-effects-observer requires ALLOX_WORKSPACE_TOKEN for the management API"
@@ -829,6 +882,7 @@ def main(argv: list[str] | None = None) -> int:
         network_socket_root=args.network_socket_root,
         monitor_root=args.monitor_root,
         monitor_socket_root=args.monitor_socket_root,
+        session_memory=args.session_memory,
         system_effects_config=system_effects_config,
     )
     server = WorkspaceHTTPServer((host, int(port_raw)), service, token)

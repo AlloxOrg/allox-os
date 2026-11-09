@@ -105,6 +105,7 @@ class TurnCheckpointLifecycle:
         turn: int,
         message: str,
         metadata: dict[str, Any],
+        memory_update: tuple[dict[str, Any], int] | None = None,
     ) -> dict[str, Any]:
         checkpoint_id = self._id_factory()
         complete_metadata = {
@@ -114,6 +115,10 @@ class TurnCheckpointLifecycle:
             "timestamp": self._timestamp_factory(),
             **metadata,
         }
+        memory_options = (
+            {"memory_state": memory_update[0], "expected_memory_revision": memory_update[1]}
+            if memory_update is not None else {}
+        )
         try:
             checkpoint = self.client.rpc(
                 "checkpoint.create",
@@ -124,6 +129,7 @@ class TurnCheckpointLifecycle:
                 message=message[:MESSAGE_LIMIT],
                 pinned=False,
                 metadata=complete_metadata,
+                **memory_options,
             )
         except Exception as exc:  # noqa: BLE001 - lifecycle failures must not fail the Agent
             return {
@@ -142,7 +148,10 @@ class TurnCheckpointLifecycle:
             "checkpoint": checkpoint,
         }
 
-    def on_session_start(self, *, runtime_session_id: str | None = None) -> dict[str, Any]:
+    def on_session_start(
+        self, *, runtime_session_id: str | None = None,
+        memory_update: tuple[dict[str, Any], int] | None = None,
+    ) -> dict[str, Any]:
         """Create the optional turn-0 baseline checkpoint once per runtime instance."""
         with self._lock:
             if not self.enabled:
@@ -163,6 +172,7 @@ class TurnCheckpointLifecycle:
                 turn=0,
                 message="session-start",
                 metadata=metadata,
+                memory_update=memory_update,
             )
 
     def on_user_message(self, message: str) -> dict[str, Any]:
@@ -181,6 +191,7 @@ class TurnCheckpointLifecycle:
         turn_id: str | None = None,
         completed: bool = True,
         interrupted: bool = False,
+        memory_update: tuple[dict[str, Any], int] | None = None,
     ) -> dict[str, Any]:
         """Create one non-blocking checkpoint after the runtime finishes a turn."""
         with self._lock:
@@ -218,6 +229,7 @@ class TurnCheckpointLifecycle:
                 turn=self._turn_count,
                 message=message,
                 metadata=metadata,
+                memory_update=memory_update,
             )
 
     def mark_rollback(self) -> None:

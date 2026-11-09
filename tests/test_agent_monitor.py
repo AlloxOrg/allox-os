@@ -361,6 +361,7 @@ def test_real_http_collector_and_framework_sdk(tmp_path):
 
     plugin, _ = make_plugin(tmp_path)
     service = SimpleNamespace(feature_names=("agent-monitor",),
+                              session_memory=False,
                               dispatch=plugin.dispatch)
     server = WorkspaceHTTPServer(("127.0.0.1", 0), service, "test-only-token")
     worker = threading.Thread(target=server.serve_forever, daemon=True)

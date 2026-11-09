@@ -9,8 +9,11 @@ from __future__ import annotations
 
 from typing import Any
 
+from allox.workspace.session_memory import is_version
+
 LIVE_CHILD = "__live__"
 INDEX_VERSION = 1
+MEMORY_INDEX_VERSION = 2
 
 
 class CheckpointIndexError(ValueError):
@@ -23,13 +26,18 @@ class CheckpointIndex:
         *,
         head: str | None = None,
         checkpoints: dict[str, dict[str, Any]] | None = None,
+        memory_version: str | None = None,
+        memory_revision: int = 0,
     ) -> None:
         self.head = head
         self.checkpoints = checkpoints or {}
+        self.memory_version = memory_version
+        self.memory_revision = memory_revision
 
     @classmethod
     def from_dict(cls, value: dict[str, Any]) -> CheckpointIndex:
-        if value.get("version", INDEX_VERSION) != INDEX_VERSION:
+        schema = value.get("version", INDEX_VERSION)
+        if type(schema) is not int or schema not in {INDEX_VERSION, MEMORY_INDEX_VERSION}:
             raise CheckpointIndexError("unsupported checkpoint index version")
         head = value.get("head")
         checkpoints = value.get("checkpoints", {})
@@ -40,14 +48,27 @@ class CheckpointIndex:
             for key, meta in checkpoints.items()
         ):
             raise CheckpointIndexError("checkpoint index entries are invalid")
-        return cls(head=head, checkpoints=checkpoints)
+        version, revision = value.get("memory_version"), value.get("memory_revision", 0)
+        if (
+            (schema == MEMORY_INDEX_VERSION) != (version is not None)
+            or type(revision) is not int or revision < 0
+            or (version is None and revision != 0)
+            or (version is not None and (not is_version(version) or revision == 0))
+            or any("memory_version" in item and (version is None or not is_version(item["memory_version"]))
+                   for item in checkpoints.values())
+        ):
+            raise CheckpointIndexError("invalid Session memory version or revision")
+        return cls(head=head, checkpoints=checkpoints, memory_version=version, memory_revision=revision)
 
     def to_dict(self) -> dict[str, Any]:
-        return {
-            "version": INDEX_VERSION,
+        result = {
+            "version": MEMORY_INDEX_VERSION if self.memory_version is not None else INDEX_VERSION,
             "head": self.head,
             "checkpoints": self.checkpoints,
         }
+        if self.memory_version is not None:
+            result.update(memory_version=self.memory_version, memory_revision=self.memory_revision)
+        return result
 
     def add(
         self,
@@ -76,6 +97,8 @@ class CheckpointIndex:
             "parent_id": self.head,
             "child_ids": [LIVE_CHILD],
         }
+        if self.memory_version is not None:
+            self.checkpoints[checkpoint_id]["memory_version"] = self.memory_version
         self.head = checkpoint_id
 
     def reconcile(self, actual_ids: set[str]) -> bool:

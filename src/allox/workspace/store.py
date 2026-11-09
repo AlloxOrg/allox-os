@@ -23,6 +23,13 @@ from pathlib import Path
 from typing import Any, Protocol
 
 from allox.workspace.checkpoint_index import CheckpointIndex, CheckpointIndexError
+from allox.workspace.session_memory import (
+    MAX_BYTES,
+    MemoryStateError,
+    empty_state,
+    is_version,
+    snapshot,
+)
 
 ID_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_.-]{0,63}$")
 
@@ -138,6 +145,7 @@ class WorkspaceStore:
         value: dict[str, Any],
         *,
         file_mode: int | None = None,
+        compact: bool = False,
     ) -> None:
         target.parent.mkdir(parents=True, exist_ok=True)
         temporary = target.with_name(f".{target.name}.{uuid.uuid4().hex}.tmp")
@@ -152,19 +160,141 @@ class WorkspaceStore:
                 )
                 stream = os.fdopen(descriptor, "w", encoding="utf-8")
             with stream:
-                json.dump(value, stream, indent=2, sort_keys=True)
+                json.dump(value, stream, indent=None if compact else 2, sort_keys=True,
+                          separators=(",", ":") if compact else None, allow_nan=not compact)
                 stream.write("\n")
                 stream.flush()
                 os.fsync(stream.fileno())
             os.replace(temporary, target)
-            if os.name == "posix":
-                descriptor = os.open(target.parent, os.O_RDONLY)
-                try:
-                    os.fsync(descriptor)
-                finally:
-                    os.close(descriptor)
+            WorkspaceStore._sync_directory(target.parent)
         finally:
             temporary.unlink(missing_ok=True)
+
+    @staticmethod
+    def _sync_directory(path: Path) -> None:
+        if os.name == "posix":
+            descriptor = os.open(path, os.O_RDONLY)
+            try:
+                os.fsync(descriptor)
+            finally:
+                os.close(descriptor)
+
+    def require_memory_ready(self, agent_id: str, session_id: str) -> None:
+        transaction = self._load_transaction(agent_id, session_id)
+        if transaction is not None and transaction.get("version") == 3:
+            raise WorkspaceError("Session has a pending memory rollback; recover before use")
+
+    def _read_memory_version(self, agent_id: str, session_id: str, version: str) -> dict[str, Any]:
+        if not is_version(version):
+            raise WorkspaceError("invalid memory version")
+        root = self.root / ".allox" / "memory"
+        self._require_managed_directory(root, "memory storage")
+        path = root / f"{version}.json"
+        if path.is_symlink() or not path.is_file():
+            raise WorkspaceError("missing or unsafe memory snapshot")
+        try:
+            with path.open("rb") as stream:
+                data = stream.read(MAX_BYTES + 2)
+            if len(data) > MAX_BYTES + 1:
+                raise MemoryStateError("memory snapshot exceeds size limit")
+            document = json.loads(data)
+            if not isinstance(document, dict):
+                raise MemoryStateError("invalid memory snapshot")
+            normalized, digest = snapshot(agent_id, session_id, document.get("state"))
+            if normalized != document or digest != version:
+                raise MemoryStateError("memory snapshot identity or digest mismatch")
+        except (OSError, ValueError, RecursionError) as exc:
+            raise WorkspaceError("invalid memory snapshot or integrity check failed") from exc
+        return normalized["state"]
+
+    @staticmethod
+    def _check_memory_revision(index: CheckpointIndex, expected_revision: Any) -> None:
+        if type(expected_revision) is not int or expected_revision != index.memory_revision:
+            raise WorkspaceError("memory revision conflict; reload the current Session state")
+
+    def memory_read(self, agent_id: str, session_id: str) -> dict[str, Any]:
+        with self._session_lock(agent_id, session_id):
+            self.require_memory_ready(agent_id, session_id)
+            self._require_managed_directory(self.current(agent_id, session_id), "session workspace")
+            index = self._load_index(agent_id, session_id)
+            version = index.memory_version
+            state = self._read_memory_version(agent_id, session_id, version) if version else empty_state()
+            return {"memory_version": version, "memory_revision": index.memory_revision, "state": state}
+
+    def _stage_memory(
+        self, agent_id: str, session_id: str, index: CheckpointIndex,
+        state: Any, expected_revision: Any,
+    ) -> None:
+        """Persist an immutable blob but leave head publication to the caller."""
+        self._check_memory_revision(index, expected_revision)
+        try:
+            document, version = snapshot(agent_id, session_id, state)
+        except MemoryStateError as exc:
+            raise WorkspaceError(str(exc)) from exc
+        root = self.root / ".allox" / "memory"
+        root.mkdir(mode=0o700, exist_ok=True)
+        self._require_managed_directory(root, "memory storage")
+        self._sync_directory(root.parent)
+        target = root / f"{version}.json"
+        if target.exists() or target.is_symlink():
+            self._read_memory_version(agent_id, session_id, version)
+        else:
+            self._atomic_write_json(target, document, file_mode=0o600, compact=True)
+        index.memory_version = version
+        index.memory_revision += 1
+
+    def memory_write(
+        self, agent_id: str, session_id: str, state: Any, *, expected_revision: Any
+    ) -> dict[str, Any]:
+        with self._session_lock(agent_id, session_id):
+            self.require_memory_ready(agent_id, session_id)
+            self._require_managed_directory(self.current(agent_id, session_id), "session workspace")
+            index = self._load_index(agent_id, session_id)
+            self._stage_memory(agent_id, session_id, index, state, expected_revision)
+            self._save_index(agent_id, session_id, index)
+            result = {"memory_version": index.memory_version, "memory_revision": index.memory_revision}
+            self._append_event({"op": "memory.write", **result}, agent_id, session_id)
+            return result
+
+    def memory_restore(
+        self, agent_id: str, session_id: str, checkpoint_id: str, *, expected_revision: Any
+    ) -> dict[str, Any]:
+        validate_id("checkpoint", checkpoint_id)
+        with self._session_lock(agent_id, session_id):
+            self.require_memory_ready(agent_id, session_id)
+            self._require_managed_directory(self.current(agent_id, session_id), "session workspace")
+            index = self._load_index(agent_id, session_id)
+            self._check_memory_revision(index, expected_revision)
+            entry = index.checkpoints.get(checkpoint_id, {})
+            version = entry.get("memory_version")
+            if not isinstance(version, str) or entry.get("missing"):
+                raise WorkspaceError("exact checkpoint with a bound memory version is required")
+            self._read_memory_version(agent_id, session_id, version)
+            index.memory_version = version
+            index.memory_revision += 1
+            self._save_index(agent_id, session_id, index)
+            result = {"checkpoint_id": checkpoint_id, "memory_version": version,
+                      "memory_revision": index.memory_revision, "scope": "memory-only"}
+            self._append_event({"op": "memory.restore", **result}, agent_id, session_id)
+            return result
+
+    def _apply_memory_target(
+        self, agent_id: str, session_id: str, index: CheckpointIndex,
+        checkpoint_id: str, target: Any,
+    ) -> None:
+        if not isinstance(target, dict) or set(target) != {"version", "revision", "restore"}:
+            raise WorkspaceError("invalid rollback memory target")
+        version, revision, restore = target["version"], target["revision"], target["restore"]
+        if (not is_version(version) or type(revision) is not int or revision < 1
+                or type(restore) is not bool or index.memory_revision not in (revision-1, revision)
+                or (index.memory_revision == revision and index.memory_version != version)):
+            raise WorkspaceError("invalid rollback memory revision")
+        expected = index.checkpoints[checkpoint_id].get("memory_version") if restore else index.memory_version
+        if version != expected:
+            raise WorkspaceError("rollback memory binding mismatch")
+        self._read_memory_version(agent_id, session_id, version)
+        index.memory_version = version
+        index.memory_revision = revision
 
     def _actual_checkpoint_ids(self, agent_id: str, session_id: str) -> set[str]:
         target = self.checkpoints(agent_id, session_id)
@@ -209,12 +339,16 @@ class WorkspaceStore:
     def _write_transaction(
         self, agent_id: str, session_id: str, transaction: dict[str, Any]
     ) -> None:
-        self._atomic_write_json(
-            self._transaction_path(agent_id, session_id), transaction
-        )
+        path = self._transaction_path(agent_id, session_id)
+        self._atomic_write_json(path, transaction)
+        if transaction.get("version") == 3 and transaction.get("phase") == "preparing":
+            self._sync_directory(path.parent.parent)
 
     def _clear_transaction(self, agent_id: str, session_id: str) -> None:
-        self._transaction_path(agent_id, session_id).unlink(missing_ok=True)
+        path = self._transaction_path(agent_id, session_id)
+        path.unlink(missing_ok=True)
+        if path.parent.is_dir():
+            self._sync_directory(path.parent)
 
     def _load_transaction(
         self, agent_id: str, session_id: str
@@ -376,9 +510,15 @@ class WorkspaceStore:
         if phase not in {"preparing", "prepared", "old_moved", "committed"}:
             raise WorkspaceError(f"invalid rollback transaction phase: {phase!r}")
         version = transaction.get("version")
-        if version not in {1, 2}:
+        if version not in {1, 2, 3}:
             raise WorkspaceError("unsupported rollback transaction version")
-        deferred = version == 2
+        memory_rollback = version == 3
+        memory_target = transaction.get("memory_target")
+        if memory_rollback and (not isinstance(memory_target, dict)
+                                or not isinstance(transaction.get("defer_cleanup"), bool)
+                                or not isinstance(transaction.get("scrub_runtime"), bool)):
+            raise WorkspaceError("invalid Session memory rollback journal")
+        deferred = version == 2 or (memory_rollback and transaction["defer_cleanup"])
         recovery_id: str | None = None
         if deferred:
             if transaction.get("defer_cleanup") is not True:
@@ -403,6 +543,11 @@ class WorkspaceStore:
         discarded = self._transaction_subvolume_path(
             session_dir, transaction.get("discard_name"), ".discard-"
         )
+        if memory_rollback and (
+            (phase == "committed" and not current.exists())
+            or (phase in {"old_moved", "committed"} and current.exists() and restored.exists())
+        ):
+            raise WorkspaceError("ambiguous file state in Session memory rollback")
 
         if deferred and phase == "committed" and current.exists():
             assert recovery_id is not None
@@ -414,6 +559,11 @@ class WorkspaceStore:
                 raise WorkspaceError(
                     "committed deferred rollback does not match the checkpoint head"
                 )
+            if memory_rollback:
+                assert isinstance(memory_target, dict)
+                if index.memory_revision != memory_target.get("revision"):
+                    raise WorkspaceError("committed rollback memory revision mismatch")
+                self._apply_memory_target(agent_id, session_id, index, checkpoint_id, memory_target)
             receipt = self._load_recovery_receipt(
                 agent_id, session_id, recovery_id
             )
@@ -464,7 +614,7 @@ class WorkspaceStore:
                 self._require_managed_directory(restored, "rollback restore workspace")
                 restored.rename(current)
                 commit = True
-            elif discarded.exists():
+            elif discarded.exists() and not memory_rollback:
                 self._require_managed_directory(discarded, "rollback discarded workspace")
                 discarded.rename(current)
                 commit = False
@@ -496,6 +646,11 @@ class WorkspaceStore:
                 index.move_head(resolved)
             except CheckpointIndexError as exc:
                 raise WorkspaceError(str(exc)) from exc
+            if memory_rollback:
+                if resolved != checkpoint_id:
+                    raise WorkspaceError("rollback checkpoint binding mismatch")
+                self._apply_memory_target(agent_id, session_id, index, resolved, memory_target)
+                self._sync_directory(current.parent)
             self._save_index(agent_id, session_id, index)
             transaction["phase"] = "committed"
             transaction["removed_runtime_entries"] = removed
@@ -519,6 +674,22 @@ class WorkspaceStore:
                 raise WorkspaceError(
                     "aborted deferred rollback unexpectedly has a cleanup receipt"
                 )
+        if memory_rollback and commit:
+            self._require_managed_directory(current, "session workspace")
+            if transaction["scrub_runtime"]:
+                self._scrub_runtime_entries(current / ".allox-tmp")
+            index = self._load_index(agent_id, session_id)
+            try:
+                if index.resolve(checkpoint_id=checkpoint_id) != checkpoint_id:
+                    raise WorkspaceError("rollback checkpoint binding mismatch")
+                index.move_head(checkpoint_id)
+            except CheckpointIndexError as exc:
+                raise WorkspaceError(str(exc)) from exc
+            self._apply_memory_target(agent_id, session_id, index, checkpoint_id, memory_target)
+            self._sync_directory(current.parent)
+            self._save_index(agent_id, session_id, index)
+            transaction["phase"] = "committed"
+            self._write_transaction(agent_id, session_id, transaction)
         if discarded.exists():
             self._require_managed_directory(discarded, "rollback discarded workspace")
             self.backend.delete_subvolume(discarded)
@@ -526,7 +697,7 @@ class WorkspaceStore:
             self._require_managed_directory(restored, "rollback restore workspace")
             self.backend.delete_subvolume(restored)
 
-        if commit:
+        if commit and not memory_rollback:
             index = self._load_index(agent_id, session_id)
             try:
                 resolved = index.resolve(checkpoint_id=checkpoint_id)
@@ -631,6 +802,7 @@ class WorkspaceStore:
     ) -> dict[str, Any]:
         self.create_agent(agent_id, origin=origin)
         with self._session_lock(agent_id, session_id):
+            self.require_memory_ready(agent_id, session_id)
             session_dir = self.session_dir(agent_id, session_id)
             current = session_dir / "current"
             if current.exists() or current.is_symlink():
@@ -645,6 +817,10 @@ class WorkspaceStore:
         return self.describe(agent_id, session_id)
 
     def describe(self, agent_id: str, session_id: str) -> dict[str, Any]:
+        with self._session_lock(agent_id, session_id):
+            return self._describe_locked(agent_id, session_id)
+
+    def _describe_locked(self, agent_id: str, session_id: str) -> dict[str, Any]:
         current = self.current(agent_id, session_id)
         if not current.exists():
             raise WorkspaceError(f"session does not exist: {agent_id}/{session_id}")
@@ -673,11 +849,13 @@ class WorkspaceStore:
         message: str | None = None,
         pinned: bool = False,
         metadata: dict[str, Any] | None = None,
+        memory_update: tuple[Any, Any] | None = None,
     ) -> dict[str, Any]:
         checkpoint_id = validate_id(
             "checkpoint", checkpoint_id or f"cp-{time.time_ns()}"
         )
         with self._session_lock(agent_id, session_id):
+            self.require_memory_ready(agent_id, session_id)
             current = self.current(agent_id, session_id)
             if not current.exists():
                 raise WorkspaceError(f"session does not exist: {agent_id}/{session_id}")
@@ -686,6 +864,11 @@ class WorkspaceStore:
             if target.exists():
                 raise WorkspaceError(f"checkpoint already exists: {checkpoint_id}")
             index = self._load_index(agent_id, session_id)
+            if memory_update is not None:
+                self._stage_memory(agent_id, session_id, index, *memory_update)
+            memory_version = index.memory_version
+            if memory_version is not None and memory_update is None:
+                self._read_memory_version(agent_id, session_id, memory_version)
             try:
                 index.add(
                     checkpoint_id,
@@ -698,6 +881,8 @@ class WorkspaceStore:
             except CheckpointIndexError as exc:
                 raise WorkspaceError(str(exc)) from exc
             self.backend.snapshot(current, target, readonly=True)
+            if memory_version is not None:
+                self._sync_directory(target.parent)
             self._save_index(agent_id, session_id, index)
             self._append_event(
                 {
@@ -707,6 +892,8 @@ class WorkspaceStore:
                     "message": message,
                     "pinned": pinned,
                     "metadata": metadata,
+                    **({"memory_version": memory_version, "memory_revision": index.memory_revision}
+                       if memory_version is not None else {}),
                 },
                 agent_id,
                 session_id,
@@ -717,12 +904,18 @@ class WorkspaceStore:
             "checkpoint_id": checkpoint_id,
             "parent_id": index.checkpoints[checkpoint_id]["parent_id"],
             "metadata": metadata,
+            **({"memory_version": memory_version, "memory_revision": index.memory_revision}
+               if memory_version is not None else {}),
         }
 
     def list_checkpoints(self, agent_id: str, session_id: str) -> list[str]:
         return sorted(self._actual_checkpoint_ids(agent_id, session_id))
 
     def checkpoint_status(self, agent_id: str, session_id: str) -> dict[str, Any]:
+        with self._session_lock(agent_id, session_id):
+            return self._checkpoint_status_locked(agent_id, session_id)
+
+    def _checkpoint_status_locked(self, agent_id: str, session_id: str) -> dict[str, Any]:
         index = self._load_index(agent_id, session_id)
         return {
             "agent_id": agent_id,
@@ -735,6 +928,8 @@ class WorkspaceStore:
     @staticmethod
     def _scrub_runtime_entries(tmp_dir: Path) -> list[str]:
         removed: list[str] = []
+        if tmp_dir.is_symlink():
+            raise WorkspaceError("cannot scrub a symlinked Session runtime directory")
         if not tmp_dir.exists():
             return removed
         for parent, directories, files in os.walk(tmp_dir):
@@ -757,7 +952,10 @@ class WorkspaceStore:
         origin: str = "unknown",
         recovery_id: str | None = None,
         defer_cleanup: bool = False,
+        restore_memory: bool = True,
     ) -> dict[str, Any]:
+        if type(restore_memory) is not bool:
+            raise WorkspaceError("restore_memory must be a boolean")
         if not isinstance(defer_cleanup, bool):
             raise WorkspaceError("defer_cleanup must be a boolean")
         if checkpoint_id is not None:
@@ -814,11 +1012,22 @@ class WorkspaceStore:
             self._require_managed_directory(source, "checkpoint")
             self._require_managed_directory(current, "session workspace")
 
+            memory_target = None
+            if index.memory_version is not None:
+                version = (index.checkpoints[checkpoint_id].get("memory_version")
+                           if restore_memory else index.memory_version)
+                if version is None:
+                    raise WorkspaceError("checkpoint has no bound memory; select explicit files-only rollback")
+                memory_target = {"version": version, "revision": index.memory_revision + 1,
+                                 "restore": restore_memory}
+                # Validate all memory evidence before changing current or writing a journal.
+                self._apply_memory_target(agent_id, session_id, index, checkpoint_id, memory_target)
+
             token = uuid.uuid4().hex
             restored = current.parent / f".restore-{token}"
             discarded = current.parent / f".discard-{token}"
             transaction = {
-                "version": 2 if defer_cleanup else 1,
+                "version": 3 if memory_target is not None else (2 if defer_cleanup else 1),
                 "phase": "preparing",
                 "checkpoint_id": checkpoint_id,
                 "restore_name": restored.name,
@@ -829,6 +1038,8 @@ class WorkspaceStore:
             if defer_cleanup:
                 transaction["defer_cleanup"] = True
                 transaction["recovery_id"] = recovery_id
+            if memory_target is not None:
+                transaction.update(memory_target=memory_target, defer_cleanup=defer_cleanup)
             self._write_transaction(agent_id, session_id, transaction)
             try:
                 self.backend.snapshot(source, restored, readonly=False)
@@ -845,23 +1056,32 @@ class WorkspaceStore:
             try:
                 restored.rename(current)
             except Exception:
+                if memory_target is not None:
+                    # Do not guess a commit/abort outcome. Keep the journal and both
+                    # versions for fenced recovery before another execution starts.
+                    raise
                 discarded.rename(current)
                 if restored.exists():
                     self.backend.delete_subvolume(restored)
                 self._clear_transaction(agent_id, session_id)
                 raise
-            if defer_cleanup:
+            if defer_cleanup or memory_target is not None:
                 removed = (
                     self._scrub_runtime_entries(current / ".allox-tmp")
                     if scrub_runtime
                     else []
                 )
                 index.move_head(checkpoint_id)
+                if memory_target is not None:
+                    self._sync_directory(current.parent)
                 self._save_index(agent_id, session_id, index)
                 transaction["phase"] = "committed"
                 transaction["removed_runtime_entries"] = removed
                 transaction["committed_at_ns"] = time.time_ns()
                 self._write_transaction(agent_id, session_id, transaction)
+                if not defer_cleanup:
+                    self.backend.delete_subvolume(discarded)
+                    self._clear_transaction(agent_id, session_id)
             else:
                 transaction["phase"] = "committed"
                 self._write_transaction(agent_id, session_id, transaction)
@@ -883,6 +1103,7 @@ class WorkspaceStore:
                     "removed_runtime_entries": removed,
                     "recovery_id": recovery_id,
                     "deferred_cleanup": defer_cleanup,
+                    **({"memory_target": memory_target} if memory_target is not None else {}),
                 },
                 agent_id,
                 session_id,
@@ -896,6 +1117,8 @@ class WorkspaceStore:
             "recovery_id": recovery_id,
             "deferred_cleanup": defer_cleanup,
             "cleanup_pending": defer_cleanup,
+            **({"memory_version": memory_target["version"], "memory_revision": memory_target["revision"],
+                "memory_restored": memory_target["restore"]} if memory_target is not None else {}),
             "deferred_discard_relative_path": (
                 discarded.relative_to(self.root).as_posix()
                 if defer_cleanup
@@ -946,7 +1169,7 @@ class WorkspaceStore:
                 }
 
             if (
-                transaction.get("version") != 2
+                transaction.get("version") not in {2, 3}
                 or transaction.get("phase") != "committed"
                 or transaction.get("defer_cleanup") is not True
             ):
@@ -985,6 +1208,12 @@ class WorkspaceStore:
                 raise WorkspaceError(
                     "committed deferred rollback does not match the checkpoint head"
                 )
+
+            if transaction.get("version") == 3:
+                target = transaction.get("memory_target")
+                if not isinstance(target, dict) or index.memory_revision != target.get("revision"):
+                    raise WorkspaceError("committed rollback memory revision mismatch")
+                self._apply_memory_target(agent_id, session_id, index, checkpoint_id, target)
 
             receipt = self._load_recovery_receipt(
                 agent_id, session_id, recovery_id
@@ -1067,6 +1296,7 @@ class WorkspaceStore:
     ) -> dict[str, Any]:
         checkpoint_id = validate_id("checkpoint", checkpoint_id)
         with self._session_lock(agent_id, session_id):
+            self.require_memory_ready(agent_id, session_id)
             index = self._load_index(agent_id, session_id)
             try:
                 checkpoint_id = index.resolve(checkpoint_id=checkpoint_id)
