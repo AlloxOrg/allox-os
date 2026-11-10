@@ -22,6 +22,7 @@ from contextlib import contextmanager
 from pathlib import Path
 from typing import Any, Protocol
 
+from allox.workspace import btrfs_ioctl
 from allox.workspace.checkpoint_index import CheckpointIndex, CheckpointIndexError
 from allox.workspace.session_memory import (
     MAX_BYTES,
@@ -57,6 +58,9 @@ class SnapshotBackend(Protocol):
 class BtrfsBackend:
     """Btrfs implementation used by the trusted host daemon."""
 
+    def __init__(self, *, native_ioctls: bool = True) -> None:
+        self._native_ioctls = native_ioctls and btrfs_ioctl.supported()
+
     @staticmethod
     def _run(argv: list[str], *, capture: bool = False) -> str:
         if capture:
@@ -75,6 +79,13 @@ class BtrfsBackend:
         self._run(["btrfs", "subvolume", "create", str(path)])
 
     def snapshot(self, source: Path, target: Path, *, readonly: bool) -> None:
+        if self._native_ioctls:
+            try:
+                btrfs_ioctl.snapshot(source, target, readonly=readonly)
+            except (OSError, ValueError) as exc:
+                # Do not retry a mutating ioctl via CLI after an error.
+                raise WorkspaceError(f"Btrfs snapshot failed: {exc}") from exc
+            return
         argv = ["btrfs", "subvolume", "snapshot"]
         if readonly:
             argv.append("-r")
@@ -82,6 +93,12 @@ class BtrfsBackend:
         self._run(argv)
 
     def delete_subvolume(self, path: Path) -> None:
+        if self._native_ioctls:
+            try:
+                btrfs_ioctl.delete_subvolume(path)
+            except (OSError, ValueError) as exc:
+                raise WorkspaceError(f"Btrfs subvolume deletion failed: {exc}") from exc
+            return
         self._run(["btrfs", "subvolume", "delete", str(path)])
 
 

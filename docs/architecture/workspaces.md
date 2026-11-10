@@ -46,6 +46,14 @@ information.
 Checkpoint IDs support exact and unique-prefix lookup. Ancestor rollback uses
 the current DAG head.
 
+On Linux x86-64 and arm64, the Btrfs backend uses directory-descriptor ioctls
+for snapshot creation and subvolume deletion instead of starting a
+`btrfs` subprocess for each operation. Other architectures retain the CLI
+path; embedding callers can also select it with
+`BtrfsBackend(native_ioctls=False)`. A failed mutating ioctl is not retried
+through the CLI. The workspace transaction, index, fsync and cleanup ordering
+are unchanged.
+
 ## Rollback
 
 Session Workspace rollback is a durable transaction:

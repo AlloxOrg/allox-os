@@ -462,7 +462,7 @@ def test_initialize_finishes_authorized_cleanup_after_delete_crash(
 def test_btrfs_backend_deletes_only_deferred_discard(store, monkeypatch):
     _, discarded = _deferred_rollback(store)
     commands: list[list[str]] = []
-    backend = BtrfsBackend()
+    backend = BtrfsBackend(native_ioctls=False)
 
     def run(argv: list[str], *, capture: bool = False) -> str:
         assert capture is False
