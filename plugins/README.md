@@ -11,6 +11,7 @@ option is enabled.
 | `allox-session-share` | `allox.workspace_features:session-share` | `--share-tools` |
 | `allox-session-network` | `allox.workspace_features:session-network` | `--session-network isolated/proxy` |
 | `allox-agent-monitor` | `allox.workspace_features:agent-monitor` | `--monitor-root PATH` |
+| `allox-trace-correlation` | `allox.workspace_features:trace-correlation` | `--correlation-trace-root PATH` or offline CLI |
 | `allox-system-effects` | `allox.workspace_features:system-effects` | `--system-effects-observer PATH` plus pinned BPF objects |
 
 Agent call tracing, timing, cgroup resource correlation and semantic profiling are described in

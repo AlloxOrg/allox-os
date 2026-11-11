@@ -61,6 +61,7 @@ include = [
     "plugins/session-share/src",
     "plugins/session-network/src",
     "plugins/agent-monitor/src",
+    "plugins/trace-correlation/src",
 ]
 extraPaths = [
     "src",
@@ -68,6 +69,7 @@ extraPaths = [
     "plugins/session-share/src",
     "plugins/session-network/src",
     "plugins/agent-monitor/src",
+    "plugins/trace-correlation/src",
 ]
 
 [tool.pytest.ini_options]
@@ -79,4 +81,5 @@ pythonpath = [
     "plugins/session-network/src",
     "plugins/agent-monitor/src",
     "plugins/system-effects/src",
+    "plugins/trace-correlation/src",
 ]

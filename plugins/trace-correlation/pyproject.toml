@@ -1,0 +1,20 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "allox-trace-correlation"
+version = "0.1.0"
+description = "Optional read-only post-hoc trace and kernel-evidence correlation"
+requires-python = ">=3.10"
+license = { text = "Apache-2.0" }
+dependencies = ["allox-os>=0.1.0"]
+
+[project.entry-points."allox.workspace_features"]
+trace-correlation = "allox_trace_correlation.plugin:TraceCorrelationFeature"
+
+[project.scripts]
+allox-trace-correlate = "allox_trace_correlation.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/allox_trace_correlation"]

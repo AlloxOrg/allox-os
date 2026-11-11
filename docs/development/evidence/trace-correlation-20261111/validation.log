@@ -1,0 +1,32 @@
+CPUs 24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47 /data/hy/Allox/agent-monitoring-main-20261030-v2/.validation-venv/bin/ruff check --select E9,F,I plugins/trace-correlation tests/test_trace_correlation.py src/allox/workspace/daemon.py
+All checks passed!
+CPUs 24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47 /data/hy/Allox/agent-monitoring-main-20261030-v2/.validation-venv/bin/python -m pytest -q tests/test_trace_correlation.py
+............................                                             [100%]
+28 passed in 4.51s
+CPUs 24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47 /data/hy/Allox/agent-monitoring-main-20261030-v2/.validation-venv/bin/python -m pytest -q tests plugins/system-effects/tests
+........................................................................ [ 23%]
+............................ssssss..............s..s.......s.sssssssss.. [ 46%]
+.................s..............ss...................................... [ 69%]
+........................................................................ [ 92%]
+.........................                                                [100%]
+292 passed, 21 skipped in 32.43s
+CPUs 24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47 /data/hy/Allox/agent-monitoring-main-20261030-v2/.validation-venv/bin/python -m build --wheel --no-isolation plugins/trace-correlation --outdir /data/hy/Allox/trace-correlation-20261111/dist
+* Getting build dependencies for wheel...
+* Building wheel...
+Successfully built allox_trace_correlation-0.1.0-py3-none-any.whl
+CPUs 24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47 /data/hy/Allox/agent-monitoring-main-20261030-v2/.validation-venv/bin/python -m build --wheel --no-isolation --outdir /data/hy/Allox/trace-correlation-20261111/dist
+* Getting build dependencies for wheel...
+* Building wheel...
+Successfully built allox_os-0.1.0-py3-none-any.whl
+CPUs 24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47 /data/hy/Allox/agent-monitoring-main-20261030-v2/.validation-venv/bin/python -m pip install --no-deps --upgrade --target /data/hy/Allox/trace-correlation-20261111/installed /data/hy/Allox/trace-correlation-20261111/dist/allox_os-0.1.0-py3-none-any.whl /data/hy/Allox/trace-correlation-20261111/dist/allox_trace_correlation-0.1.0-py3-none-any.whl
+Processing /data/hy/Allox/trace-correlation-20261111/dist/allox_os-0.1.0-py3-none-any.whl
+Processing /data/hy/Allox/trace-correlation-20261111/dist/allox_trace_correlation-0.1.0-py3-none-any.whl
+Installing collected packages: allox-trace-correlation, allox-os
+
+Successfully installed allox-os-0.1.0 allox-trace-correlation-0.1.0
+
+[notice] A new release of pip is available: 26.2.2 -> 26.3
+[notice] To update, run: /data/hy/Allox/agent-monitoring-main-20261030-v2/.validation-venv/bin/python -m pip install --upgrade pip
+CPUs 24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47 /data/hy/Allox/agent-monitoring-main-20261030-v2/.validation-venv/bin/python -m venv --without-pip /data/hy/Allox/trace-correlation-20261111/isolated
+CPUs 24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47 /data/hy/Allox/trace-correlation-20261111/isolated/bin/python /data/hy/Allox/trace-correlation-20261111/package_smoke.py
+{"entry_point_discovered": true, "historical_result": "missing_core_record", "optional_collectors_installed": false, "real_historical_trace_read": true, "standalone_wheel": true}

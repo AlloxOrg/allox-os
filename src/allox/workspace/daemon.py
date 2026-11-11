@@ -197,6 +197,7 @@ class WorkspaceService:
         monitor_root: Path | None = None,
         monitor_socket_root: Path = Path("/dev/shm/allox-monitor"),
         session_memory: bool = False,
+        correlation_config: dict[str, Any] | None = None,
         system_effects_config: dict[str, Any] | None = None,
         process_service_factory=None,
         feature_factories=None,
@@ -244,9 +245,13 @@ class WorkspaceService:
                     "process tracker to avoid duplicate kernel hooks"
                 )
             feature_specs.append(("system-effects", dict(system_effects_config)))
+        if correlation_config is not None:
+            if not isinstance(correlation_config, dict):
+                raise WorkspaceError("correlation configuration must be an object")
+            feature_specs.append(("trace-correlation", dict(correlation_config)))
         execution_required = bool(
             self.process_tracking != "disabled"
-            or feature_specs
+            or any(name != "trace-correlation" for name, _ in feature_specs)
             or self.kill_session_processes_on_rollback
         )
         if execution_required:
@@ -267,20 +272,21 @@ class WorkspaceService:
                 cgroup_root=process_cgroup_root,
             )
         if feature_specs:
-            assert self.processes is not None
             try:
                 self.features = FeatureManager(
                     WorkspaceFeatureContext(
                         store=self.store,
                         executions=self.executions,
-                        cgroups=self.processes.cgroups,
+                        cgroups=self.processes.cgroups if self.processes is not None else None,
                     ),
                     tuple(feature_specs),
                     factories=feature_factories,
                 )
-                self.processes.features = self.features
+                if self.processes is not None:
+                    self.processes.features = self.features
             except BaseException:
-                self.processes.close()
+                if self.processes is not None:
+                    self.processes.close()
                 self.processes = None
                 raise
 
@@ -528,7 +534,7 @@ class WorkspaceHTTPServer(ThreadingHTTPServer):
     def __init__(self, address, service: WorkspaceService, token: str):
         if service.session_memory and not token:
             raise WorkspaceError("Session memory requires an authenticated management endpoint")
-        if {"session-share", "agent-monitor"}.intersection(service.feature_names) and not token:
+        if {"session-share", "agent-monitor", "trace-correlation"}.intersection(service.feature_names) and not token:
             raise WorkspaceError("share/monitor tools require an authenticated management endpoint")
         super().__init__(address, WorkspaceRequestHandler)
         self.service = service
@@ -600,6 +606,8 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--token", default="", help="Bearer token (prefer ALLOX_WORKSPACE_TOKEN)")
     parser.add_argument("--session-memory", action="store_true",
                         help="Enable authenticated Session logical memory RPCs")
+    parser.add_argument("--correlation-trace-root", type=Path, default=None,
+                        help="Enable read-only post-hoc correlation from existing trace storage")
     parser.add_argument("--monitor-root", type=Path, default=None,
                         help="Enable agent-monitor; durable traces outside workspace store")
     parser.add_argument("--monitor-socket-root", type=Path, default=Path("/dev/shm/allox-monitor"),
@@ -862,6 +870,13 @@ def main(argv: list[str] | None = None) -> int:
         raise SystemExit("--monitor-root requires ALLOX_WORKSPACE_TOKEN for the management API")
     if args.session_memory and not token:
         raise SystemExit("--session-memory requires ALLOX_WORKSPACE_TOKEN for the management API")
+    correlation_config = None
+    if args.correlation_trace_root is not None:
+        if not token or args.process_audit_root is None:
+            raise SystemExit("--correlation-trace-root requires a token and --process-audit-root")
+        correlation_config = {
+            "trace_root": args.correlation_trace_root, "audit_root": args.process_audit_root,
+        }
     if system_effects_config is not None and not token:
         raise SystemExit(
             "--system-effects-observer requires ALLOX_WORKSPACE_TOKEN for the management API"
@@ -883,6 +898,7 @@ def main(argv: list[str] | None = None) -> int:
         monitor_root=args.monitor_root,
         monitor_socket_root=args.monitor_socket_root,
         session_memory=args.session_memory,
+        correlation_config=correlation_config,
         system_effects_config=system_effects_config,
     )
     server = WorkspaceHTTPServer((host, int(port_raw)), service, token)
