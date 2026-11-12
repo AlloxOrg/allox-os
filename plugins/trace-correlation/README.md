@@ -48,6 +48,11 @@ RPC：
 支持 Observer v2 / v3 的 artifact manifest；按 receipt 中记录的 SHA-256 核对
 manifest，再按 manifest 核对所选 JSONL 的 SHA-256 和长度。不跟随证据目录/文件软链接。
 JSON、事件条数、行大小和单页输出均有界；每次翻页重新核验已提交流。
+同一 Correlator/daemon 对不超过 8 MiB 的流可缓存已验证 JSONL 的行索引：
+每次查询仍重新读取全部内容并核对 SHA256/长度，只有摘要相同才复用索引、
+仅解析所选页。最多缓存 4 个索引、合计 200,000 个行边界；更大的流保持原有
+有界逐行验证路径。缓存不绕过 no-follow、文件变化检查、Agent/Session/run 绑定或
+不完整证据状态。首次查询与每次新启动的离线 CLI 仍需完整解析，未宣称一样快。
 源文件缺失、尚未结束、未提交入 manifest 分别返回
 `missing_evidence`、`run_not_finalized`、`stream_not_committed`。
 原 Core 进程记录已被清理时返回 `missing_core_record`，不会仅凭 trace 强配事件。

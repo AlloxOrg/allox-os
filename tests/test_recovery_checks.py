@@ -175,6 +175,7 @@ def test_crash_fence_persists_across_service_restart(tmp_path, monkeypatch):
     original = service.store.rollback
 
     def die(*args, **kwargs):
+        kwargs["before_change"]()  # Simulate interruption AFTER the destructive boundary.
         raise RuntimeError("injected daemon interruption")
 
     monkeypatch.setattr(service.store, "rollback", die)
@@ -354,7 +355,7 @@ def test_evidence_cannot_be_rebound_to_another_store(service, tmp_path):
     other.mkdir()
     store = WorkspaceStore(other, Backend())
     store.initialize()
-    with pytest.raises(WorkspaceError, match="different workspace"):
+    with pytest.raises(WorkspaceError, match="different workspace|active owner"):
         WorkspaceService(store, recovery_checks_config={"root": tmp_path / "evidence"},
                          feature_factories={"recovery-checks": RecoveryChecksFeature})
 
@@ -383,3 +384,88 @@ def test_finite_checker_matches_exhaustive_subset_oracle():
             result = check_history([[list(t) for t in f] for f in outcomes],
                                    [list(t) for t in policy])
             assert greatest == {(x["outcome"], tuple(x["trace"])) for x in result["survivors"]}
+
+
+@pytest.mark.parametrize("case", ["duplicate", "metadata", "missing-delete", "busy"])
+def test_rejected_request_does_not_leave_fence(service, case):
+    baseline(service)
+    token = rpc(service, "execution.acquire")["lease_token"] if case == "busy" else None
+    action, params = {
+        "duplicate": ("checkpoint.create", {"checkpoint_id": "c0"}),
+        "metadata": ("checkpoint.create", {"checkpoint_id": "bad", "metadata": []}),
+        "missing-delete": ("checkpoint.delete", {"checkpoint_id": "missing"}),
+        "busy": ("checkpoint.create", {"checkpoint_id": "busy"}),
+    }[case]
+    with pytest.raises(WorkspaceError):
+        rpc(service, action, **params)
+    if token:
+        rpc(service, "execution.release", lease_token=token)
+    assert rpc(service, "recovery.status")["fence"] is None
+    token = rpc(service, "execution.acquire")["lease_token"]
+    rpc(service, "execution.release", lease_token=token)
+
+
+def test_single_owner_blocks_same_evidence_and_same_store(service, tmp_path):
+    with pytest.raises(WorkspaceError, match="active recovery owner"):
+        service.store.initialize()
+    for root in (tmp_path / "evidence", tmp_path / "other-evidence"):
+        with pytest.raises(WorkspaceError, match="active owner"):
+            WorkspaceService(service.store, recovery_checks_config={"root": root},
+                             feature_factories={"recovery-checks": RecoveryChecksFeature})
+
+
+def test_prefix_delete_removes_resolved_assertion(service):
+    baseline(service)
+    rpc(service, "checkpoint.create", checkpoint_id="long-checkpoint")
+    rpc(service, "checkpoint.delete", checkpoint_id="long-check")
+    assert service.features._features[0]._get(("a", "s"), "checkpoint", "long-checkpoint") is None
+
+
+def test_other_session_management_does_not_wait_for_scanner(service, monkeypatch):
+    import allox_recovery_checks.plugin as module
+    baseline(service)
+    rpc(service, "session.create", session_id="other")
+    entered, release = threading.Event(), threading.Event()
+    original = module.tree_manifest
+
+    def pause(*args, **kwargs):
+        entered.set()
+        assert release.wait(3)
+        return original(*args, **kwargs)
+
+    monkeypatch.setattr(module, "tree_manifest", pause)
+    with ThreadPoolExecutor(2) as pool:
+        future = pool.submit(rpc, service, "checkpoint.create", checkpoint_id="slow")
+        assert entered.wait(2)
+        try:
+            status = pool.submit(rpc, service, "recovery.status", session_id="other").result(timeout=1)
+            assert status["fence"] is None
+        finally:
+            release.set()
+        future.result(timeout=3)
+
+
+def test_guarded_plugin_rejects_core_without_boundary_abi():
+    from types import SimpleNamespace
+    with pytest.raises(WorkspaceError, match="boundary ABI"):
+        RecoveryChecksFeature(context=SimpleNamespace(), config={})
+
+
+def test_parallel_hash_failure_closes_fds_and_pool_remains_usable(tmp_path, monkeypatch):
+    from allox_recovery_checks import assertions
+
+    for i in range(40):
+        (tmp_path / str(i)).write_bytes(b"data" * 4096)
+    before = len(os.listdir("/proc/self/fd"))
+    original = assertions.hashlib.sha256
+
+    def fail():
+        raise RuntimeError("injected hash failure")
+
+    with ThreadPoolExecutor(4) as pool:
+        monkeypatch.setattr(assertions.hashlib, "sha256", fail)
+        with pytest.raises(RuntimeError, match="injected"):
+            tree_manifest(tmp_path, executor=pool)
+        monkeypatch.setattr(assertions.hashlib, "sha256", original)
+        assert len(tree_manifest(tmp_path, executor=pool)) == 40
+    assert len(os.listdir("/proc/self/fd")) == before

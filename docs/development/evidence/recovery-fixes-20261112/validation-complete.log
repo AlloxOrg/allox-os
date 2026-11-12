@@ -1,0 +1,45 @@
+AFFINITY [24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47] COMMAND ['/data/hy/Allox/agent-monitoring-main-20261030-v2/.validation-venv/bin/ruff', 'check', '--select', 'E4,E7,E9,F,I', 'src', 'plugins/recovery-checks', 'plugins/trace-correlation', 'tests/test_recovery_checks.py', 'tests/test_trace_correlation.py']
+All checks passed!
+AFFINITY [24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47] COMMAND ['docker', 'run', '--rm', '--network', 'none', '-v', '/data/hy/Allox/recovery-fixes-20261112/source:/work:ro', '-v', '/data/hy/Allox/agent-monitoring-main-20261030-v2/.validation-venv/lib/python3.10/site-packages/pyright:/checker:ro', '-w', '/work', 'node:22-alpine', 'node', '/checker/dist/dist/pyright.js', '--typeshedpath', '/checker/dist/dist/typeshed-fallback']
+0 errors, 0 warnings, 0 informations
+AFFINITY [24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47] COMMAND ['/data/hy/Allox/agent-monitoring-main-20261030-v2/.validation-venv/bin/python', '-m', 'pytest', '-q', '--maxfail=5', 'tests', 'plugins/system-effects/tests']
+........................................................................ [ 20%]
+............................ssssss................s..s.......s.sssssssss [ 40%]
+.......................................................s..............ss [ 60%]
+........................................................................ [ 80%]
+.......................................................................  [100%]
+338 passed, 21 skipped in 45.47s
+AFFINITY [24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47] COMMAND ['/data/hy/Allox/agent-monitoring-main-20261030-v2/.validation-venv/bin/python', '-m', 'pip', 'wheel', '--no-deps', '--no-build-isolation', '--wheel-dir', '/data/hy/Allox/recovery-fixes-20261112/wheels', '.', './plugins/recovery-checks', './plugins/trace-correlation', './plugins/agent-monitor']
+Processing ./.
+  Preparing metadata (pyproject.toml): started
+  Preparing metadata (pyproject.toml): finished with status 'done'
+Processing ./plugins/recovery-checks
+  Preparing metadata (pyproject.toml): started
+  Preparing metadata (pyproject.toml): finished with status 'done'
+Processing ./plugins/trace-correlation
+  Preparing metadata (pyproject.toml): started
+  Preparing metadata (pyproject.toml): finished with status 'done'
+Processing ./plugins/agent-monitor
+  Preparing metadata (pyproject.toml): started
+  Preparing metadata (pyproject.toml): finished with status 'done'
+Building wheels for collected packages: allox-os, allox-recovery-checks, allox-trace-correlation, allox-agent-monitor
+  Building wheel for allox-os (pyproject.toml): started
+  Building wheel for allox-os (pyproject.toml): finished with status 'done'
+  Created wheel for allox-os: filename=allox_os-0.1.0-py3-none-any.whl size=58999 sha256=2332d1ab3e30c9c94a53253e685c82aae33976e037b0a6f274ab707f39cf3bf7
+  Stored in directory: /tmp/pip-ephem-wheel-cache-m_ysnqj9/wheels/30/9b/87/52cd12716f0f13bd0e6ed92aaa979b07fe98a39da68128315e
+  Building wheel for allox-recovery-checks (pyproject.toml): started
+  Building wheel for allox-recovery-checks (pyproject.toml): finished with status 'done'
+  Created wheel for allox-recovery-checks: filename=allox_recovery_checks-0.1.0-py3-none-any.whl size=11162 sha256=55b71c7c7e649c7e097ecb60b779ff1f4a2f6ab26d3e5e42af7d2d9ba682febe
+  Stored in directory: /tmp/pip-ephem-wheel-cache-m_ysnqj9/wheels/37/4b/1d/ebf224b3fead6b8cb1fcc15afde80ca0065f16c08f362d2ce5
+  Building wheel for allox-trace-correlation (pyproject.toml): started
+  Building wheel for allox-trace-correlation (pyproject.toml): finished with status 'done'
+  Created wheel for allox-trace-correlation: filename=allox_trace_correlation-0.1.0-py3-none-any.whl size=9474 sha256=d494c419690437f28ff89018599e43ba3c3b12c32b56dfee546e0957276a886c
+  Stored in directory: /tmp/pip-ephem-wheel-cache-m_ysnqj9/wheels/ea/49/59/c298bb09fc40043d9efde0f02d84e58f9e2d2da3a7356dbd87
+  Building wheel for allox-agent-monitor (pyproject.toml): started
+  Building wheel for allox-agent-monitor (pyproject.toml): finished with status 'done'
+  Created wheel for allox-agent-monitor: filename=allox_agent_monitor-0.1.0-py3-none-any.whl size=22620 sha256=9374c5cbf3e2dc89b7237554b36ae76d31daca44675a27ebbe326cc47da396d4
+  Stored in directory: /tmp/pip-ephem-wheel-cache-m_ysnqj9/wheels/19/79/25/871520cc2b8a280960cded9f22c7e0ce291820b238f4a2dc42
+Successfully built allox-os allox-recovery-checks allox-trace-correlation allox-agent-monitor
+
+[notice] A new release of pip is available: 26.2.2 -> 26.3
+[notice] To update, run: /data/hy/Allox/agent-monitoring-main-20261030-v2/.validation-venv/bin/python -m pip install --upgrade pip

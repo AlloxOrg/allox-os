@@ -9,6 +9,7 @@ from typing import Any
 
 from allox.workspace.store import WorkspaceError, validate_id
 from allox_trace_correlation.reader import MAX_LINE, MAX_STREAM, EvidenceReader, read_spans
+from allox_trace_correlation.stream import StreamIndex
 
 STREAMS = ("system-effects.jsonl", "process-lifecycle.jsonl")
 
@@ -23,6 +24,7 @@ class Correlator:
     def __init__(self, trace_root: Path, audit_root: Path):
         self.trace_root = trace_root.resolve(strict=True)
         self.reader = EvidenceReader(audit_root)
+        self.index = StreamIndex()
 
     def run(
         self, agent: str, session: str, run_id: str, *, trace_id: str | None = None,
@@ -114,7 +116,10 @@ class Correlator:
         digest, count, selected, nbytes = hashlib.sha256(), 0, [], 0
         selected_bytes, page_full = 0, False
         with self.reader.open((run_id, "system-effects", stream), MAX_STREAM) as source:
-            while raw := source.readline(MAX_LINE + 1):
+            page = self.index.page(source, run_id, entry, offset, limit)
+            if page is not None:
+                count, selected = page
+            while page is None and (raw := source.readline(MAX_LINE + 1)):
                 if len(raw) > MAX_LINE or count >= 100000:
                     raise WorkspaceError("event stream exceeds bounded limits")
                 digest.update(raw)
@@ -135,7 +140,7 @@ class Correlator:
                         selected.append({"event_index": count, "event": event})
                         selected_bytes += output_size
                 count += 1
-        if digest.hexdigest() != entry.get("sha256") or nbytes != entry.get("size_bytes"):
+        if page is None and (digest.hexdigest() != entry.get("sha256") or nbytes != entry.get("size_bytes")):
             raise WorkspaceError("event stream digest or length mismatch")
         result.update(status="correlated", integrity="matched_recorded_sha256",
                       stream=stream, event_count=count, events=selected,

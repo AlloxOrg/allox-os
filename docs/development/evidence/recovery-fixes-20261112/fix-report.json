@@ -1,0 +1,341 @@
+{
+  "base_commit": "4ad25c6",
+  "fixed_branch": "fix/recovery-safety-performance",
+  "product_source_pushed": false,
+  "tests": [
+    "338 passed, 21 skipped in 45.47s"
+  ],
+  "typecheck": [
+    "0 errors, 0 warnings, 0 informations"
+  ],
+  "guest_report": "/data/hy/Allox/recovery-fixes-20261112/guest-3dx3ie8s/report.json",
+  "host_cpus": [
+    24,
+    25,
+    26,
+    27,
+    28,
+    29,
+    30,
+    31,
+    32,
+    33,
+    34,
+    35,
+    36,
+    37,
+    38,
+    39,
+    40,
+    41,
+    42,
+    43,
+    44,
+    45,
+    46,
+    47
+  ],
+  "diagnostics": {
+    "rejected_requests": [
+      {
+        "case": "duplicate_checkpoint",
+        "checks": false,
+        "error": "checkpoint already exists: existing",
+        "new_execution_allowed_after_rejection": true,
+        "checkpoints": [
+          "existing"
+        ]
+      },
+      {
+        "case": "missing_delete",
+        "checks": false,
+        "error": "checkpoint does not exist: not-present",
+        "new_execution_allowed_after_rejection": true,
+        "checkpoints": [
+          "existing"
+        ]
+      },
+      {
+        "case": "invalid_metadata",
+        "checks": false,
+        "error": "metadata must be an object",
+        "new_execution_allowed_after_rejection": true,
+        "checkpoints": [
+          "existing"
+        ]
+      },
+      {
+        "case": "active_lease",
+        "checks": false,
+        "error": "session has active executions: audit/target",
+        "new_execution_allowed_after_rejection": true,
+        "checkpoints": [
+          "existing"
+        ]
+      },
+      {
+        "case": "duplicate_checkpoint",
+        "checks": true,
+        "error": "checkpoint already exists: existing",
+        "new_execution_allowed_after_rejection": true,
+        "checkpoints": [
+          "existing"
+        ],
+        "fence": null
+      },
+      {
+        "case": "missing_delete",
+        "checks": true,
+        "error": "checkpoint does not exist: not-present",
+        "new_execution_allowed_after_rejection": true,
+        "checkpoints": [
+          "existing"
+        ],
+        "fence": null
+      },
+      {
+        "case": "invalid_metadata",
+        "checks": true,
+        "error": "metadata must be an object",
+        "new_execution_allowed_after_rejection": true,
+        "checkpoints": [
+          "existing"
+        ],
+        "fence": null
+      },
+      {
+        "case": "active_lease",
+        "checks": true,
+        "error": "session has active executions: audit/target",
+        "new_execution_allowed_after_rejection": true,
+        "checkpoints": [
+          "existing"
+        ],
+        "fence": null
+      }
+    ],
+    "prefix_delete": {
+      "delete_response": {
+        "agent_id": "audit",
+        "session_id": "target",
+        "checkpoint_id": "checkpoint-long-id",
+        "deleted": true
+      },
+      "actual_checkpoints": [
+        "new-head"
+      ],
+      "assertion_baselines_remaining": [
+        "new-head"
+      ],
+      "deleted_baseline_leaked": false
+    },
+    "global_lock": {
+      "controlled_delay_ms": 250,
+      "other_session_status_blocked": false,
+      "query_finished_immediately": false,
+      "other_session_execution_lease_allowed": true,
+      "elapsed_ms": 1.28681,
+      "enabled": true
+    },
+    "split_brain_cache": {
+      "second_service_rejected": true,
+      "error": "recovery store/evidence already has an active owner"
+    },
+    "invalid_reset": [
+      {
+        "checks": false,
+        "error": "invalid runtime reset token for session",
+        "listener_exited": false,
+        "file_not_rolled_back": true
+      },
+      {
+        "checks": true,
+        "error": "invalid runtime reset token for session",
+        "listener_exited": false,
+        "file_not_rolled_back": true
+      }
+    ]
+  },
+  "orphan_runtime": {
+    "orphan_listener_killed": true,
+    "no_in_memory_runs": true,
+    "control_process_unaffected": true,
+    "restore_consistent": true
+  },
+  "recovery_performance": [
+    {
+      "files": 128,
+      "MiB": 4.0,
+      "old_checks_on_ms": {
+        "checkpoint_ms": 33.8651835,
+        "rollback_ms": 57.2056885
+      },
+      "fixed_checks_on_ms": {
+        "checkpoint_ms": 22.614716,
+        "rollback_ms": 42.1555445
+      },
+      "fixed_checks_off_ms": {
+        "checkpoint_ms": 2.460304,
+        "rollback_ms": 8.438597999999999
+      },
+      "all_restores_consistent": true
+    },
+    {
+      "files": 1024,
+      "MiB": 32.0,
+      "old_checks_on_ms": {
+        "checkpoint_ms": 259.60415650000004,
+        "rollback_ms": 401.4285985
+      },
+      "fixed_checks_on_ms": {
+        "checkpoint_ms": 127.9146535,
+        "rollback_ms": 221.66848299999998
+      },
+      "fixed_checks_off_ms": {
+        "checkpoint_ms": 3.117577,
+        "rollback_ms": 14.9790655
+      },
+      "all_restores_consistent": true
+    },
+    {
+      "files": 1024,
+      "MiB": 4.0,
+      "old_checks_on_ms": {
+        "checkpoint_ms": 120.5409365,
+        "rollback_ms": 185.4123015
+      },
+      "fixed_checks_on_ms": {
+        "checkpoint_ms": 106.101084,
+        "rollback_ms": 171.39907549999998
+      },
+      "fixed_checks_off_ms": {
+        "checkpoint_ms": 3.086022,
+        "rollback_ms": 11.227193499999998
+      },
+      "all_restores_consistent": true
+    },
+    {
+      "files": 128,
+      "MiB": 32.0,
+      "old_checks_on_ms": {
+        "checkpoint_ms": 154.21954,
+        "rollback_ms": 268.955609
+      },
+      "fixed_checks_on_ms": {
+        "checkpoint_ms": 72.59639100000001,
+        "rollback_ms": 110.4563825
+      },
+      "fixed_checks_off_ms": {
+        "checkpoint_ms": 3.0773194999999998,
+        "rollback_ms": 12.1849945
+      },
+      "all_restores_consistent": true
+    }
+  ],
+  "correlation_before": [
+    {
+      "events": 1000,
+      "page_size": 50,
+      "samples_ms": [
+        15.434716,
+        13.775756,
+        12.879714,
+        12.357184,
+        9.3599,
+        9.950839,
+        9.806749,
+        9.887952,
+        9.64712,
+        9.618841
+      ],
+      "p50_ms": 9.9193955,
+      "stream_bytes": 346890,
+      "scope": "fixture parse+integrity+join; not collector overhead"
+    },
+    {
+      "events": 10000,
+      "page_size": 50,
+      "samples_ms": [
+        82.023804,
+        82.693282,
+        82.553996,
+        82.856778,
+        82.092487,
+        82.334621,
+        81.865351,
+        82.449743,
+        82.181178,
+        82.583285
+      ],
+      "p50_ms": 82.39218199999999,
+      "stream_bytes": 3478890,
+      "scope": "fixture parse+integrity+join; not collector overhead"
+    }
+  ],
+  "correlation_after": [
+    {
+      "events": 1000,
+      "page_size": 50,
+      "samples_ms": [
+        18.260672,
+        4.457318,
+        4.352799,
+        4.266802,
+        4.102128,
+        4.125315,
+        3.940664,
+        3.91355,
+        3.900595,
+        3.732476
+      ],
+      "p50_ms": 4.1137215000000005,
+      "stream_bytes": 346890,
+      "scope": "fixture parse+integrity+join; not collector overhead"
+    },
+    {
+      "events": 10000,
+      "page_size": 50,
+      "samples_ms": [
+        82.738076,
+        12.720307,
+        13.024233,
+        13.113395,
+        13.178094,
+        13.080671,
+        13.275322,
+        13.181622,
+        13.183536,
+        13.004355
+      ],
+      "p50_ms": 13.1457445,
+      "stream_bytes": 3478890,
+      "scope": "fixture parse+integrity+join; not collector overhead"
+    }
+  ],
+  "monitoring_sdk": {
+    "sync": {
+      "old_median_pair_overhead_percent": 373.5714792149967,
+      "new_median_pair_overhead_percent": 375.62612703045613,
+      "old_on_wall_ms": 241.1256725,
+      "new_on_wall_ms": 241.398932,
+      "new_cpu_ms": 59.274,
+      "all_events_acknowledged": true
+    },
+    "background": {
+      "old_median_pair_overhead_percent": 304.4616908762305,
+      "new_median_pair_overhead_percent": 352.1925486995863,
+      "old_on_wall_ms": 203.372272,
+      "new_on_wall_ms": 224.7017875,
+      "new_cpu_ms": 63.346000000000004,
+      "all_events_acknowledged": true
+    }
+  },
+  "limits": [
+    "warm-cache tmpfs loop Btrfs; not physical disk timing",
+    "4 shared hash workers versus serial baseline",
+    "shared host load not controlled; baseline/fixed are separate runs",
+    "no new real LLM or eBPF capture",
+    "FULL durability and full content hashes preserved",
+    "correlation cache improves repeated queries, not first parse"
+  ]
+}

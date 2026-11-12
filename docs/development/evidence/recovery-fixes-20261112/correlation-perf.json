@@ -1,0 +1,40 @@
+[
+  {
+    "events": 1000,
+    "page_size": 50,
+    "samples_ms": [
+      18.260672,
+      4.457318,
+      4.352799,
+      4.266802,
+      4.102128,
+      4.125315,
+      3.940664,
+      3.91355,
+      3.900595,
+      3.732476
+    ],
+    "p50_ms": 4.1137215000000005,
+    "stream_bytes": 346890,
+    "scope": "fixture parse+integrity+join; not collector overhead"
+  },
+  {
+    "events": 10000,
+    "page_size": 50,
+    "samples_ms": [
+      82.738076,
+      12.720307,
+      13.024233,
+      13.113395,
+      13.178094,
+      13.080671,
+      13.275322,
+      13.181622,
+      13.183536,
+      13.004355
+    ],
+    "p50_ms": 13.1457445,
+    "stream_bytes": 3478890,
+    "scope": "fixture parse+integrity+join; not collector overhead"
+  }
+]

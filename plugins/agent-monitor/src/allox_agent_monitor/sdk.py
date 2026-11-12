@@ -103,8 +103,11 @@ class Span:
         }
         try:
             self.tracer.emit(event)
-            if self.tracer.delivery == 'background' and self.fields['kind'] in {'run', 'turn'}:
-                self.tracer.barrier()
+            if self.tracer.delivery in {'background', 'queued'}:
+                if self.fields['kind'] == 'run':
+                    self.tracer.barrier()
+                elif self.fields['kind'] == 'turn':
+                    self.tracer.action_finished()
         except Exception:
             if exc is None:
                 raise
@@ -123,6 +126,8 @@ class Tracer:
         queue_bytes: int = 1024*1024,
         flush_interval: float = .02,
         export_timeout: float = 10,
+        action_batch_size: int | None = None,
+        action_flush_interval: float = .05,
     ) -> None:
         context = {}
         raw = os.environ.get('ALLOX_MONITOR_CONTEXT', '') if inherit_context else ''
@@ -152,10 +157,22 @@ class Tracer:
         self._emit_lock = threading.RLock()
         self._owner_pid = os.getpid()
         self.acknowledged = self.batch_requests = 0
-        if delivery not in {'sync', 'background'}:
-            raise ValueError('delivery must be sync or background')
+        if delivery not in {'sync', 'background', 'queued'}:
+            raise ValueError('delivery must be sync, background or queued')
         self.delivery = delivery
+        if action_batch_size is not None and delivery != 'queued':
+            raise ValueError('action batching requires queued delivery')
+        self._action_batching = action_batch_size is not None
         self._background = None
+        if delivery == 'queued' and enabled:
+            if self._action_batching:
+                from allox_agent_monitor.action_batch import ActionBatchExporter
+                self._background = ActionBatchExporter(emit, batch_size=batch_size,
+                    actions=action_batch_size, interval=action_flush_interval,
+                    capacity=queue_capacity, max_bytes=queue_bytes, timeout=export_timeout)
+            else:
+                from allox_agent_monitor.queue_exporter import QueuedExporter
+                self._background = QueuedExporter(emit, batch_size=batch_size)
         if delivery == 'background' and enabled:
             from allox_agent_monitor.background import BackgroundExporter
             self._background = BackgroundExporter(emit, batch_size=batch_size, capacity=queue_capacity,
@@ -202,7 +219,8 @@ class Tracer:
             encoded = json.dumps(event, allow_nan=False).encode()
             self.wire_bytes += len(encoded)
             ack = self._emit(event)
-            if isinstance(ack, dict) and (ack.get("accepted") is False or ack.get("ok") is False):
+            if isinstance(ack, dict) and (ack.get("accepted") is False or ack.get("ok") is False
+                                         or ack.get('durable') is False):
                 raise RuntimeError("collector rejected event")
             self.acknowledged += 1
         except Exception:
@@ -269,6 +287,23 @@ class Tracer:
         """Trusted integration helper; never invoke checkpoint creation before durable telemetry."""
         self.barrier()
         return create_checkpoint(*args, **kwargs)
+
+    def action_finished(self):
+        """A turn is an action. Other adapters can call this once per completed action.
+
+        Opt-in multi-action mode only schedules persistence; explicit barriers,
+        checkpoints, exported context and run exit still wait for FULL durability.
+        """
+        if not self.enabled:
+            return
+        if self._action_batching and self._background is not None:
+            try:
+                getattr(self._background, 'action_finished')()
+            except Exception:
+                if self.strict:
+                    raise
+        else:
+            self.barrier()
 
     def __enter__(self):
         return self

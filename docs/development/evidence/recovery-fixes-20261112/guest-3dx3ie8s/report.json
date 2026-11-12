@@ -1,0 +1,1722 @@
+{
+  "passed": true,
+  "source_commit": "4ad25c6 + recovery fixes (working tree)",
+  "regression": {
+    "passed": true,
+    "repetitions": 3,
+    "reports": [
+      {
+        "schema": "allox.recovery-checks/v1",
+        "agent_id": "agent",
+        "session_id": "target",
+        "checkpoint_id": "c0",
+        "status": "CONSISTENT_WITHIN_SCOPE",
+        "checks": {
+          "checkpoint_binding": {
+            "status": "CONSISTENT_WITHIN_SCOPE"
+          },
+          "filesystem": {
+            "status": "CONSISTENT_WITHIN_SCOPE",
+            "changed_count": 0,
+            "changed_paths": []
+          },
+          "memory": {
+            "status": "CONSISTENT_WITHIN_SCOPE"
+          },
+          "runtime_reset": {
+            "status": "CONSISTENT_WITHIN_SCOPE",
+            "basis": "SESSION_CGROUP_EMPTY",
+            "restores_checkpoint_processes": false
+          },
+          "semantic": {
+            "status": "CONSISTENT_WITHIN_SCOPE",
+            "basis": "TRUSTED_ADAPTER_LEDGER",
+            "coverage": {
+              "adapter_id": "local-test-harness",
+              "contract": "complete-effect-ledger/v1"
+            },
+            "unrecorded_effects_checked": false
+          }
+        },
+        "scope": [
+          "checkpoint_binding",
+          "filesystem",
+          "memory",
+          "runtime_reset",
+          "semantic"
+        ],
+        "excluded": [
+          "process heap restoration",
+          "external service state",
+          "unrecorded effects",
+          "unmanaged writers",
+          "xattrs/ACLs",
+          "timestamps",
+          "mounts",
+          "workspace root metadata"
+        ]
+      },
+      {
+        "schema": "allox.recovery-checks/v1",
+        "agent_id": "agent",
+        "session_id": "target",
+        "checkpoint_id": "c0",
+        "status": "CONSISTENT_WITHIN_SCOPE",
+        "checks": {
+          "checkpoint_binding": {
+            "status": "CONSISTENT_WITHIN_SCOPE"
+          },
+          "filesystem": {
+            "status": "CONSISTENT_WITHIN_SCOPE",
+            "changed_count": 0,
+            "changed_paths": []
+          },
+          "memory": {
+            "status": "CONSISTENT_WITHIN_SCOPE"
+          },
+          "runtime_reset": {
+            "status": "CONSISTENT_WITHIN_SCOPE",
+            "basis": "SESSION_CGROUP_EMPTY",
+            "restores_checkpoint_processes": false
+          },
+          "semantic": {
+            "status": "CONSISTENT_WITHIN_SCOPE",
+            "basis": "TRUSTED_ADAPTER_LEDGER",
+            "coverage": {
+              "adapter_id": "local-test-harness",
+              "contract": "complete-effect-ledger/v1"
+            },
+            "unrecorded_effects_checked": false
+          }
+        },
+        "scope": [
+          "checkpoint_binding",
+          "filesystem",
+          "memory",
+          "runtime_reset",
+          "semantic"
+        ],
+        "excluded": [
+          "process heap restoration",
+          "external service state",
+          "unrecorded effects",
+          "unmanaged writers",
+          "xattrs/ACLs",
+          "timestamps",
+          "mounts",
+          "workspace root metadata"
+        ]
+      },
+      {
+        "schema": "allox.recovery-checks/v1",
+        "agent_id": "agent",
+        "session_id": "target",
+        "checkpoint_id": "c0",
+        "status": "CONSISTENT_WITHIN_SCOPE",
+        "checks": {
+          "checkpoint_binding": {
+            "status": "CONSISTENT_WITHIN_SCOPE"
+          },
+          "filesystem": {
+            "status": "CONSISTENT_WITHIN_SCOPE",
+            "changed_count": 0,
+            "changed_paths": []
+          },
+          "memory": {
+            "status": "CONSISTENT_WITHIN_SCOPE"
+          },
+          "runtime_reset": {
+            "status": "CONSISTENT_WITHIN_SCOPE",
+            "basis": "SESSION_CGROUP_EMPTY",
+            "restores_checkpoint_processes": false
+          },
+          "semantic": {
+            "status": "CONSISTENT_WITHIN_SCOPE",
+            "basis": "TRUSTED_ADAPTER_LEDGER",
+            "coverage": {
+              "adapter_id": "local-test-harness",
+              "contract": "complete-effect-ledger/v1"
+            },
+            "unrecorded_effects_checked": false
+          }
+        },
+        "scope": [
+          "checkpoint_binding",
+          "filesystem",
+          "memory",
+          "runtime_reset",
+          "semantic"
+        ],
+        "excluded": [
+          "process heap restoration",
+          "external service state",
+          "unrecorded effects",
+          "unmanaged writers",
+          "xattrs/ACLs",
+          "timestamps",
+          "mounts",
+          "workspace root metadata"
+        ]
+      }
+    ],
+    "semantic_preflight": "rejected-before-kill",
+    "negative_memory": "fenced-and-recovered",
+    "history_chain": [
+      2,
+      1,
+      0
+    ],
+    "kernel": "6.1.62-allox-joint-btrfs"
+  },
+  "diagnostics": {
+    "rejected_requests": [
+      {
+        "case": "duplicate_checkpoint",
+        "checks": false,
+        "error": "checkpoint already exists: existing",
+        "new_execution_allowed_after_rejection": true,
+        "checkpoints": [
+          "existing"
+        ]
+      },
+      {
+        "case": "missing_delete",
+        "checks": false,
+        "error": "checkpoint does not exist: not-present",
+        "new_execution_allowed_after_rejection": true,
+        "checkpoints": [
+          "existing"
+        ]
+      },
+      {
+        "case": "invalid_metadata",
+        "checks": false,
+        "error": "metadata must be an object",
+        "new_execution_allowed_after_rejection": true,
+        "checkpoints": [
+          "existing"
+        ]
+      },
+      {
+        "case": "active_lease",
+        "checks": false,
+        "error": "session has active executions: audit/target",
+        "new_execution_allowed_after_rejection": true,
+        "checkpoints": [
+          "existing"
+        ]
+      },
+      {
+        "case": "duplicate_checkpoint",
+        "checks": true,
+        "error": "checkpoint already exists: existing",
+        "new_execution_allowed_after_rejection": true,
+        "checkpoints": [
+          "existing"
+        ],
+        "fence": null
+      },
+      {
+        "case": "missing_delete",
+        "checks": true,
+        "error": "checkpoint does not exist: not-present",
+        "new_execution_allowed_after_rejection": true,
+        "checkpoints": [
+          "existing"
+        ],
+        "fence": null
+      },
+      {
+        "case": "invalid_metadata",
+        "checks": true,
+        "error": "metadata must be an object",
+        "new_execution_allowed_after_rejection": true,
+        "checkpoints": [
+          "existing"
+        ],
+        "fence": null
+      },
+      {
+        "case": "active_lease",
+        "checks": true,
+        "error": "session has active executions: audit/target",
+        "new_execution_allowed_after_rejection": true,
+        "checkpoints": [
+          "existing"
+        ],
+        "fence": null
+      }
+    ],
+    "prefix_delete": {
+      "delete_response": {
+        "agent_id": "audit",
+        "session_id": "target",
+        "checkpoint_id": "checkpoint-long-id",
+        "deleted": true
+      },
+      "actual_checkpoints": [
+        "new-head"
+      ],
+      "assertion_baselines_remaining": [
+        "new-head"
+      ],
+      "deleted_baseline_leaked": false
+    },
+    "global_lock": {
+      "controlled_delay_ms": 250,
+      "other_session_status_blocked": false,
+      "query_finished_immediately": false,
+      "other_session_execution_lease_allowed": true,
+      "elapsed_ms": 1.28681,
+      "enabled": true
+    },
+    "split_brain_cache": {
+      "second_service_rejected": true,
+      "error": "recovery store/evidence already has an active owner"
+    },
+    "invalid_reset": [
+      {
+        "checks": false,
+        "error": "invalid runtime reset token for session",
+        "listener_exited": false,
+        "file_not_rolled_back": true
+      },
+      {
+        "checks": true,
+        "error": "invalid runtime reset token for session",
+        "listener_exited": false,
+        "file_not_rolled_back": true
+      }
+    ]
+  },
+  "performance": [
+    {
+      "files": 128,
+      "file_bytes": 32768,
+      "total_bytes": 4194304,
+      "pairs": [
+        {
+          "pair": 0,
+          "off": {
+            "checkpoint_ms": 2.424068,
+            "rollback_ms": 7.783045,
+            "restore_oracle": true
+          },
+          "on": {
+            "checkpoint_ms": 22.724298,
+            "rollback_ms": 43.136162,
+            "restore_oracle": true
+          }
+        },
+        {
+          "pair": 1,
+          "on": {
+            "checkpoint_ms": 26.474539,
+            "rollback_ms": 51.731844,
+            "restore_oracle": true
+          },
+          "off": {
+            "checkpoint_ms": 3.379436,
+            "rollback_ms": 10.155038,
+            "restore_oracle": true
+          }
+        },
+        {
+          "pair": 2,
+          "off": {
+            "checkpoint_ms": 2.226793,
+            "rollback_ms": 7.578364,
+            "restore_oracle": true
+          },
+          "on": {
+            "checkpoint_ms": 23.216888,
+            "rollback_ms": 41.782039,
+            "restore_oracle": true
+          }
+        },
+        {
+          "pair": 3,
+          "on": {
+            "checkpoint_ms": 19.45451,
+            "rollback_ms": 35.95848,
+            "restore_oracle": true
+          },
+          "off": {
+            "checkpoint_ms": 2.49654,
+            "rollback_ms": 8.633438,
+            "restore_oracle": true
+          }
+        },
+        {
+          "pair": 4,
+          "off": {
+            "checkpoint_ms": 2.360578,
+            "rollback_ms": 8.394017,
+            "restore_oracle": true
+          },
+          "on": {
+            "checkpoint_ms": 23.32486,
+            "rollback_ms": 42.851521,
+            "restore_oracle": true
+          }
+        },
+        {
+          "pair": 5,
+          "on": {
+            "checkpoint_ms": 22.625778,
+            "rollback_ms": 41.033203,
+            "restore_oracle": true
+          },
+          "off": {
+            "checkpoint_ms": 2.788444,
+            "rollback_ms": 9.148185,
+            "restore_oracle": true
+          }
+        },
+        {
+          "pair": 6,
+          "off": {
+            "checkpoint_ms": 2.345972,
+            "rollback_ms": 8.483179,
+            "restore_oracle": true
+          },
+          "on": {
+            "checkpoint_ms": 22.603654,
+            "rollback_ms": 40.613946,
+            "restore_oracle": true
+          }
+        },
+        {
+          "pair": 7,
+          "on": {
+            "checkpoint_ms": 21.495952,
+            "rollback_ms": 40.663458,
+            "restore_oracle": true
+          },
+          "off": {
+            "checkpoint_ms": 2.647291,
+            "rollback_ms": 8.21739,
+            "restore_oracle": true
+          }
+        },
+        {
+          "pair": 8,
+          "off": {
+            "checkpoint_ms": 2.261831,
+            "rollback_ms": 7.871274,
+            "restore_oracle": true
+          },
+          "on": {
+            "checkpoint_ms": 22.38683,
+            "rollback_ms": 42.52905,
+            "restore_oracle": true
+          }
+        },
+        {
+          "pair": 9,
+          "on": {
+            "checkpoint_ms": 22.036615,
+            "rollback_ms": 51.80838,
+            "restore_oracle": true
+          },
+          "off": {
+            "checkpoint_ms": 3.789737,
+            "rollback_ms": 11.12919,
+            "restore_oracle": true
+          }
+        }
+      ],
+      "median_ms": {
+        "off": {
+          "checkpoint_ms": 2.460304,
+          "rollback_ms": 8.438597999999999
+        },
+        "on": {
+          "checkpoint_ms": 22.614716,
+          "rollback_ms": 42.1555445
+        }
+      },
+      "phase_profile": [
+        {
+          "phase": "sqlite_put",
+          "ms": 0.471404,
+          "kind": "fence"
+        },
+        {
+          "phase": "core_checkpoint",
+          "ms": 2.973479,
+          "kind": null
+        },
+        {
+          "phase": "scan_hash_manifest",
+          "ms": 17.617509,
+          "kind": null
+        },
+        {
+          "phase": "sqlite_put",
+          "ms": 1.075781,
+          "kind": "checkpoint"
+        },
+        {
+          "phase": "scan_hash_manifest",
+          "ms": 14.379294,
+          "kind": null
+        },
+        {
+          "phase": "sqlite_put",
+          "ms": 0.453166,
+          "kind": "fence"
+        },
+        {
+          "phase": "sqlite_put",
+          "ms": 0.316491,
+          "kind": "report"
+        },
+        {
+          "phase": "core_rollback",
+          "ms": 8.929013,
+          "kind": null
+        },
+        {
+          "phase": "scan_hash_manifest",
+          "ms": 15.291367,
+          "kind": null
+        },
+        {
+          "phase": "sqlite_put",
+          "ms": 0.454868,
+          "kind": "report"
+        },
+        {
+          "phase": "sqlite_put",
+          "ms": 0.356218,
+          "kind": "fence"
+        }
+      ],
+      "scan_cprofile": [
+        {
+          "function": "collect",
+          "file": "/usr/local/lib/python3.12/site-packages/allox_recovery_checks/assertions.py",
+          "calls": 17,
+          "self_ms": 0.21977700000000003,
+          "cumulative_ms": 62.818824000000006
+        },
+        {
+          "function": "result",
+          "file": "/usr/local/lib/python3.12/concurrent/futures/_base.py",
+          "calls": 17,
+          "self_ms": 0.887328,
+          "cumulative_ms": 62.36939
+        },
+        {
+          "function": "<method 'acquire' of '_thread.lock' objects>",
+          "file": "~",
+          "calls": 90,
+          "self_ms": 0.5790230000000001,
+          "cumulative_ms": 42.199579
+        },
+        {
+          "function": "join",
+          "file": "/usr/local/lib/python3.12/threading.py",
+          "calls": 4,
+          "self_ms": 0.032512000000000006,
+          "cumulative_ms": 42.158433
+        },
+        {
+          "function": "_wait_for_tstate_lock",
+          "file": "/usr/local/lib/python3.12/threading.py",
+          "calls": 4,
+          "self_ms": 0.065324,
+          "cumulative_ms": 42.111271
+        },
+        {
+          "function": "wait",
+          "file": "/usr/local/lib/python3.12/threading.py",
+          "calls": 22,
+          "self_ms": 1.003267,
+          "cumulative_ms": 31.19762
+        },
+        {
+          "function": "tree_manifest",
+          "file": "/usr/local/lib/python3.12/site-packages/allox_recovery_checks/assertions.py",
+          "calls": 1,
+          "self_ms": 0.027340000000000003,
+          "cumulative_ms": 22.20074
+        },
+        {
+          "function": "shutdown",
+          "file": "/usr/local/lib/python3.12/concurrent/futures/thread.py",
+          "calls": 1,
+          "self_ms": 0.11341000000000001,
+          "cumulative_ms": 21.90321
+        },
+        {
+          "function": "_bootstrap",
+          "file": "/usr/local/lib/python3.12/threading.py",
+          "calls": 4,
+          "self_ms": 0.160055,
+          "cumulative_ms": 21.316785000000003
+        },
+        {
+          "function": "_bootstrap_inner",
+          "file": "/usr/local/lib/python3.12/threading.py",
+          "calls": 4,
+          "self_ms": 0.032074000000000005,
+          "cumulative_ms": 21.312022
+        },
+        {
+          "function": "run",
+          "file": "/usr/local/lib/python3.12/threading.py",
+          "calls": 4,
+          "self_ms": 0.142434,
+          "cumulative_ms": 21.294788
+        },
+        {
+          "function": "_worker",
+          "file": "/usr/local/lib/python3.12/concurrent/futures/thread.py",
+          "calls": 4,
+          "self_ms": 0.10114600000000001,
+          "cumulative_ms": 21.18165
+        },
+        {
+          "function": "<method 'get' of '_queue.SimpleQueue' objects>",
+          "file": "~",
+          "calls": 16,
+          "self_ms": 0.49611700000000003,
+          "cumulative_ms": 21.026189000000002
+        },
+        {
+          "function": "<built-in method posix.fstat>",
+          "file": "~",
+          "calls": 258,
+          "self_ms": 2.720338,
+          "cumulative_ms": 2.114916
+        },
+        {
+          "function": "visit",
+          "file": "/usr/local/lib/python3.12/site-packages/allox_recovery_checks/assertions.py",
+          "calls": 2,
+          "self_ms": 0.025619000000000003,
+          "cumulative_ms": 1.7458770000000001
+        },
+        {
+          "function": "<built-in method posix.read>",
+          "file": "~",
+          "calls": 258,
+          "self_ms": 2.653935,
+          "cumulative_ms": 1.296774
+        },
+        {
+          "function": "submit",
+          "file": "/usr/local/lib/python3.12/concurrent/futures/thread.py",
+          "calls": 17,
+          "self_ms": 0.146446,
+          "cumulative_ms": 1.158593
+        },
+        {
+          "function": "<built-in method posix.open>",
+          "file": "~",
+          "calls": 131,
+          "self_ms": 0.815431,
+          "cumulative_ms": 1.048586
+        },
+        {
+          "function": "<built-in method posix.close>",
+          "file": "~",
+          "calls": 131,
+          "self_ms": 1.099577,
+          "cumulative_ms": 1.028772
+        },
+        {
+          "function": "<built-in method posix.stat>",
+          "file": "~",
+          "calls": 131,
+          "self_ms": 0.958933,
+          "cumulative_ms": 0.958933
+        }
+      ],
+      "scope": "in-process management RPC; joint file+serialized memory; no running processes"
+    },
+    {
+      "files": 1024,
+      "file_bytes": 32768,
+      "total_bytes": 33554432,
+      "pairs": [
+        {
+          "pair": 0,
+          "off": {
+            "checkpoint_ms": 3.015724,
+            "rollback_ms": 14.874858,
+            "restore_oracle": true
+          },
+          "on": {
+            "checkpoint_ms": 126.994474,
+            "rollback_ms": 198.118452,
+            "restore_oracle": true
+          }
+        },
+        {
+          "pair": 1,
+          "on": {
+            "checkpoint_ms": 122.757673,
+            "rollback_ms": 196.528626,
+            "restore_oracle": true
+          },
+          "off": {
+            "checkpoint_ms": 3.098308,
+            "rollback_ms": 14.065532,
+            "restore_oracle": true
+          }
+        },
+        {
+          "pair": 2,
+          "off": {
+            "checkpoint_ms": 2.436793,
+            "rollback_ms": 12.887215,
+            "restore_oracle": true
+          },
+          "on": {
+            "checkpoint_ms": 128.834833,
+            "rollback_ms": 200.865,
+            "restore_oracle": true
+          }
+        },
+        {
+          "pair": 3,
+          "on": {
+            "checkpoint_ms": 123.371295,
+            "rollback_ms": 212.786728,
+            "restore_oracle": true
+          },
+          "off": {
+            "checkpoint_ms": 3.136846,
+            "rollback_ms": 15.059045,
+            "restore_oracle": true
+          }
+        },
+        {
+          "pair": 4,
+          "off": {
+            "checkpoint_ms": 2.669723,
+            "rollback_ms": 13.953087,
+            "restore_oracle": true
+          },
+          "on": {
+            "checkpoint_ms": 119.940677,
+            "rollback_ms": 225.614755,
+            "restore_oracle": true
+          }
+        },
+        {
+          "pair": 5,
+          "on": {
+            "checkpoint_ms": 122.146352,
+            "rollback_ms": 233.913446,
+            "restore_oracle": true
+          },
+          "off": {
+            "checkpoint_ms": 3.065242,
+            "rollback_ms": 15.39063,
+            "restore_oracle": true
+          }
+        },
+        {
+          "pair": 6,
+          "off": {
+            "checkpoint_ms": 3.298633,
+            "rollback_ms": 14.899086,
+            "restore_oracle": true
+          },
+          "on": {
+            "checkpoint_ms": 129.720305,
+            "rollback_ms": 229.044872,
+            "restore_oracle": true
+          }
+        },
+        {
+          "pair": 7,
+          "on": {
+            "checkpoint_ms": 137.312957,
+            "rollback_ms": 220.087989,
+            "restore_oracle": true
+          },
+          "off": {
+            "checkpoint_ms": 3.416342,
+            "rollback_ms": 16.909592,
+            "restore_oracle": true
+          }
+        },
+        {
+          "pair": 8,
+          "off": {
+            "checkpoint_ms": 3.379879,
+            "rollback_ms": 15.459759,
+            "restore_oracle": true
+          },
+          "on": {
+            "checkpoint_ms": 131.024325,
+            "rollback_ms": 223.248977,
+            "restore_oracle": true
+          }
+        },
+        {
+          "pair": 9,
+          "on": {
+            "checkpoint_ms": 142.751649,
+            "rollback_ms": 223.520653,
+            "restore_oracle": true
+          },
+          "off": {
+            "checkpoint_ms": 3.835682,
+            "rollback_ms": 17.133087,
+            "restore_oracle": true
+          }
+        }
+      ],
+      "median_ms": {
+        "off": {
+          "checkpoint_ms": 3.117577,
+          "rollback_ms": 14.9790655
+        },
+        "on": {
+          "checkpoint_ms": 127.9146535,
+          "rollback_ms": 221.66848299999998
+        }
+      },
+      "phase_profile": [
+        {
+          "phase": "sqlite_put",
+          "ms": 0.492749,
+          "kind": "fence"
+        },
+        {
+          "phase": "core_checkpoint",
+          "ms": 3.78448,
+          "kind": null
+        },
+        {
+          "phase": "scan_hash_manifest",
+          "ms": 108.367935,
+          "kind": null
+        },
+        {
+          "phase": "sqlite_put",
+          "ms": 5.323665,
+          "kind": "checkpoint"
+        },
+        {
+          "phase": "scan_hash_manifest",
+          "ms": 75.386132,
+          "kind": null
+        },
+        {
+          "phase": "sqlite_put",
+          "ms": 0.569556,
+          "kind": "fence"
+        },
+        {
+          "phase": "sqlite_put",
+          "ms": 0.421365,
+          "kind": "report"
+        },
+        {
+          "phase": "core_rollback",
+          "ms": 18.820576,
+          "kind": null
+        },
+        {
+          "phase": "scan_hash_manifest",
+          "ms": 120.23326,
+          "kind": null
+        },
+        {
+          "phase": "sqlite_put",
+          "ms": 0.708847,
+          "kind": "report"
+        },
+        {
+          "phase": "sqlite_put",
+          "ms": 0.524504,
+          "kind": "fence"
+        }
+      ],
+      "scan_cprofile": [
+        {
+          "function": "collect",
+          "file": "/usr/local/lib/python3.12/site-packages/allox_recovery_checks/assertions.py",
+          "calls": 129,
+          "self_ms": 3.0030620000000003,
+          "cumulative_ms": 442.16238500000003
+        },
+        {
+          "function": "<method 'acquire' of '_thread.lock' objects>",
+          "file": "~",
+          "calls": 337,
+          "self_ms": 1.6526160000000003,
+          "cumulative_ms": 315.362365
+        },
+        {
+          "function": "join",
+          "file": "/usr/local/lib/python3.12/threading.py",
+          "calls": 4,
+          "self_ms": 0.15560200000000002,
+          "cumulative_ms": 314.772744
+        },
+        {
+          "function": "_wait_for_tstate_lock",
+          "file": "/usr/local/lib/python3.12/threading.py",
+          "calls": 4,
+          "self_ms": 0.10124500000000002,
+          "cumulative_ms": 314.60271
+        },
+        {
+          "function": "result",
+          "file": "/usr/local/lib/python3.12/concurrent/futures/_base.py",
+          "calls": 129,
+          "self_ms": 5.863136000000001,
+          "cumulative_ms": 285.01744900000006
+        },
+        {
+          "function": "tree_manifest",
+          "file": "/usr/local/lib/python3.12/site-packages/allox_recovery_checks/assertions.py",
+          "calls": 1,
+          "self_ms": 0.025722000000000002,
+          "cumulative_ms": 158.21505200000001
+        },
+        {
+          "function": "shutdown",
+          "file": "/usr/local/lib/python3.12/concurrent/futures/thread.py",
+          "calls": 1,
+          "self_ms": 0.07016,
+          "cumulative_ms": 158.08406900000003
+        },
+        {
+          "function": "_bootstrap",
+          "file": "/usr/local/lib/python3.12/threading.py",
+          "calls": 4,
+          "self_ms": 0.15557100000000001,
+          "cumulative_ms": 157.270619
+        },
+        {
+          "function": "_bootstrap_inner",
+          "file": "/usr/local/lib/python3.12/threading.py",
+          "calls": 4,
+          "self_ms": 0.034661,
+          "cumulative_ms": 157.265338
+        },
+        {
+          "function": "wait",
+          "file": "/usr/local/lib/python3.12/threading.py",
+          "calls": 87,
+          "self_ms": 3.787685,
+          "cumulative_ms": 114.77320300000001
+        },
+        {
+          "function": "run",
+          "file": "/usr/local/lib/python3.12/concurrent/futures/thread.py",
+          "calls": 129,
+          "self_ms": 3.313842,
+          "cumulative_ms": 19.834581
+        },
+        {
+          "function": "<built-in method posix.fstat>",
+          "file": "~",
+          "calls": 2050,
+          "self_ms": 20.706763,
+          "cumulative_ms": 15.84735
+        },
+        {
+          "function": "hash_batch",
+          "file": "/usr/local/lib/python3.12/site-packages/allox_recovery_checks/assertions.py",
+          "calls": 129,
+          "self_ms": 20.509787000000003,
+          "cumulative_ms": 13.949808
+        },
+        {
+          "function": "<built-in method posix.stat>",
+          "file": "~",
+          "calls": 1027,
+          "self_ms": 10.733667,
+          "cumulative_ms": 10.733667
+        },
+        {
+          "function": "<built-in method posix.read>",
+          "file": "~",
+          "calls": 2050,
+          "self_ms": 20.190906000000002,
+          "cumulative_ms": 9.082919
+        },
+        {
+          "function": "<built-in method posix.open>",
+          "file": "~",
+          "calls": 1027,
+          "self_ms": 8.491028000000002,
+          "cumulative_ms": 8.558861
+        },
+        {
+          "function": "<built-in method posix.close>",
+          "file": "~",
+          "calls": 1027,
+          "self_ms": 8.0385,
+          "cumulative_ms": 7.5898460000000005
+        },
+        {
+          "function": "submit",
+          "file": "/usr/local/lib/python3.12/concurrent/futures/thread.py",
+          "calls": 129,
+          "self_ms": 1.2247620000000001,
+          "cumulative_ms": 6.3892560000000005
+        },
+        {
+          "function": "<method 'hexdigest' of '_hashlib.HASH' objects>",
+          "file": "~",
+          "calls": 1025,
+          "self_ms": 4.031527,
+          "cumulative_ms": 4.031527
+        },
+        {
+          "function": "<method 'update' of '_hashlib.HASH' objects>",
+          "file": "~",
+          "calls": 1025,
+          "self_ms": 20.370845000000003,
+          "cumulative_ms": 3.339846
+        }
+      ],
+      "scope": "in-process management RPC; joint file+serialized memory; no running processes"
+    },
+    {
+      "files": 1024,
+      "file_bytes": 4096,
+      "total_bytes": 4194304,
+      "pairs": [
+        {
+          "pair": 0,
+          "off": {
+            "checkpoint_ms": 3.79811,
+            "rollback_ms": 11.23232,
+            "restore_oracle": true
+          },
+          "on": {
+            "checkpoint_ms": 106.273213,
+            "rollback_ms": 171.735233,
+            "restore_oracle": true
+          }
+        },
+        {
+          "pair": 1,
+          "on": {
+            "checkpoint_ms": 105.426919,
+            "rollback_ms": 165.816118,
+            "restore_oracle": true
+          },
+          "off": {
+            "checkpoint_ms": 4.11206,
+            "rollback_ms": 11.270646,
+            "restore_oracle": true
+          }
+        },
+        {
+          "pair": 2,
+          "off": {
+            "checkpoint_ms": 2.630894,
+            "rollback_ms": 10.358176,
+            "restore_oracle": true
+          },
+          "on": {
+            "checkpoint_ms": 106.071715,
+            "rollback_ms": 175.600541,
+            "restore_oracle": true
+          }
+        },
+        {
+          "pair": 3,
+          "on": {
+            "checkpoint_ms": 104.687745,
+            "rollback_ms": 171.062918,
+            "restore_oracle": true
+          },
+          "off": {
+            "checkpoint_ms": 2.965535,
+            "rollback_ms": 11.124691,
+            "restore_oracle": true
+          }
+        },
+        {
+          "pair": 4,
+          "off": {
+            "checkpoint_ms": 2.43598,
+            "rollback_ms": 8.111216,
+            "restore_oracle": true
+          },
+          "on": {
+            "checkpoint_ms": 106.130453,
+            "rollback_ms": 172.650259,
+            "restore_oracle": true
+          }
+        },
+        {
+          "pair": 5,
+          "on": {
+            "checkpoint_ms": 107.331621,
+            "rollback_ms": 165.340844,
+            "restore_oracle": true
+          },
+          "off": {
+            "checkpoint_ms": 3.206509,
+            "rollback_ms": 13.20358,
+            "restore_oracle": true
+          }
+        },
+        {
+          "pair": 6,
+          "off": {
+            "checkpoint_ms": 2.65278,
+            "rollback_ms": 8.628205,
+            "restore_oracle": true
+          },
+          "on": {
+            "checkpoint_ms": 98.601482,
+            "rollback_ms": 173.380495,
+            "restore_oracle": true
+          }
+        },
+        {
+          "pair": 7,
+          "on": {
+            "checkpoint_ms": 104.454054,
+            "rollback_ms": 167.084583,
+            "restore_oracle": true
+          },
+          "off": {
+            "checkpoint_ms": 3.69249,
+            "rollback_ms": 13.195201,
+            "restore_oracle": true
+          }
+        },
+        {
+          "pair": 8,
+          "off": {
+            "checkpoint_ms": 2.900367,
+            "rollback_ms": 11.222067,
+            "restore_oracle": true
+          },
+          "on": {
+            "checkpoint_ms": 107.702658,
+            "rollback_ms": 168.777554,
+            "restore_oracle": true
+          }
+        },
+        {
+          "pair": 9,
+          "on": {
+            "checkpoint_ms": 108.030775,
+            "rollback_ms": 174.100365,
+            "restore_oracle": true
+          },
+          "off": {
+            "checkpoint_ms": 3.712003,
+            "rollback_ms": 13.050001,
+            "restore_oracle": true
+          }
+        }
+      ],
+      "median_ms": {
+        "off": {
+          "checkpoint_ms": 3.086022,
+          "rollback_ms": 11.227193499999998
+        },
+        "on": {
+          "checkpoint_ms": 106.101084,
+          "rollback_ms": 171.39907549999998
+        }
+      },
+      "phase_profile": [
+        {
+          "phase": "sqlite_put",
+          "ms": 0.35934,
+          "kind": "fence"
+        },
+        {
+          "phase": "core_checkpoint",
+          "ms": 3.478108,
+          "kind": null
+        },
+        {
+          "phase": "scan_hash_manifest",
+          "ms": 104.360671,
+          "kind": null
+        },
+        {
+          "phase": "sqlite_put",
+          "ms": 4.504728,
+          "kind": "checkpoint"
+        },
+        {
+          "phase": "scan_hash_manifest",
+          "ms": 72.0868,
+          "kind": null
+        },
+        {
+          "phase": "sqlite_put",
+          "ms": 0.472302,
+          "kind": "fence"
+        },
+        {
+          "phase": "sqlite_put",
+          "ms": 0.334376,
+          "kind": "report"
+        },
+        {
+          "phase": "core_rollback",
+          "ms": 14.508424,
+          "kind": null
+        },
+        {
+          "phase": "scan_hash_manifest",
+          "ms": 70.92504,
+          "kind": null
+        },
+        {
+          "phase": "sqlite_put",
+          "ms": 0.398052,
+          "kind": "report"
+        },
+        {
+          "phase": "sqlite_put",
+          "ms": 0.358011,
+          "kind": "fence"
+        }
+      ],
+      "scan_cprofile": [
+        {
+          "function": "collect",
+          "file": "/usr/local/lib/python3.12/site-packages/allox_recovery_checks/assertions.py",
+          "calls": 129,
+          "self_ms": 1.493404,
+          "cumulative_ms": 380.22452300000003
+        },
+        {
+          "function": "<method 'acquire' of '_thread.lock' objects>",
+          "file": "~",
+          "calls": 347,
+          "self_ms": 1.2912770000000002,
+          "cumulative_ms": 268.697149
+        },
+        {
+          "function": "result",
+          "file": "/usr/local/lib/python3.12/concurrent/futures/_base.py",
+          "calls": 129,
+          "self_ms": 6.5738080000000005,
+          "cumulative_ms": 268.47285500000004
+        },
+        {
+          "function": "join",
+          "file": "/usr/local/lib/python3.12/threading.py",
+          "calls": 4,
+          "self_ms": 0.090493,
+          "cumulative_ms": 268.19766100000004
+        },
+        {
+          "function": "_wait_for_tstate_lock",
+          "file": "/usr/local/lib/python3.12/threading.py",
+          "calls": 4,
+          "self_ms": 0.09723300000000001,
+          "cumulative_ms": 268.095232
+        },
+        {
+          "function": "tree_manifest",
+          "file": "/usr/local/lib/python3.12/site-packages/allox_recovery_checks/assertions.py",
+          "calls": 1,
+          "self_ms": 0.02162,
+          "cumulative_ms": 134.892433
+        },
+        {
+          "function": "shutdown",
+          "file": "/usr/local/lib/python3.12/concurrent/futures/thread.py",
+          "calls": 1,
+          "self_ms": 0.072958,
+          "cumulative_ms": 134.776847
+        },
+        {
+          "function": "_bootstrap",
+          "file": "/usr/local/lib/python3.12/threading.py",
+          "calls": 4,
+          "self_ms": 0.12497300000000001,
+          "cumulative_ms": 133.981872
+        },
+        {
+          "function": "_bootstrap_inner",
+          "file": "/usr/local/lib/python3.12/threading.py",
+          "calls": 4,
+          "self_ms": 0.043686,
+          "cumulative_ms": 133.97743200000002
+        },
+        {
+          "function": "wait",
+          "file": "/usr/local/lib/python3.12/threading.py",
+          "calls": 89,
+          "self_ms": 3.923154,
+          "cumulative_ms": 123.137127
+        },
+        {
+          "function": "run",
+          "file": "/usr/local/lib/python3.12/concurrent/futures/thread.py",
+          "calls": 129,
+          "self_ms": 2.202557,
+          "cumulative_ms": 35.447957
+        },
+        {
+          "function": "hash_batch",
+          "file": "/usr/local/lib/python3.12/site-packages/allox_recovery_checks/assertions.py",
+          "calls": 129,
+          "self_ms": 17.033829,
+          "cumulative_ms": 34.974603
+        },
+        {
+          "function": "<built-in method posix.read>",
+          "file": "~",
+          "calls": 2050,
+          "self_ms": 18.126605,
+          "cumulative_ms": 12.532289
+        },
+        {
+          "function": "<built-in method posix.fstat>",
+          "file": "~",
+          "calls": 2050,
+          "self_ms": 23.175366000000004,
+          "cumulative_ms": 10.831873
+        },
+        {
+          "function": "<built-in method posix.stat>",
+          "file": "~",
+          "calls": 1027,
+          "self_ms": 8.379761000000002,
+          "cumulative_ms": 8.379761000000002
+        },
+        {
+          "function": "<built-in method posix.close>",
+          "file": "~",
+          "calls": 1027,
+          "self_ms": 8.85498,
+          "cumulative_ms": 7.938118000000001
+        },
+        {
+          "function": "<built-in method posix.open>",
+          "file": "~",
+          "calls": 1027,
+          "self_ms": 6.391051,
+          "cumulative_ms": 6.453406
+        },
+        {
+          "function": "submit",
+          "file": "/usr/local/lib/python3.12/concurrent/futures/thread.py",
+          "calls": 129,
+          "self_ms": 0.952277,
+          "cumulative_ms": 5.062202
+        },
+        {
+          "function": "<method 'hexdigest' of '_hashlib.HASH' objects>",
+          "file": "~",
+          "calls": 1025,
+          "self_ms": 3.630615,
+          "cumulative_ms": 3.630615
+        },
+        {
+          "function": "set_result",
+          "file": "/usr/local/lib/python3.12/concurrent/futures/_base.py",
+          "calls": 129,
+          "self_ms": 1.057085,
+          "cumulative_ms": 3.0630550000000003
+        }
+      ],
+      "scope": "in-process management RPC; joint file+serialized memory; no running processes"
+    },
+    {
+      "files": 128,
+      "file_bytes": 262144,
+      "total_bytes": 33554432,
+      "pairs": [
+        {
+          "pair": 0,
+          "off": {
+            "checkpoint_ms": 4.325244,
+            "rollback_ms": 12.65334,
+            "restore_oracle": true
+          },
+          "on": {
+            "checkpoint_ms": 70.948708,
+            "rollback_ms": 120.743037,
+            "restore_oracle": true
+          }
+        },
+        {
+          "pair": 1,
+          "on": {
+            "checkpoint_ms": 72.274945,
+            "rollback_ms": 122.152642,
+            "restore_oracle": true
+          },
+          "off": {
+            "checkpoint_ms": 4.282797,
+            "rollback_ms": 12.897971,
+            "restore_oracle": true
+          }
+        },
+        {
+          "pair": 2,
+          "off": {
+            "checkpoint_ms": 2.85407,
+            "rollback_ms": 12.24579,
+            "restore_oracle": true
+          },
+          "on": {
+            "checkpoint_ms": 72.802108,
+            "rollback_ms": 120.134503,
+            "restore_oracle": true
+          }
+        },
+        {
+          "pair": 3,
+          "on": {
+            "checkpoint_ms": 74.475569,
+            "rollback_ms": 110.811722,
+            "restore_oracle": true
+          },
+          "off": {
+            "checkpoint_ms": 3.497603,
+            "rollback_ms": 12.753576,
+            "restore_oracle": true
+          }
+        },
+        {
+          "pair": 4,
+          "off": {
+            "checkpoint_ms": 3.09898,
+            "rollback_ms": 12.565895,
+            "restore_oracle": true
+          },
+          "on": {
+            "checkpoint_ms": 74.07702,
+            "rollback_ms": 109.534613,
+            "restore_oracle": true
+          }
+        },
+        {
+          "pair": 5,
+          "on": {
+            "checkpoint_ms": 73.197641,
+            "rollback_ms": 114.427053,
+            "restore_oracle": true
+          },
+          "off": {
+            "checkpoint_ms": 2.896922,
+            "rollback_ms": 11.422369,
+            "restore_oracle": true
+          }
+        },
+        {
+          "pair": 6,
+          "off": {
+            "checkpoint_ms": 2.577853,
+            "rollback_ms": 10.404948,
+            "restore_oracle": true
+          },
+          "on": {
+            "checkpoint_ms": 71.54401,
+            "rollback_ms": 109.910645,
+            "restore_oracle": true
+          }
+        },
+        {
+          "pair": 7,
+          "on": {
+            "checkpoint_ms": 72.390674,
+            "rollback_ms": 110.101043,
+            "restore_oracle": true
+          },
+          "off": {
+            "checkpoint_ms": 3.404492,
+            "rollback_ms": 12.124199,
+            "restore_oracle": true
+          }
+        },
+        {
+          "pair": 8,
+          "off": {
+            "checkpoint_ms": 2.637859,
+            "rollback_ms": 10.557139,
+            "restore_oracle": true
+          },
+          "on": {
+            "checkpoint_ms": 71.220009,
+            "rollback_ms": 106.362131,
+            "restore_oracle": true
+          }
+        },
+        {
+          "pair": 9,
+          "on": {
+            "checkpoint_ms": 73.423805,
+            "rollback_ms": 105.004237,
+            "restore_oracle": true
+          },
+          "off": {
+            "checkpoint_ms": 3.055659,
+            "rollback_ms": 11.474799,
+            "restore_oracle": true
+          }
+        }
+      ],
+      "median_ms": {
+        "off": {
+          "checkpoint_ms": 3.0773194999999998,
+          "rollback_ms": 12.1849945
+        },
+        "on": {
+          "checkpoint_ms": 72.59639100000001,
+          "rollback_ms": 110.4563825
+        }
+      },
+      "phase_profile": [
+        {
+          "phase": "sqlite_put",
+          "ms": 0.346058,
+          "kind": "fence"
+        },
+        {
+          "phase": "core_checkpoint",
+          "ms": 3.219121,
+          "kind": null
+        },
+        {
+          "phase": "scan_hash_manifest",
+          "ms": 67.016731,
+          "kind": null
+        },
+        {
+          "phase": "sqlite_put",
+          "ms": 1.059836,
+          "kind": "checkpoint"
+        },
+        {
+          "phase": "scan_hash_manifest",
+          "ms": 42.296027,
+          "kind": null
+        },
+        {
+          "phase": "sqlite_put",
+          "ms": 0.510087,
+          "kind": "fence"
+        },
+        {
+          "phase": "sqlite_put",
+          "ms": 0.381847,
+          "kind": "report"
+        },
+        {
+          "phase": "core_rollback",
+          "ms": 13.240331,
+          "kind": null
+        },
+        {
+          "phase": "scan_hash_manifest",
+          "ms": 49.158013,
+          "kind": null
+        },
+        {
+          "phase": "sqlite_put",
+          "ms": 0.508755,
+          "kind": "report"
+        },
+        {
+          "phase": "sqlite_put",
+          "ms": 0.485547,
+          "kind": "fence"
+        }
+      ],
+      "scan_cprofile": [
+        {
+          "function": "collect",
+          "file": "/usr/local/lib/python3.12/site-packages/allox_recovery_checks/assertions.py",
+          "calls": 17,
+          "self_ms": 0.250293,
+          "cumulative_ms": 181.55047000000002
+        },
+        {
+          "function": "result",
+          "file": "/usr/local/lib/python3.12/concurrent/futures/_base.py",
+          "calls": 17,
+          "self_ms": 0.40312600000000004,
+          "cumulative_ms": 165.536327
+        },
+        {
+          "function": "wait",
+          "file": "/usr/local/lib/python3.12/threading.py",
+          "calls": 21,
+          "self_ms": 0.730627,
+          "cumulative_ms": 94.712266
+        },
+        {
+          "function": "tree_manifest",
+          "file": "/usr/local/lib/python3.12/site-packages/allox_recovery_checks/assertions.py",
+          "calls": 1,
+          "self_ms": 0.039203,
+          "cumulative_ms": 61.794378
+        },
+        {
+          "function": "shutdown",
+          "file": "/usr/local/lib/python3.12/concurrent/futures/thread.py",
+          "calls": 1,
+          "self_ms": 0.087316,
+          "cumulative_ms": 61.629892000000005
+        },
+        {
+          "function": "<method 'acquire' of '_thread.lock' objects>",
+          "file": "~",
+          "calls": 88,
+          "self_ms": 0.40584100000000006,
+          "cumulative_ms": 61.492704
+        },
+        {
+          "function": "join",
+          "file": "/usr/local/lib/python3.12/threading.py",
+          "calls": 4,
+          "self_ms": 0.027895000000000003,
+          "cumulative_ms": 61.37279900000001
+        },
+        {
+          "function": "_wait_for_tstate_lock",
+          "file": "/usr/local/lib/python3.12/threading.py",
+          "calls": 4,
+          "self_ms": 0.026518000000000003,
+          "cumulative_ms": 61.33025
+        },
+        {
+          "function": "_bootstrap",
+          "file": "/usr/local/lib/python3.12/threading.py",
+          "calls": 4,
+          "self_ms": 0.11987,
+          "cumulative_ms": 61.039985
+        },
+        {
+          "function": "_bootstrap_inner",
+          "file": "/usr/local/lib/python3.12/threading.py",
+          "calls": 4,
+          "self_ms": 0.029942000000000003,
+          "cumulative_ms": 61.020929
+        },
+        {
+          "function": "run",
+          "file": "/usr/local/lib/python3.12/threading.py",
+          "calls": 4,
+          "self_ms": 0.217741,
+          "cumulative_ms": 61.005831
+        },
+        {
+          "function": "_worker",
+          "file": "/usr/local/lib/python3.12/concurrent/futures/thread.py",
+          "calls": 4,
+          "self_ms": 0.190929,
+          "cumulative_ms": 60.816095
+        },
+        {
+          "function": "<method 'get' of '_queue.SimpleQueue' objects>",
+          "file": "~",
+          "calls": 16,
+          "self_ms": 0.571331,
+          "cumulative_ms": 60.418533000000004
+        },
+        {
+          "function": "visit",
+          "file": "/usr/local/lib/python3.12/site-packages/allox_recovery_checks/assertions.py",
+          "calls": 2,
+          "self_ms": 0.19648000000000002,
+          "cumulative_ms": 10.343100000000002
+        },
+        {
+          "function": "<built-in method posix.read>",
+          "file": "~",
+          "calls": 645,
+          "self_ms": 7.381086,
+          "cumulative_ms": 5.8195310000000005
+        },
+        {
+          "function": "<built-in method posix.fstat>",
+          "file": "~",
+          "calls": 258,
+          "self_ms": 1.9882150000000003,
+          "cumulative_ms": 1.869615
+        },
+        {
+          "function": "run",
+          "file": "/usr/local/lib/python3.12/concurrent/futures/thread.py",
+          "calls": 17,
+          "self_ms": 0.15781799999999999,
+          "cumulative_ms": 1.694128
+        },
+        {
+          "function": "hash_batch",
+          "file": "/usr/local/lib/python3.12/site-packages/allox_recovery_checks/assertions.py",
+          "calls": 17,
+          "self_ms": 4.086455,
+          "cumulative_ms": 1.6596100000000003
+        },
+        {
+          "function": "<method 'update' of '_hashlib.HASH' objects>",
+          "file": "~",
+          "calls": 516,
+          "self_ms": 37.371479,
+          "cumulative_ms": 1.6204470000000002
+        },
+        {
+          "function": "submit",
+          "file": "/usr/local/lib/python3.12/concurrent/futures/thread.py",
+          "calls": 17,
+          "self_ms": 0.151041,
+          "cumulative_ms": 1.247553
+        }
+      ],
+      "scope": "in-process management RPC; joint file+serialized memory; no running processes"
+    }
+  ],
+  "kernel": "6.1.62-allox-joint-btrfs",
+  "orphan_runtime": {
+    "orphan_listener_killed": true,
+    "no_in_memory_runs": true,
+    "control_process_unaffected": true,
+    "restore_consistent": true
+  },
+  "parallel_hash_workers": 4,
+  "host_cpus": [
+    24,
+    25,
+    26,
+    27,
+    28,
+    29,
+    30,
+    31,
+    32,
+    33,
+    34,
+    35,
+    36,
+    37,
+    38,
+    39,
+    40,
+    41,
+    42,
+    43,
+    44,
+    45,
+    46,
+    47
+  ],
+  "host_processes": [
+    2033833,
+    2033843
+  ],
+  "runtime": "kata-allox-ebpf",
+  "backing": "Guest tmpfs loop Btrfs; not physical-disk/power-loss validation"
+}

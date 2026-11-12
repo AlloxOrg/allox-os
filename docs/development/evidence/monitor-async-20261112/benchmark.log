@@ -1,0 +1,346 @@
+direct False 0 off 51.321
+direct False 0 sync 257.915
+direct False 0 background 212.211
+direct False 0 queued 188.429
+direct False 1 sync 216.294
+direct False 1 background 212.03
+direct False 1 queued 138.483
+direct False 1 off 51.421
+direct False 2 background 470.513
+direct False 2 queued 146.812
+direct False 2 off 48.645
+direct False 2 sync 258.076
+direct False 3 queued 155.167
+direct False 3 off 51.095
+direct False 3 sync 216.329
+direct False 3 background 237.089
+direct False 4 off 50.584
+direct False 4 sync 241.351
+direct False 4 background 162.195
+direct False 4 queued 146.698
+direct False 5 sync 258.022
+direct False 5 background 237.141
+direct False 5 queued 130.11
+direct False 5 off 51.04
+direct False 6 background 212.0
+direct False 6 queued 130.015
+direct False 6 off 51.357
+direct False 6 sync 258.067
+direct False 7 queued 138.568
+direct False 7 off 51.4
+direct False 7 sync 207.986
+direct False 7 background 262.158
+direct False 8 off 51.268
+direct False 8 sync 224.653
+direct False 8 background 170.397
+direct False 8 queued 130.214
+direct False 9 sync 399.692
+direct False 9 background 203.732
+direct False 9 queued 138.362
+direct False 9 off 50.598
+direct True 0 off 50.069
+direct True 0 sync 1158.598
+direct True 0 background 2705.602
+direct True 0 queued 1423.728
+direct True 1 sync 850.285
+direct True 1 background 1554.535
+direct True 1 queued 1639.642
+direct True 1 off 51.104
+direct True 2 background 1004.969
+direct True 2 queued 1722.538
+direct True 2 off 51.082
+direct True 2 sync 1175.139
+direct True 3 queued 897.442
+direct True 3 off 50.388
+direct True 3 sync 1617.309
+direct True 3 background 1896.864
+direct True 4 off 50.573
+direct True 4 sync 1267.2
+direct True 4 background 862.96
+direct True 4 queued 1705.822
+direct True 5 sync 2101.632
+direct True 5 background 1755.882
+direct True 5 queued 1539.148
+direct True 5 off 50.726
+direct True 6 background 929.57
+direct True 6 queued 1389.563
+direct True 6 off 51.596
+direct True 6 sync 1626.23
+direct True 7 queued 1239.564
+direct True 7 off 51.877
+direct True 7 sync 1325.216
+direct True 7 background 1421.187
+direct True 8 off 51.175
+direct True 8 sync 1316.862
+direct True 8 background 1546.01
+direct True 8 queued 1180.469
+direct True 9 sync 1009.005
+direct True 9 background 1513.068
+direct True 9 queued 1414.181
+direct True 9 off 51.323
+socket False 0 off 51.335
+socket False 0 sync 287.623
+socket False 0 background 1544.804
+socket False 0 queued 178.796
+socket False 1 sync 332.176
+socket False 1 background 219.972
+socket False 1 queued 137.19
+socket False 1 off 50.728
+socket False 2 background 302.606
+socket False 2 queued 175.714
+socket False 2 off 51.272
+socket False 2 sync 215.168
+socket False 3 queued 153.867
+socket False 3 off 51.116
+socket False 3 sync 273.266
+socket False 3 background 211.091
+socket False 4 off 51.128
+socket False 4 sync 265.289
+socket False 4 background 169.297
+socket False 4 queued 154.072
+socket False 5 sync 465.351
+socket False 5 background 244.183
+socket False 5 queued 129.14
+socket False 5 off 51.536
+socket False 6 background 219.212
+socket False 6 queued 153.675
+socket False 6 off 50.968
+socket False 6 sync 355.423
+socket False 7 queued 154.106
+socket False 7 off 51.207
+socket False 7 sync 356.331
+socket False 7 background 202.512
+socket False 8 off 50.511
+socket False 8 sync 288.983
+socket False 8 background 235.537
+socket False 8 queued 120.771
+socket False 9 sync 249.069
+socket False 9 background 135.933
+socket False 9 queued 912.557
+socket False 9 off 50.594
+socket True 0 off 51.655
+socket True 0 sync 1449.176
+socket True 0 background 1219.894
+socket True 0 queued 1805.051
+socket True 1 sync 1065.801
+socket True 1 background 1587.146
+socket True 1 queued 1138.056
+socket True 1 off 50.064
+socket True 2 background 1169.841
+socket True 2 queued 1471.171
+socket True 2 off 49.73
+socket True 2 sync 964.141
+socket True 3 queued 1813.209
+socket True 3 off 50.906
+socket True 3 sync 1465.504
+socket True 3 background 1361.879
+socket True 4 off 50.666
+socket True 4 sync 1415.747
+socket True 4 background 2420.537
+socket True 4 queued 2156.398
+socket True 5 sync 1224.558
+socket True 5 background 1610.921
+socket True 5 queued 1046.8
+socket True 5 off 49.868
+socket True 6 background 1269.467
+socket True 6 queued 1804.888
+socket True 6 off 50.514
+socket True 6 sync 998.685
+socket True 7 queued 1420.827
+socket True 7 off 50.501
+socket True 7 sync 2266.35
+socket True 7 background 1554.47
+socket True 8 off 47.89
+socket True 8 sync 1065.565
+socket True 8 background 1361.14
+socket True 8 queued 1896.234
+socket True 9 sync 1432.955
+socket True 9 background 1069.608
+socket True 9 queued 1462.608
+socket True 9 off 50.924
+SUMMARY [
+  {
+    "transport": "direct",
+    "per_action_turn": false,
+    "medians": {
+      "off": {
+        "wall_ms": 51.1813475,
+        "foreground_ms": 51.1805655,
+        "final_flush_ms": 0.0007149999999999999,
+        "step_p95_ms": 1.3231495,
+        "cpu_ms": 8.140000000000011,
+        "transactions": 0,
+        "all_reopen_oracles": true,
+        "paired_overhead_percent": 0.0
+      },
+      "sync": {
+        "wall_ms": 249.63316,
+        "foreground_ms": 249.62262049999998,
+        "final_flush_ms": 0.0103705,
+        "step_p95_ms": 36.7010755,
+        "cpu_ms": 59.25449999999999,
+        "transactions": 5.0,
+        "all_reopen_oracles": true,
+        "paired_overhead_percent": 389.8135692136975
+      },
+      "background": {
+        "wall_ms": 212.12075650000003,
+        "foreground_ms": 70.746463,
+        "final_flush_ms": 141.7798795,
+        "step_p95_ms": 1.8233535,
+        "cpu_ms": 65.85899999999998,
+        "transactions": 5.0,
+        "all_reopen_oracles": true,
+        "paired_overhead_percent": 313.15022327445286
+      },
+      "queued": {
+        "wall_ms": 138.52541100000002,
+        "foreground_ms": 77.896157,
+        "final_flush_ms": 60.7612415,
+        "step_p95_ms": 2.567629,
+        "cpu_ms": 66.8285,
+        "transactions": 2.0,
+        "all_reopen_oracles": true,
+        "paired_overhead_percent": 171.51996531510088
+      }
+    }
+  },
+  {
+    "transport": "direct",
+    "per_action_turn": true,
+    "medians": {
+      "off": {
+        "wall_ms": 51.093004,
+        "foreground_ms": 51.0922735,
+        "final_flush_ms": 0.0007390000000000001,
+        "step_p95_ms": 1.3276055,
+        "cpu_ms": 8.09399999999999,
+        "transactions": 0,
+        "all_reopen_oracles": true,
+        "paired_overhead_percent": 0.0
+      },
+      "sync": {
+        "wall_ms": 1292.031059,
+        "foreground_ms": 1292.021635,
+        "final_flush_ms": 0.00904,
+        "step_p95_ms": 41.743645,
+        "cpu_ms": 106.24449999999999,
+        "transactions": 40.0,
+        "all_reopen_oracles": true,
+        "paired_overhead_percent": 2430.0940036100587
+      },
+      "background": {
+        "wall_ms": 1529.539064,
+        "foreground_ms": 1529.4565465,
+        "final_flush_ms": 0.0848,
+        "step_p95_ms": 54.204285,
+        "cpu_ms": 127.03349999999998,
+        "transactions": 40.0,
+        "all_reopen_oracles": true,
+        "paired_overhead_percent": 2884.5907444660556
+      },
+      "queued": {
+        "wall_ms": 1418.954757,
+        "foreground_ms": 1418.825155,
+        "final_flush_ms": 0.1350915,
+        "step_p95_ms": 50.4072735,
+        "cpu_ms": 135.38649999999996,
+        "transactions": 40.0,
+        "all_reopen_oracles": true,
+        "paired_overhead_percent": 2699.509921461989
+      }
+    }
+  },
+  {
+    "transport": "socket",
+    "per_action_turn": false,
+    "medians": {
+      "off": {
+        "wall_ms": 51.121956,
+        "foreground_ms": 51.1212225,
+        "final_flush_ms": 0.000753,
+        "step_p95_ms": 1.3261355,
+        "cpu_ms": 8.102999999999993,
+        "transactions": 0,
+        "all_reopen_oracles": true,
+        "paired_overhead_percent": 0.0
+      },
+      "sync": {
+        "wall_ms": 288.302838,
+        "foreground_ms": 288.29339300000004,
+        "final_flush_ms": 0.0092,
+        "step_p95_ms": 41.554071,
+        "cpu_ms": 72.10049999999998,
+        "transactions": 5.0,
+        "all_reopen_oracles": true,
+        "paired_overhead_percent": 466.2013658431259
+      },
+      "background": {
+        "wall_ms": 219.591856,
+        "foreground_ms": 71.6649865,
+        "final_flush_ms": 148.22287749999998,
+        "step_p95_ms": 2.1672445,
+        "cpu_ms": 74.946,
+        "transactions": 5.0,
+        "all_reopen_oracles": true,
+        "paired_overhead_percent": 331.86432600790994
+      },
+      "queued": {
+        "wall_ms": 153.9694965,
+        "foreground_ms": 85.8936545,
+        "final_flush_ms": 68.092814,
+        "step_p95_ms": 4.281867999999999,
+        "cpu_ms": 77.09800000000001,
+        "transactions": 2.0,
+        "all_reopen_oracles": true,
+        "paired_overhead_percent": 201.18074306478746
+      }
+    }
+  },
+  {
+    "transport": "socket",
+    "per_action_turn": true,
+    "medians": {
+      "off": {
+        "wall_ms": 50.507513,
+        "foreground_ms": 50.5068265,
+        "final_flush_ms": 0.000657,
+        "step_p95_ms": 1.3238794999999999,
+        "cpu_ms": 7.534500000000012,
+        "transactions": 0,
+        "all_reopen_oracles": true,
+        "paired_overhead_percent": 0.0
+      },
+      "sync": {
+        "wall_ms": 1320.1521845,
+        "foreground_ms": 1320.1428685,
+        "final_flush_ms": 0.0086735,
+        "step_p95_ms": 49.99025,
+        "cpu_ms": 155.5025,
+        "transactions": 40.0,
+        "all_reopen_oracles": true,
+        "paired_overhead_percent": 2524.9282219364377
+      },
+      "background": {
+        "wall_ms": 1361.509145,
+        "foreground_ms": 1361.411428,
+        "final_flush_ms": 0.0786805,
+        "step_p95_ms": 46.9042645,
+        "cpu_ms": 172.71999999999997,
+        "transactions": 40.0,
+        "all_reopen_oracles": true,
+        "paired_overhead_percent": 2658.737306075248
+      },
+      "queued": {
+        "wall_ms": 1638.029875,
+        "foreground_ms": 1637.8839939999998,
+        "final_flush_ms": 0.132826,
+        "step_p95_ms": 50.045984000000004,
+        "cpu_ms": 232.7335,
+        "transactions": 40.0,
+        "all_reopen_oracles": true,
+        "paired_overhead_percent": 3126.3686051731443
+      }
+    }
+  }
+]

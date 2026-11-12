@@ -30,17 +30,27 @@ class Handler(socketserver.StreamRequestHandler):
             if len(line) > 131072 or not line.endswith(b"\n"):
                 raise WorkspaceError("invalid telemetry request size")
             request = json.loads(line)
-            if not isinstance(request, dict) or set(request) != {"event"}:
-                raise WorkspaceError("only event ingestion is allowed")
-            event = request["event"]
-            if not isinstance(event, dict) or any(
-                key in event for key in ("agent_id", "session_id", "source", "process_run_id")
+            if not isinstance(request, dict) or set(request) not in (
+                {"event"}, {"event", "delivery"}, {"flush"}
             ):
+                raise WorkspaceError("only event ingestion or receipt flush is allowed")
+            queued = set(request) == {"event", "delivery"}
+            if queued and request["delivery"] != "queued":
+                raise WorkspaceError("unknown delivery mode")
+            event = request.get("event")
+            if "event" in request and (not isinstance(event, dict) or any(
+                key in event for key in ("agent_id", "session_id", "source", "process_run_id")
+            )):
                 raise WorkspaceError("Agent cannot supply caller identity or source")
             with server.executions.share_access(*server.identity, write=False):
                 if not server.cgroups.owns(*server.identity, pid):
                     raise WorkspaceError("caller left this Session")
-                result = server.plugin.ingest_session(server.identity, event, bound_run)
+                if "flush" in request:
+                    result = server.plugin.flush_session_receipt(server.identity, request["flush"], bound_run)
+                elif queued:
+                    result = server.plugin.enqueue_session(server.identity, event, bound_run)
+                else:
+                    result = server.plugin.ingest_session(server.identity, event, bound_run)
             response = {"ok": True, "result": result}
         except (WorkspaceError, ValueError) as exc:
             response = {"ok": False, "error": str(exc)}

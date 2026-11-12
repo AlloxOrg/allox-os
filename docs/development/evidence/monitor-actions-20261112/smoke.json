@@ -1,0 +1,156 @@
+{
+  "scope": "synthetic SDK + SQLite FULL durability; not real Agent/eBPF overhead",
+  "delivery": "queued",
+  "turns": true,
+  "transport": "socket",
+  "pairs": [
+    {
+      "off": {
+        "enabled": false,
+        "wall_ns": 2516281,
+        "foreground_ns": 2515567,
+        "final_flush_ns": 714,
+        "cpu_seconds": 0.00037400000000000627,
+        "peak_rss_kib": 19532,
+        "step_p50_ns": 1254488.0,
+        "step_p95_ns": 1193616,
+        "monitor": null,
+        "collector": null,
+        "profile": null
+      },
+      "on": {
+        "enabled": true,
+        "wall_ns": 41743867,
+        "foreground_ns": 4254381,
+        "final_flush_ns": 37489486,
+        "cpu_seconds": 0.010674000000000003,
+        "peak_rss_kib": 19532,
+        "step_p50_ns": 2124529.5,
+        "step_p95_ns": 1704962,
+        "monitor": {
+          "attempted_events": 12,
+          "acknowledged_events": 12,
+          "failed_events": 0,
+          "pending_events": 0,
+          "pending_bytes": 0,
+          "peak_pending_events": 12,
+          "peak_pending_bytes": 4066,
+          "serialized_bytes": 4066,
+          "emit_ns": 38547773,
+          "batch_requests": 1,
+          "worker_alive": false,
+          "action_batch_size": 8,
+          "action_flush_interval": 0.05,
+          "completed_actions": 2,
+          "durable_actions": 2,
+          "flush_requests": 1,
+          "closed": true,
+          "complete": true,
+          "enabled": true,
+          "delivery": "queued",
+          "batch_size": 32,
+          "metric_errors": 0,
+          "strict": true
+        },
+        "collector": {
+          "accepted_events_this_process": 13,
+          "rejected_events_this_process": 0,
+          "collector_ns_this_process": 66268965,
+          "storage_bytes": 49544,
+          "delivery": "synchronous-acknowledged",
+          "event_loss_rate": null,
+          "committed_transactions_this_process": 2,
+          "event_loss_note": "no claim about events never submitted by a producer"
+        },
+        "profile": {
+          "runs": 2,
+          "spans": 7,
+          "complete": false,
+          "warnings": [
+            {
+              "span_id": "process-benchmark-process",
+              "reason": "unfinished"
+            }
+          ],
+          "groups": [
+            {
+              "semantic_path": [],
+              "kind": "phase",
+              "name": "tool_execution",
+              "model": null,
+              "calls": 2,
+              "runs": 1,
+              "errors": 0,
+              "inclusive_ns": 2832039,
+              "self_ns": 2832039,
+              "p50_ns": 1320805,
+              "p95_ns": 1511234,
+              "timing_samples": [],
+              "metrics": {
+                "executor.execution_ns": {
+                  "sum": 2512722,
+                  "samples": 2
+                },
+                "executor.thread_cpu_ns": {
+                  "sum": 436010,
+                  "samples": 2
+                }
+              }
+            },
+            {
+              "semantic_path": [],
+              "kind": "tool",
+              "name": "cpu-and-wait",
+              "model": null,
+              "calls": 2,
+              "runs": 1,
+              "errors": 0,
+              "inclusive_ns": 3409376,
+              "self_ns": 577337,
+              "p50_ns": 1472439,
+              "p95_ns": 1936937,
+              "timing_samples": [
+                {
+                  "executor_internal_ns": 1252916,
+                  "non_execution_ns": 684021
+                },
+                {
+                  "executor_internal_ns": 1259806,
+                  "non_execution_ns": 212633
+                }
+              ],
+              "metrics": {}
+            },
+            {
+              "semantic_path": [],
+              "kind": "turn",
+              "name": "action",
+              "model": null,
+              "calls": 2,
+              "runs": 1,
+              "errors": 0,
+              "inclusive_ns": 4072927,
+              "self_ns": 663551,
+              "p50_ns": 1618158,
+              "p95_ns": 2454769,
+              "timing_samples": [],
+              "metrics": {}
+            }
+          ],
+          "completeness_scope": "received spans only; reconcile producer health separately",
+          "time_semantics": "inclusive sums are work, not elapsed wall time; self subtracts child union",
+          "unobserved": [
+            "transport unless instrumented",
+            "server timings unless provider reports"
+          ]
+        },
+        "reopen_oracle": true
+      },
+      "wall_overhead_percent": 1558.950927976645
+    }
+  ],
+  "median_wall_overhead_percent": 1558.950927976645,
+  "clock_resolution_seconds": 1e-09,
+  "clock_error_bound_ns": null,
+  "clock_note": "resolution is not measured accuracy or cross-host synchronization"
+}

@@ -17,7 +17,7 @@ import subprocess
 import threading
 import time
 import uuid
-from collections.abc import Iterator
+from collections.abc import Callable, Iterator
 from contextlib import contextmanager
 from pathlib import Path
 from typing import Any, Protocol
@@ -113,6 +113,33 @@ class WorkspaceStore:
 
     def initialize(self) -> dict[str, Any]:
         self.backend.assert_root(self.root)
+        (self.root / ".allox").mkdir(parents=True, exist_ok=True)
+        with self._initialization_guard():
+            return self._initialize_unowned()
+
+    @contextmanager
+    def _initialization_guard(self):
+        # Journal recovery must not race an already running recovery owner,
+        # even before a second daemon reaches plugin activation.
+        if os.name != "posix":
+            yield
+            return
+        import fcntl
+
+        fd = os.open(self.root / ".allox" / "recovery-checks.owner",
+                     os.O_RDWR | os.O_CREAT | os.O_NOFOLLOW | os.O_CLOEXEC, 0o600)
+        try:
+            if not stat.S_ISREG(os.fstat(fd).st_mode):
+                raise WorkspaceError("recovery owner lock must be a regular file")
+            try:
+                fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            except BlockingIOError as exc:
+                raise WorkspaceError("store already has an active recovery owner") from exc
+            yield
+        finally:
+            os.close(fd)
+
+    def _initialize_unowned(self) -> dict[str, Any]:
         (self.root / "agents").mkdir(parents=True, exist_ok=True)
         (self.root / ".allox" / "events").mkdir(parents=True, exist_ok=True)
         (self.root / ".allox" / "indexes").mkdir(parents=True, exist_ok=True)
@@ -867,6 +894,7 @@ class WorkspaceStore:
         pinned: bool = False,
         metadata: dict[str, Any] | None = None,
         memory_update: tuple[Any, Any] | None = None,
+        before_change: Callable[[], None] | None = None,
     ) -> dict[str, Any]:
         checkpoint_id = validate_id(
             "checkpoint", checkpoint_id or f"cp-{time.time_ns()}"
@@ -897,6 +925,8 @@ class WorkspaceStore:
                 )
             except CheckpointIndexError as exc:
                 raise WorkspaceError(str(exc)) from exc
+            if before_change is not None:
+                before_change()
             self.backend.snapshot(current, target, readonly=True)
             if memory_version is not None:
                 self._sync_directory(target.parent)
@@ -958,6 +988,33 @@ class WorkspaceStore:
                     removed.append(str(path.relative_to(tmp_dir)))
         return removed
 
+    def validate_rollback_target(
+        self, agent_id: str, session_id: str, checkpoint_id: str | None,
+        *, num_ancestors: int | None = None, restore_memory: bool = True,
+    ) -> str:
+        """Read-only preflight for callers that will terminate runtime first.
+
+        rollback revalidates under its mutation boundary; this check must never
+        be used as a substitute for rollback's journal or memory validation.
+        """
+        if checkpoint_id is not None:
+            checkpoint_id = validate_id("checkpoint", checkpoint_id)
+        with self._session_lock(agent_id, session_id):
+            self.require_memory_ready(agent_id, session_id)
+            index = self._load_index(agent_id, session_id)
+            try:
+                target = index.resolve(checkpoint_id, num_ancestors)
+            except CheckpointIndexError as exc:
+                raise WorkspaceError(str(exc)) from exc
+            self._require_managed_directory(self.checkpoints(agent_id, session_id) / target, "checkpoint")
+            self._require_managed_directory(self.current(agent_id, session_id), "session workspace")
+            if index.memory_version is not None:
+                version = index.checkpoints[target].get("memory_version") if restore_memory else index.memory_version
+                if version is None:
+                    raise WorkspaceError("checkpoint has no bound memory; select explicit files-only rollback")
+                self._read_memory_version(agent_id, session_id, version)
+            return target
+
     def rollback(
         self,
         agent_id: str,
@@ -970,6 +1027,7 @@ class WorkspaceStore:
         recovery_id: str | None = None,
         defer_cleanup: bool = False,
         restore_memory: bool = True,
+        before_change: Callable[[], None] | None = None,
     ) -> dict[str, Any]:
         if type(restore_memory) is not bool:
             raise WorkspaceError("restore_memory must be a boolean")
@@ -1057,6 +1115,8 @@ class WorkspaceStore:
                 transaction["recovery_id"] = recovery_id
             if memory_target is not None:
                 transaction.update(memory_target=memory_target, defer_cleanup=defer_cleanup)
+            if before_change is not None:
+                before_change()
             self._write_transaction(agent_id, session_id, transaction)
             try:
                 self.backend.snapshot(source, restored, readonly=False)
@@ -1310,6 +1370,7 @@ class WorkspaceStore:
         *,
         origin: str = "unknown",
         force: bool = False,
+        before_change: Callable[[], None] | None = None,
     ) -> dict[str, Any]:
         checkpoint_id = validate_id("checkpoint", checkpoint_id)
         with self._session_lock(agent_id, session_id):
@@ -1327,6 +1388,8 @@ class WorkspaceStore:
             if not target.exists():
                 raise WorkspaceError(f"checkpoint does not exist: {checkpoint_id}")
             self._require_managed_directory(target, "checkpoint")
+            if before_change is not None:
+                before_change()
             self.backend.delete_subvolume(target)
             index.remove(checkpoint_id)
             self._save_index(agent_id, session_id, index)

@@ -23,12 +23,66 @@ class FakeProcessService:
         self.fences = []
 
     @contextmanager
-    def session_launch_fence(self, agent_id, session_id, *, terminate, reason):
+    def session_launch_fence(self, agent_id, session_id, *, terminate, reason, before_terminate=None):
         self.fences.append((agent_id, session_id, terminate, reason))
         yield ["run-1"]
 
     def close(self):
         pass
+
+
+def test_invalid_reset_token_is_rejected_before_entering_kill_fence():
+    processes = FakeProcessService()
+    service = WorkspaceService(MagicMock(), process_audit_root=Path("/audit"),
+                               kill_session_processes_on_rollback=True,
+                               process_service_factory=lambda *args, **kwargs: processes)
+    with pytest.raises(WorkspaceError, match="invalid runtime reset token"):
+        service.dispatch("session.rollback_after_runtime_reset", {
+            "agent_id": "a", "session_id": "s", "checkpoint_id": "c0",
+            "reset_token": "invalid", "kill_processes": True,
+        })
+    assert processes.fences == []
+
+
+def test_reset_reservation_cannot_be_completed_or_reentered_during_rollback():
+    registry = ExecutionRegistry()
+    token = registry.begin_runtime_reset("a", "s")["reset_token"]
+    with registry.reset_mutation(token, "a", "s"):
+        with pytest.raises(WorkspaceError, match="in use"):
+            registry.complete_runtime_reset(token, success=True)
+        with pytest.raises(WorkspaceError, match="active rollback"):
+            with registry.reset_mutation(token, "a", "s"):
+                pass
+    assert registry.complete_runtime_reset(token, success=True)["completed"]
+
+
+@pytest.mark.parametrize("params", [{"checkpoint_id": "missing"}, {"scrub_runtime": "invalid"},
+                                   {"restore_memory": "invalid"}])
+def test_preflight_rejects_invalid_target_before_killing(tmp_path, params):
+    from test_recovery_checks import Backend
+
+    from allox.workspace.store import WorkspaceStore
+
+    class CheckedProcesses(FakeProcessService):
+        @contextmanager
+        def session_launch_fence(self, agent_id, session_id, *, terminate, reason, before_terminate=None):
+            if before_terminate is not None:
+                before_terminate()
+            self.fences.append((agent_id, session_id, terminate, reason))
+            yield ["run"]
+
+    store = WorkspaceStore(tmp_path, Backend())
+    store.initialize()
+    store.create_session("a", "s")
+    store.create_checkpoint("a", "s", "c0")
+    processes = CheckedProcesses()
+    service = WorkspaceService(store, process_audit_root=tmp_path / "audit",
+                               kill_session_processes_on_rollback=True,
+                               process_service_factory=lambda *args, **kwargs: processes)
+    with pytest.raises(WorkspaceError):
+        service.dispatch("session.rollback", {"agent_id": "a", "session_id": "s", "checkpoint_id": "c0",
+                                               "kill_processes": True, **params})
+    assert processes.fences == []
 
 
 @pytest.mark.parametrize("argv_params", [{}, {"argv": None}, {"argv": "echo hello"}, {"argv": 1}])

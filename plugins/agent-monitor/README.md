@@ -152,6 +152,76 @@ Core process span、trace、turn 和语义路径。可信变量覆盖调用者�
 这是显式 semantic_path 的火焰图输入，不是自动语义识别或 pprof protobuf。缺失 token usage、
 未结束 span、不足以计算 self time 的时钟关系会报告 skipped/incomplete，不补零。
 
+### 可选 collector 异步批量落盘
+
+daemon 增加 `--monitor-async-write`（须同时启用 `--monitor-root`），SDK 显式选用：
+
+```python
+from allox_agent_monitor import Tracer
+from allox_agent_monitor.transport import SessionQueueTransport
+
+with Tracer(SessionQueueTransport(), delivery="queued", batch_size=32,
+            strict=True) as tracer:
+    with tracer.span("action", "turn"):
+        tracer.call_tool("work", process)
+```
+
+这与 `background` 不同：旧模式在 SDK 后台逐批等待 FULL ACK；新模式由 collector
+先返回 `accepted=true,durable=false` 的入队回执，再把**同一 Agent/Session/source/run**
+的多个批次合并成一个 FULL 事务。SDK 不再增加发送线程，单次请求仍有 socket/入队成本。
+不同 channel 不共用事务，一个 channel 的非法事件不会回滚另一 Session 的数据。
+默认同步路径、Core process 记录和 system-effects/恢复安全日志均未改为异步。
+
+回执绑定 collector 实例、channel 随机 ID 和序号；只有 `flush` 返回匹配的 durable watermark
+后，SDK 才增加 acknowledged。重启、错误回执、失败提交、超时均不能变为成功 ACK，也不重试
+不确定投递。`health()` 中 enqueued 不等于 acknowledged；失败后流保持 incomplete。
+`run/turn` 结束、parent context 导出、`tracer.checkpoint` 和正常退出均等待落盘；
+collector 在 Session execution 结束时封闭该 run 入队并排空，在 Core mutation hook 和
+trace/profile/export 查询前也排空已接收的对应 Session 数据。**这不能排空其他进程尚未发送的 SDK 缓冲**。
+
+collector 默认最多 4096 个在途事件/8 MiB 编码数据、单 channel 1024 事件、1024 channel；
+满队列背压，5 秒仍不能接纳则拒绝。channel 元数据保留到 collector 关闭，达到数量上限会明确拒绝，
+不是无限长运行保证。worker 最长等待 20ms 尝试合并，单事务最多 512 事件/1 MiB；
+慢盘和调度可能延后提交，20ms **不是持久化时限**。这些是数据容量限制，不是进程 RSS 限制。
+SDK 本地仍最多 64 事件/64 KiB，按 batch_size 或显式边界发送，没有本地计时器；
+`queue_capacity/queue_bytes/flush_interval/export_timeout` 是旧 background 模式参数，不控制 queued collector。
+
+异步队列在内存中：SIGKILL/断电可能丢失**所有尚未取得 durable 回执的尾部**，不能把它用于要求逐条
+崩溃证据的审计。旧回执不能跨 collector 重启复用。频繁每 action 强制 flush 时合并空间很小，
+不承诺比严格批量模式更快。性能须包含最后一次 flush，不能只报前台返回速度。
+
+### 可选多 action / 时间窗口策略
+
+在 queued 模式上显式增加以下参数，放宽**普通 profiling** 的逐 turn 持久化要求：
+
+```python
+with Tracer(SessionQueueTransport(), delivery="queued", batch_size=32,
+            action_batch_size=8, action_flush_interval=0.05,
+            strict=True) as tracer:
+    for item in work_items:
+        with tracer.span("action", "turn"):
+            tracer.call_tool("work", process, item)
+```
+
+- 默认仍不启用此策略。开启后，`turn` span 结束只报告一个完成的 action，不等待磁盘。
+  子 tool/phase 不重复计数；没有 turn span 的适配器可显式调用 `tracer.action_finished()`，不要两处都调用。
+- 每个 Tracer 累计 8 个尚未确认的完成 action，**或最早未确认事件等待到 50ms**，先到即通知后台提交。
+  定时器不依赖下一次 action，不被持续的新事件无限重置；一个长 action 中的事件也可定时落盘。
+- 专用后台 worker 执行入队与 FULL flush，不持有生产者/health 的锁等待磁盘。
+  本地队列沿用 `queue_capacity/queue_bytes/export_timeout`，容量计入排队及在途数据；满时背压并提前请求提交。
+  wire batch 上限和 collector 自己的计时器也可能让数据更早提交，因此“8/50ms”是触发策略，不是每批恰好 8 个 action。
+- `tracer.flush()/barrier()`、`tracer.checkpoint(...)`、parent context 导出、run span 结束、正常 close
+  都覆盖此策略并等待 FULL durable ACK。collector 的 mutation/export/execution-end 屏障保持不变，
+  **仍只能排空其已接收的记录**；外部管理调用不能读取另一个进程尚未发送的 SDK 缓冲。
+- `health()` 增加 completed_actions/durable_actions、action_batch_size、action_flush_interval、
+  flush_requests 和 worker 状态；只有已收到持久化回执才增加 acknowledged，失败保持 incomplete。
+  50ms 是尝试开始提交的等待窗口，**不是实际持久化时限或最大崩溃丢失窗口**。
+- 如果每个 action 内仍调用 checkpoint/context/barrier，仍然会每次 flush，无法靠这个选项合并。
+  此策略不合并 workspace checkpoint，也不改变 system-effects/恢复安全日志。
+
+这明确改变了监控持久化语义：允许多个 action 的记录尚未落盘。进程或 collector 崩溃可能丢失尾部，
+不能用速度改善声称与“每 action 都已持久化”的原模式有相同崩溃保证。
+
 ## 可信度与尚未完成的部分
 
 - 框架记录标为 `framework-sdk`，执行器记录标为 `allox-executor`。前者不是内核证据。
@@ -171,10 +241,13 @@ Core process span、trace、turn 和语义路径。可信变量覆盖调用者�
 - 服务端指标按 [vLLM v0.25 文档](https://docs.vllm.ai/en/v0.25.0/features/per_request_metrics/)
   读取 queue、TTFT、generation；generation 是 decode，不包含 prefill。
   流式 wrapper 自动处理收到的最终 usage/metrics chunk；服务端不返回则仍未知。
-- SQLite 是同步有界事件写入，不宣称零开销。发送失败在 SDK health 暴露；collector
+- SQLite 提交仍是 WAL/FULL；默认同步有界写入，可显式开启上述异步队列，不宣称零开销。发送失败在 SDK health 暴露；collector
   不知道从未发送的事件，因此 loss rate 是 unknown 而非 0。
-  首轮 117 的毫秒级合成负载已暴露 FULL 同步落盘的高延迟，下一步需要批处理/异步
-  exporter，并明确崩溃丢失边界；本版不应直接作为低开销生产采集器。
+  首轮 117 的毫秒级合成负载已暴露 FULL 同步落盘的高延迟；批处理/异步队列不能消除
+  必须的持久化边界，本版不应直接作为低开销生产采集器。
+  批量入口现已复用整个 envelope 的有限 JSON/64 KiB 编码校验，避免再序列化每条
+  event；仍逐字段检查，并保留 FULL 提交与 durable ACK。该优化不消除物理盘提交
+  延迟，也没有通过换用 tmpfs、降低同步级别或遗漏最终 flush 来制造低开销结果。
 - 正文默认仅长度和 hash；显式 capture 会按常见键脱敏，但无法保证自由文本没有秘密。
   当前无自动语义任务识别，semantic_path 由框架显式提供。
 - 可观测性失败：SDK 默认 best-effort，`strict=True` 失败即抛错。Core hooks 则 fail-closed，
@@ -183,6 +256,14 @@ Core process span、trace、turn 和语义路径。可信变量覆盖调用者�
   overhead/事件丢失实验，也不涉及 rollback/权限策略改动。
 
 ## 验证
+
+多 action / 时间窗口策略见 [2026-11-12 后续实测](../../docs/development/monitor-actions-20261112.md)：
+8 action / 50ms 策略的总耗时中位数从逐 action background 的 1316ms 降至 221ms，
+但允许未落盘尾部跨 action 存在，不具有原逐 action 模式的相同崩溃保证；默认不启用。
+
+collector 异步批量落盘的四场景、各 10 组结果见
+[2026-11-12 实测](../../docs/development/monitor-async-20261112.md)：连续调用的总耗时中位数降低约 30%–35%，
+但每 action 一个持久化边界的 socket 场景反而变慢约 20%；因此保持可选，不能宣称普遍加速。
 
 合并 system-effects main 后的真实 Kata、Codex/Qwen、跨 Session 身份与开销结果见
 [2026-10-30 集成实测](../../docs/development/agent-monitoring-integration-test-20261030.md)。

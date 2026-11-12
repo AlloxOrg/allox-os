@@ -31,6 +31,45 @@ from allox.workspace.daemon import WorkspaceService
 from allox.workspace.store import WorkspaceError, WorkspaceStore
 
 
+def test_orphan_cgroup_drains_even_without_in_memory_runs():
+    service = object.__new__(ProcessTrackingService)
+    service._lock = threading.RLock()
+    service._launch_lock = threading.RLock()
+    service._runs = {}
+    calls, populated = [], [True]
+
+    def kill(*args):
+        calls.append("kill")
+        populated[0] = False
+
+    service.cgroups = SimpleNamespace(populated=lambda *args: populated[0], kill=kill,
+                                     wait_empty=lambda *args: not populated[0])
+    with service.session_launch_fence("a", "s", terminate=True,
+                                      before_terminate=lambda: calls.append("fence")) as stopped:
+        assert stopped == [] and not populated[0]
+    assert calls == ["fence", "kill"]
+
+
+def test_rejected_preflight_never_signals_orphans():
+    service = object.__new__(ProcessTrackingService)
+    service._lock = threading.RLock()
+    service._launch_lock = threading.RLock()
+    service._runs = {}
+    calls = []
+    service.cgroups = SimpleNamespace(populated=lambda *args: True,
+                                     kill=lambda *args: calls.append("kill"))
+
+    def reject():
+        raise WorkspaceError("invalid request")
+
+    try:
+        with service.session_launch_fence("a", "s", terminate=True, before_terminate=reject):
+            raise AssertionError("rejected request entered mutation")
+    except WorkspaceError:
+        pass
+    assert not calls
+
+
 class DirectoryBackend:
     def assert_root(self, root):
         pass

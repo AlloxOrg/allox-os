@@ -98,6 +98,46 @@ def test_join_pagination_and_read_only_live_wal(records):
     assert before == {p: p.read_bytes() for p in before}
 
 
+def test_cached_pages_rehash_and_detect_same_size_tampering(records):
+    traces, audit, _ = records
+    instance = Correlator(traces, audit)
+    first = instance.run("a", "s", "run-1", limit=1)
+    assert first["event_count"] == 3
+    second = instance.run("a", "s", "run-1", offset=1, limit=1)
+    assert second["events"][0]["event_index"] == 1
+    stream = audit / "run-1/system-effects/system-effects.jsonl"
+    data = stream.read_bytes()
+    before = stream.stat()
+    changed = data.replace(b'"pid": 42', b'"pid": 43')
+    assert changed != data and len(changed) == len(data)
+    stream.write_bytes(changed)
+    os.utime(stream, ns=(before.st_atime_ns, before.st_mtime_ns))
+    with pytest.raises(WorkspaceError, match="digest"):
+        instance.run("a", "s", "run-1", limit=1)
+
+
+def test_cached_pages_only_reparse_selected_events(records, monkeypatch):
+    traces, audit, _ = records
+    instance = Correlator(traces, audit)
+    instance.run("a", "s", "run-1", limit=1)
+    calls = []
+    original = instance.index._event
+
+    def counted(raw, run):
+        calls.append(raw)
+        return original(raw, run)
+
+    monkeypatch.setattr(instance.index, "_event", counted)
+    assert len(instance.run("a", "s", "run-1", limit=1)["events"]) == 1
+    assert len(calls) == 1
+
+
+def test_large_stream_fallback_keeps_integrity(records, monkeypatch):
+    import allox_trace_correlation.stream as stream_module
+    monkeypatch.setattr(stream_module, "MAX_BUFFER", 1)
+    assert query(records)["event_count"] == 3
+
+
 def test_multiple_turns_stay_ambiguous(records):
     bind_span(records[2], span="sdk", kind="tool", turn="turn-2")
     result = query(records)

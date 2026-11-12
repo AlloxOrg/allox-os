@@ -119,6 +119,7 @@ class WorkspaceFeatureContext:
     store: Any
     executions: Any
     cgroups: Any
+    management_mutation_abi: int = 1
 
 
 class WorkspaceFeature(Protocol):
@@ -392,6 +393,13 @@ class FeatureManager:
             if wrapper is not None:
                 operation = partial(wrapper, action, params, operation)
         return operation()
+
+    def mutation_started(self, action: str, params: dict[str, Any]) -> None:
+        """Persist optional fences immediately before an actual destructive change."""
+        for feature in self._features:
+            callback = getattr(feature, "mutation_started", None)
+            if callback is not None:
+                callback(action, params)
 
     def execution_started(self, row: dict) -> None:
         """Optional observational hooks; no installed plugin means no extra work."""

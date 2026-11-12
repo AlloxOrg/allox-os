@@ -204,6 +204,7 @@ class ProcessTrackingService:
         *,
         terminate: bool,
         reason: str = "rollback",
+        before_terminate=None,
     ):
         """Block launches and optionally drain one Session before mutation."""
         validate_id("agent", agent_id)
@@ -219,8 +220,17 @@ class ProcessTrackingService:
                         and (run["row"]["agent_id"], run["row"]["session_id"])
                         == (agent_id, session_id)
                     ]
+                if (run_ids or self.cgroups.populated(agent_id, session_id)) and before_terminate is not None:
+                    before_terminate()
                 for run_id in run_ids:
                     self._terminate_locked(run_id, reason)
+                # A restarted daemon may have no in-memory run handles for
+                # surviving descendants. Exact cgroup membership, not a run
+                # cache, is the authority for termination and quiescence.
+                if self.cgroups.populated(agent_id, session_id):
+                    self.cgroups.kill(agent_id, session_id)
+                    if not self.cgroups.wait_empty(agent_id, session_id, 10):
+                        raise WorkspaceError("Session orphan cgroup did not drain; rollback remains fenced")
                 for run_id in run_ids:
                     if not self._runs[run_id]["done"].wait(10):
                         raise WorkspaceError(

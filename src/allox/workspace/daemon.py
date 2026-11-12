@@ -8,7 +8,7 @@ import secrets
 import threading
 import uuid
 from collections.abc import Callable, Iterator
-from contextlib import contextmanager, nullcontext
+from contextlib import AbstractContextManager, contextmanager, nullcontext
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -31,6 +31,7 @@ class ExecutionRegistry:
         self._mutating: set[tuple[str, str]] = set()
         self._background: dict[tuple[str, str], dict[str, dict[str, str]]] = {}
         self._resets: dict[str, tuple[str, str]] = {}
+        self._active_resets: set[str] = set()
         self._share_readers: dict[tuple[str, str], int] = {}
         self._admission_guard = admission_guard
 
@@ -111,6 +112,8 @@ class ExecutionRegistry:
 
     def complete_runtime_reset(self, token: str, *, success: bool) -> dict[str, Any]:
         with self._lock:
+            if token in self._active_resets:
+                raise WorkspaceError("runtime reset is in use by an active rollback")
             key = self._resets.pop(token, None)
             if key is None:
                 raise WorkspaceError("unknown runtime reset token")
@@ -119,6 +122,18 @@ class ExecutionRegistry:
             self._mutating.discard(key)
         return {"completed": True, "success": success}
 
+    def validate_termination(self, agent_id, session_id, *, reset_token=None):
+        key = (validate_id("agent", agent_id), validate_id("session", session_id))
+        with self._lock:
+            self._require_ready(key)
+            if self._share_readers.get(key):
+                raise WorkspaceError("session has active share reads")
+            active_reset = reset_token in self._active_resets and self._resets.get(reset_token) == key
+            if key in self._mutating and not active_reset:
+                raise WorkspaceError("session mutation already in progress")
+            if self._background.get(key) and not active_reset:
+                raise WorkspaceError("session has persistent runtime executions; use runtime reset first")
+
     @contextmanager
     def reset_mutation(self, token: str, agent_id: str, session_id: str) -> Iterator[None]:
         key = (validate_id("agent", agent_id), validate_id("session", session_id))
@@ -126,7 +141,14 @@ class ExecutionRegistry:
             self._require_ready(key)
             if self._resets.get(token) != key or key not in self._mutating:
                 raise WorkspaceError("invalid runtime reset token for session")
-        yield
+            if token in self._active_resets:
+                raise WorkspaceError("runtime reset already has an active rollback")
+            self._active_resets.add(token)
+        try:
+            yield
+        finally:
+            with self._lock:
+                self._active_resets.discard(token)
 
     @contextmanager
     def mutation(self, agent_id: str, session_id: str) -> Iterator[None]:
@@ -195,6 +217,7 @@ class WorkspaceService:
         network_root: Path = Path("/run/allox-network"),
         network_socket_root: Path = Path("/dev/shm/allox-network"),
         monitor_root: Path | None = None,
+        monitor_async_write: bool = False,
         monitor_socket_root: Path = Path("/dev/shm/allox-monitor"),
         session_memory: bool = False,
         correlation_config: dict[str, Any] | None = None,
@@ -220,9 +243,12 @@ class WorkspaceService:
             raise WorkspaceError("kill_session_processes_on_rollback must be a boolean")
         self.kill_session_processes_on_rollback = kill_session_processes_on_rollback
         feature_specs = []
+        if monitor_async_write and monitor_root is None:
+            raise WorkspaceError('monitor_async_write requires monitor_root')
         if monitor_root is not None:
             feature_specs.append(("agent-monitor", {
                 "root": monitor_root, "socket_root": monitor_socket_root,
+                "async_write": monitor_async_write,
             }))
         if share_tools:
             feature_specs.append(("session-share", {"socket_root": share_socket_root}))
@@ -468,6 +494,7 @@ class WorkspaceService:
             agent_id = self._required(params, "agent_id")
             session_id = self._required(params, "session_id")
             reset_token = params.get("reset_token")
+            mutation: AbstractContextManager[Any]
             if action == "session.rollback_after_runtime_reset":
                 if not isinstance(reset_token, str):
                     raise WorkspaceError("rollback after runtime reset requires reset_token")
@@ -477,15 +504,46 @@ class WorkspaceService:
             terminate = action.startswith("session.rollback") and self._boolean(
                 params, "kill_processes", self.kill_session_processes_on_rollback
             )
+            # Enter a token-bound reservation BEFORE any kill. It stays pinned
+            # until rollback completes, so another request cannot complete/reset it.
+            reset_scope = mutation if action == "session.rollback_after_runtime_reset" else nullcontext()
+            if action == "session.rollback_after_runtime_reset":
+                mutation = nullcontext()
+            def before_change():
+                if self.features is not None:
+                    self.features.mutation_started(action, params)
+
+            mutation_options: dict[str, Any] = (
+                {"before_change": before_change} if self.features is not None else {}
+            )
+
+            def before_terminate():
+                self.executions.validate_termination(
+                    agent_id, session_id,
+                    reset_token=reset_token if action == "session.rollback_after_runtime_reset" else None,
+                )
+                checkpoint = params.get("checkpoint_id")
+                if checkpoint is not None and not isinstance(checkpoint, str):
+                    raise WorkspaceError("checkpoint_id must be a string")
+                ancestors = params.get("num_ancestors")
+                if ancestors is not None and type(ancestors) is not int:
+                    raise WorkspaceError("num_ancestors must be an integer")
+                self._boolean(params, "scrub_runtime", True)
+                self.store.validate_rollback_target(
+                    agent_id, session_id, checkpoint,
+                    num_ancestors=ancestors, restore_memory=self._boolean(params, "restore_memory", True),
+                )
+                before_change()
             if terminate:
                 if self.processes is None:
                     raise WorkspaceError("kill_processes requires process tracking")
                 launch_fence = self.processes.session_launch_fence(
-                    agent_id, session_id, terminate=True, reason="rollback"
+                    agent_id, session_id, terminate=True, reason="rollback",
+                    before_terminate=before_terminate,
                 )
             else:
                 launch_fence = nullcontext([])
-            with launch_fence as stopped, mutation:
+            with reset_scope, launch_fence as stopped, mutation:
                 if action == "checkpoint.create":
                     checkpoint_id = params.get("checkpoint_id")
                     if checkpoint_id is not None and not isinstance(checkpoint_id, str):
@@ -512,6 +570,7 @@ class WorkspaceService:
                         pinned=self._boolean(params, "pinned", False),
                         metadata=metadata,
                         **checkpoint_options,
+                        **mutation_options,
                     )
                 if action == "checkpoint.delete":
                     checkpoint_id = self._required(params, "checkpoint_id")
@@ -521,6 +580,7 @@ class WorkspaceService:
                         checkpoint_id,
                         origin=origin,
                         force=self._boolean(params, "force", False),
+                        **mutation_options,
                     )
                 checkpoint_id = params.get("checkpoint_id")
                 if checkpoint_id is not None and not isinstance(checkpoint_id, str):
@@ -542,6 +602,7 @@ class WorkspaceService:
                     scrub_runtime=self._boolean(params, "scrub_runtime", True),
                     origin=origin,
                     **memory_options,
+                    **mutation_options,
                 )
                 if terminate:
                     result["terminated_process_runs"] = stopped
@@ -632,6 +693,8 @@ def build_parser() -> argparse.ArgumentParser:
                         help="Enable read-only post-hoc correlation from existing trace storage")
     parser.add_argument("--monitor-root", type=Path, default=None,
                         help="Enable agent-monitor; durable traces outside workspace store")
+    parser.add_argument('--monitor-async-write', action='store_true',
+                        help='Opt-in bounded monitoring queue; only flush-confirmed events are durable')
     parser.add_argument("--recovery-checks-root", type=Path, default=None,
                         help="Enable bounded restore verification with durable external fences")
     parser.add_argument("--monitor-socket-root", type=Path, default=Path("/dev/shm/allox-monitor"),
@@ -920,6 +983,7 @@ def main(argv: list[str] | None = None) -> int:
         network_root=args.network_root,
         network_socket_root=args.network_socket_root,
         monitor_root=args.monitor_root,
+        monitor_async_write=args.monitor_async_write,
         monitor_socket_root=args.monitor_socket_root,
         session_memory=args.session_memory,
         correlation_config=correlation_config,

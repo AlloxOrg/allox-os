@@ -18,7 +18,9 @@ allox-workspace-daemon --root /srv/allox-workspaces \
 
 必须通过环境变量配置 `ALLOX_WORKSPACE_TOKEN`。证据目录必须位于 workspace
 存储外、不得暴露给 Agent，并与唯一的 workspace store 绑定。SQLite 使用
-WAL + synchronous=FULL；这里的持久性指 workspace 回退/daemon 重启，不是
+WAL + synchronous=FULL；同一 store 与 evidence root 均只允许一个活动恢复管理实例。
+第二实例会在 journal 恢复/插件启用前被拒绝，而不是依赖各自的内存禁令缓存。
+这里的持久性指 workspace 回退/daemon 重启，不是
 整个 VM snapshot 回退后的外部防回滚锚点。
 
 ## 提炼了什么
@@ -81,11 +83,21 @@ v1 不与 system-effects 的内部 A/B/C 自动回退同时启用，避免产生
   也不验证外部数据库/网络服务内容。语义安全只针对完整适配器契约下的已记录 effects。
 - 文件断言 no-follow、按目录 FD 访问；软链接只比较目标字符串，不读取它指向的文件。
   每次扫描上限 10,000 条目、256 MiB、64 层；超过上限或不支持的设备节点不算通过。
+  通过每实例共享、最多 4 线程的池并行计算完整 SHA256；限制在途文件描述符，
+  异常时等待已提交任务关闭自己的 FD。没有以 mtime 或 inode 缓存替代内容校验。
+  新 checkpoint 基线只存一份文件树，旧格式仍可读；scrub 期望树按既有策略派生。
 - 每个 checkpoint 需读取文件树，每次回退需读取快照与恢复树，开销与数据量相关；
   **不是已证明低开销的常开监控功能**。
 
-fence 在调用 Core 前先落盘；异常或重启后保留。首次 checkpoint 在基线落盘前失败
-且没有任何旧基线时，Session 保持隔离，需管理员修复/重建；v1 不自动信任当前状态。
+临时 reservation 从预检开始阻止新执行。Core 完成只读校验后，必须在首次发信号、
+修改快照或写恢复日志之前通知插件持久化 fence；因此依赖 Core mutation boundary ABI 1。
+参数错误、重复 checkpoint、无效 reset token、已有 execution lease 等未开始改动的
+拒绝只释放临时 reservation，不误封禁。已经进入改动边界后的异常/重启仍保留 fence。
+reset token 在整个回退期间被 pin，不能并发 complete 或重入；残留但不在 run 缓存内的
+进程也必须按精确 Session cgroup 清理并确认排空。不同 Session 的长检查使用独立锁，
+SQLite FULL 提交仍在短共享锁内串行。前缀删除按 Core 返回的完整 ID 清理基线。
+首次 checkpoint 已开始修改、却在基线落盘前失败且没有旧基线时，Session 仍隔离，
+需管理员修复/重建；v1 不自动信任当前状态。
 直接调用 WorkspaceStore、禁用插件或修改证据库属于可信管理员绕过，不受本接口保护。
 
 ## 来源与实现边界
@@ -100,3 +112,43 @@ fence 在调用 Core 前先落盘；异常或重启后保留。首次 checkpoint
 本插件为独立编写的 Allox 实现，没有复制/打包上游代码。没有移植完整 causal
 pomset、fresh/alias 求解、Fork/Merge 安装器、provider gateway 或 Lean 证明，
 也不宣称继承其理论保证。归一化完整词检查与保守 effect frontier 是首个受限切片。
+
+## 2026-11-12 修复验证
+
+基于 `4ad25c6`，分支 `fix/recovery-safety-performance`。全部构建、测试与基准在
+117 `/data/hy/Allox/recovery-fixes-20261112` 执行，每次重读在线 CPU 并绑定末 24 核
+（本次 24–47），性能任务串行运行。338 测试通过、21 项环境相关跳过；Ruff 与
+Python 3.10/Linux Pyright standard 检查通过。Pyright 使用已有 Node 容器及显式
+typeshed 路径，没有禁用 TLS 或修改宿主机全局运行时。
+
+真实 Kata + Btrfs 上重跑原有故障用例：普通拒绝不再误封禁；无效 reset token
+不再杀 listener；不同 Session 的状态查询不等待另一 Session 的扫描；第二恢复
+实例被拒绝；前缀删除无残留基线。三轮文件/记忆联合恢复及故意记忆损坏后的
+禁令仍正确。额外用真实子进程模拟 run 表丢失：遗留 listener 被精确 cgroup 清理，
+另一 Session 进程存活。这不是一次完整的 daemon SIGKILL/重启实验。
+
+原负载各 10 组、轮换开关顺序，文件内容、权限、路径、软/硬链接及记忆的独立
+oracle 均通过。启用检查时的中位数，单位 ms：
+
+| 文件数 / 容量 | checkpoint 之前 → 修复后 | rollback 之前 → 修复后 |
+| --- | ---: | ---: |
+| 128 / 4 MiB | 33.87 → 22.61 | 57.21 → 42.16 |
+| 1024 / 4 MiB | 120.54 → 106.10 | 185.41 → 171.40 |
+| 128 / 32 MiB | 154.22 → 72.60 | 268.96 → 110.46 |
+| 1024 / 32 MiB | 259.60 → 127.91 | 401.43 → 221.67 |
+
+检查仍显著慢于不做检查。底层是 Guest tmpfs 上的 loop Btrfs、暖缓存，不代表
+物理盘性能；使用了最多 4 个 hash worker，不能当成单核 CPU 工作量减少。前后
+为同一共享主机的不同时段，未控制其他租户负载。没有新增真实 LLM/eBPF 采集。
+
+事后关联 fixture 在同一 Correlator 重复查询 1 万事件、每页 50 条的中位数约
+82.4 → 13.1 ms；首次查询仍需完整解析。SDK 只减少重复 JSON 编码，磁盘持久化
+瓶颈**没有解决**：相同微负载背景模式本轮约 203 → 225 ms/40 次小工具调用，
+同步模式约 241 → 241 ms，不能据此声称 SDK 端到端优化成功；所有事件仍已确认。
+
+[结构化对比与诊断](../../docs/development/evidence/recovery-fixes-20261112/fix-report.json)、
+[测试/构建/类型检查](../../docs/development/evidence/recovery-fixes-20261112/validation-complete.log)、
+[Guest 原始报告](../../docs/development/evidence/recovery-fixes-20261112/guest-3dx3ie8s/report.json)。
+复现入口在 `examples/recovery_fixes/`，依赖 117 上保留的基线 audit/Guest fixture，
+不是任意新服务器的一键安装器。故意注入延迟的锁测试只证明不串行等待，不能
+把其中 250 ms 当作生产环境每次请求的实际延迟。

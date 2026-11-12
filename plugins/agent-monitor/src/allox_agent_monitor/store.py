@@ -70,17 +70,18 @@ class TraceStore:
                 self.collector_ns += time.perf_counter_ns() - started
 
     def _ingest(self, agent: str, session: str, event: dict, source: str,
-                process_run_id: str | None) -> dict:
+                process_run_id: str | None, *, validated_batch: bool = False) -> dict:
         identifier(agent, "agent")
         identifier(session, "session")
         if not isinstance(event, dict):
             raise WorkspaceError("event must be an object")
-        try:
-            encoded = json.dumps(event, allow_nan=False)
-        except (TypeError, ValueError) as exc:
-            raise WorkspaceError("event must contain finite JSON data") from exc
-        if len(encoded.encode()) > 65536:
-            raise WorkspaceError("event exceeds 64 KiB")
+        if not validated_batch:
+            try:
+                encoded = json.dumps(event, allow_nan=False)
+            except (TypeError, ValueError) as exc:
+                raise WorkspaceError("event must contain finite JSON data") from exc
+            if len(encoded.encode()) > 65536:
+                raise WorkspaceError("event exceeds 64 KiB")
         trace = identifier(event.get("trace_id"), "trace")
         span = identifier(event.get("span_id"), "span")
         key = (agent, session, trace, span)
@@ -144,7 +145,10 @@ class TraceStore:
 
     def ingest_batch(self, agent, session, envelope, *, source="framework-sdk",
                      process_run_id=None):
-        started = time.perf_counter_ns()
+        return self.ingest_group([(agent, session, envelope, source, process_run_id)])
+
+    @staticmethod
+    def _batch_events(envelope):
         events = envelope.get("events")
         if set(envelope) != {"event", "events"} or not isinstance(events, list) or not 1 <= len(events) <= 64:
             raise WorkspaceError("batch requires 1..64 events")
@@ -156,18 +160,41 @@ class TraceStore:
             raise WorkspaceError("batch exceeds 64 KiB")
         if any(not isinstance(e, dict) or e.get("event") not in {"start", "end"} for e in events):
             raise WorkspaceError("batch contains an invalid event")
+        return events, len(encoded)
+
+    def ingest_group(self, requests):
+        """One FULL transaction for a bounded, ordered group from ONE channel.
+
+        Public envelope limits still apply independently. A malformed channel
+        cannot roll back another Session's transaction or get a partial ACK.
+        """
+        started = time.perf_counter_ns()
+        if not requests or len(requests) > 512:
+            raise WorkspaceError("invalid monitor commit group")
+        channel = (requests[0][0], requests[0][1], requests[0][3], requests[0][4])
+        validated, count, nbytes = [], 0, 0
+        for agent, session, envelope, source, run in requests:
+            if (agent, session, source, run) != channel:
+                raise WorkspaceError("monitor commit group crosses channel identity")
+            events, size = self._batch_events(envelope)
+            count += len(events)
+            nbytes += size
+            if count > 512 or nbytes > 1024 * 1024:
+                raise WorkspaceError("monitor commit group exceeds its bound")
+            validated.append((agent, session, events, source, run))
         with self._lock:
             accepted = self.accepted
             try:
                 self._batching = True
                 with self._db:
-                    for event in events:
-                        self._ingest(agent, session, event, source, process_run_id)
+                    for agent, session, events, source, run in validated:
+                        for event in events:
+                            self._ingest(agent, session, event, source, run, validated_batch=True)
                 self.transactions += 1
-                return {"accepted": True, "event_count": len(events), "durable": True}
+                return {"accepted": True, "event_count": count, "durable": True}
             except Exception:
                 self.accepted = accepted
-                self.rejected += len(events)
+                self.rejected += count
                 raise
             finally:
                 self._batching = False

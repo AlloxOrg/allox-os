@@ -13,6 +13,7 @@ from allox.workspace.store import WorkspaceError
 from allox_agent_monitor.clock import monotonic_domain
 from allox_agent_monitor.endpoint import SessionEndpoints
 from allox_agent_monitor.profile import profile
+from allox_agent_monitor.queued import QueuedTraceWriter
 from allox_agent_monitor.resources import delta, snapshot
 from allox_agent_monitor.store import TraceStore, identifier
 
@@ -44,6 +45,9 @@ class AgentMonitorFeature:
         if root == workspace or workspace in root.parents:
             raise WorkspaceError("monitor root must be outside workspace rollback storage")
         self.store = TraceStore(root)
+        if type(config.get('async_write', False)) is not bool:
+            raise WorkspaceError('async_write must be a boolean')
+        self.writer = QueuedTraceWriter(self.store) if config.get('async_write', False) else None
         self.cgroups = context.cgroups
         self.clock = monotonic_domain()
         self._runs: dict[str, dict] = {}
@@ -80,13 +84,23 @@ class AgentMonitorFeature:
 
     def dispatch(self, action: str, params: dict[str, Any]) -> Any:
         if action == "monitor.status":
-            return self.store.status()
+            result = self.store.status()
+            if self.writer:
+                result['write_queue'] = self.writer.status()
+                result['delivery'] = 'explicit-queued-or-synchronous; only flush confirms queued durability'
+            return result
         agent = identifier(params.get("agent_id"), "agent")
         session = identifier(params.get("session_id"), "session")
         if action == "monitor.ingest":
             event = params.get("event")
             event = validate_sdk_event(event)
+            if params.get('delivery') == 'queued':
+                return self._writer().submit(agent, session, event)
+            if self.writer:
+                self.writer.flush((agent, session, 'framework-sdk', None))
             return self.store.ingest(agent, session, event)
+        if action == 'monitor.flush':
+            return self._writer().flush((agent, session, 'framework-sdk', None), params.get('receipt'))
         sessions = params.get("session_ids", [session])
         if not isinstance(sessions, list) or not 0 < len(sessions) <= 100:
             raise WorkspaceError("session_ids must contain 1..100 Session IDs")
@@ -96,6 +110,8 @@ class AgentMonitorFeature:
             raise WorkspaceError("monitor.trace selects exactly one Session")
         rows = []
         for selected in sessions:
+            if self.writer:
+                self.writer.flush_session(agent, selected)
             rows.extend(self.store.spans(agent, selected, params.get("trace_id")))
             if len(rows) > self.store.max_spans:
                 raise WorkspaceError("query exceeds span limit; narrow selection")
@@ -123,7 +139,36 @@ class AgentMonitorFeature:
         if run_id != expected_run_id:
             raise WorkspaceError("process run changed while telemetry was pending")
         validate_sdk_event(event)
+        if self.writer:
+            self.writer.flush((*identity, 'session-sdk', run_id))
         return self.store.ingest(*identity, event, source="session-sdk", process_run_id=run_id)
+
+    def _writer(self):
+        if self.writer is None:
+            raise WorkspaceError('queued monitor persistence is not enabled')
+        return self.writer
+
+    def enqueue_session(self, identity, event, expected_run_id):
+        with self._run_lock:
+            if self.active_run_id(identity) != expected_run_id:
+                raise WorkspaceError('process run changed while telemetry was pending')
+            if self._runs[expected_run_id].get('closing'):
+                raise WorkspaceError('process run is closing')
+            validate_sdk_event(event)
+            return self._writer().submit(identity[0], identity[1], event,
+                source='session-sdk', process_run_id=expected_run_id)
+
+    def flush_session_receipt(self, identity, receipt, expected_run_id):
+        if self.active_run_id(identity) != expected_run_id:
+            raise WorkspaceError('process run changed while telemetry was pending')
+        if not isinstance(receipt, dict) or set(receipt) != {'collector_id', 'stream_id', 'sequence'}:
+            raise WorkspaceError('invalid durability receipt')
+        return self._writer().flush((*identity, 'session-sdk', expected_run_id), receipt)
+
+    def mutation_started(self, action, params):
+        # Called under Core's Session mutation/launch fence, before filesystem changes.
+        if self.writer:
+            self.writer.flush_session(params['agent_id'], params['session_id'])
 
     def execution_started(self, row: dict) -> None:
         """Called after attribution, before SIGCONT. No action can run before this ack."""
@@ -156,6 +201,9 @@ class AgentMonitorFeature:
     def execution_finished(self, row: dict) -> None:
         with self._run_lock:
             run = self._runs[row["run_id"]]
+            run['closing'] = True
+            if self.writer:
+                self.writer.flush((row['agent_id'], row['session_id'], 'session-sdk', row['run_id']), seal=True)
         metrics = delta(run["before"], snapshot(run["path"]))
         self.store.ingest(row["agent_id"], row["session_id"], {
             "event": "end", "trace_id": run["trace"], "span_id": run["span"],
@@ -174,4 +222,6 @@ class AgentMonitorFeature:
 
     def close(self) -> None:
         self._endpoints.close()
+        if self.writer:
+            self.writer.close()
         self.store.close()
