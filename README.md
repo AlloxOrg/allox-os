@@ -241,6 +241,10 @@ turn 后创建 checkpoint；该策略必须可按 Agent 或 Session 关闭。
 
 ## 开发
 
+可选的 [恢复一致性检查插件](plugins/recovery-checks/README.md) 提供
+checkpoint 绑定断言、回退前副作用准入与恢复后文件/记忆/运行时清理检查。
+通过 `--recovery-checks-root` 显式开启；证据不足或检查失败时保留 Session 执行禁令。
+
 ```bash
 uv sync --locked --group dev
 uv run pytest -q

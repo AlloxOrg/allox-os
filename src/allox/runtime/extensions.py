@@ -6,6 +6,7 @@ import threading
 from collections.abc import Callable, Mapping
 from contextlib import suppress
 from dataclasses import dataclass, field
+from functools import partial
 from importlib.metadata import entry_points
 from pathlib import Path, PurePosixPath
 from typing import Any, Protocol
@@ -377,6 +378,20 @@ class FeatureManager:
 
     def handles(self, action: str) -> bool:
         return any(action.startswith(prefix) for prefix in self._routes)
+
+    def assert_session_ready(self, agent_id: str, session_id: str) -> None:
+        for feature in self._features:
+            callback = getattr(feature, "assert_session_ready", None)
+            if callback is not None:
+                callback(agent_id, session_id)
+
+    def management_mutation(self, action, params, operation):
+        """Optional trusted wrappers; disabled plugins leave the fast path unchanged."""
+        for feature in reversed(self._features):
+            wrapper = getattr(feature, "management_mutation", None)
+            if wrapper is not None:
+                operation = partial(wrapper, action, params, operation)
+        return operation()
 
     def execution_started(self, row: dict) -> None:
         """Optional observational hooks; no installed plugin means no extra work."""

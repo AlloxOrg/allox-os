@@ -13,3 +13,4 @@
 - [进程追踪](development/process-tracking.md)
 - [Session 文件共享](development/session-sharing.md)
 - [Session 网络隔离](development/session-networking.md)
+- [可选恢复一致性检查及验证](development/recovery-checks-validation-20261112.md)

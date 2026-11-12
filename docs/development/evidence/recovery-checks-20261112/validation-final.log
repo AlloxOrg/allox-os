@@ -1,0 +1,51 @@
+AFFINITY [24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47] COMMAND ['/data/hy/Allox/agent-monitoring-main-20261030-v2/.validation-venv/bin/ruff', 'check', '--select', 'E4,E7,E9,F,I', 'src/allox/runtime/extensions.py', 'src/allox/workspace/daemon.py', 'plugins/recovery-checks', 'tests/test_recovery_checks.py']
+All checks passed!
+AFFINITY [24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47] COMMAND ['/data/hy/Allox/agent-monitoring-main-20261030-v2/.validation-venv/bin/python', '-m', 'pytest', '-q', '--maxfail=3', 'tests/test_recovery_checks.py']
+...........................                                              [100%]
+27 passed in 8.37s
+AFFINITY [24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47] COMMAND ['/data/hy/Allox/agent-monitoring-main-20261030-v2/.validation-venv/bin/python', '-m', 'pytest', '-q', 'tests', 'plugins/system-effects/tests']
+........................................................................ [ 21%]
+............................ssssss..............s..s.......s.sssssssss.. [ 42%]
+............................................s..............ss........... [ 63%]
+........................................................................ [ 84%]
+....................................................                     [100%]
+319 passed, 21 skipped in 41.68s
+PYRIGHT_NOT_RUN: no host Node.js; do not download or weaken TLS verification
+AFFINITY [24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47] COMMAND ['/data/hy/Allox/agent-monitoring-main-20261030-v2/.validation-venv/bin/python', '-m', 'pip', 'wheel', '--no-deps', '--no-build-isolation', '--wheel-dir', '/data/hy/Allox/recovery-checks-20261112/wheels', '.', './plugins/recovery-checks']
+Processing ./.
+  Preparing metadata (pyproject.toml): started
+  Preparing metadata (pyproject.toml): finished with status 'done'
+Processing ./plugins/recovery-checks
+  Preparing metadata (pyproject.toml): started
+  Preparing metadata (pyproject.toml): finished with status 'done'
+Building wheels for collected packages: allox-os, allox-recovery-checks
+  Building wheel for allox-os (pyproject.toml): started
+  Building wheel for allox-os (pyproject.toml): finished with status 'done'
+  Created wheel for allox-os: filename=allox_os-0.1.0-py3-none-any.whl size=57574 sha256=8473cafd9b7beb8ab79d97402c94515c7fa2448cf02195e5f7394bb5cf660357
+  Stored in directory: /tmp/pip-ephem-wheel-cache-0nnv8qu5/wheels/09/53/8c/6b8a2754f6ca9daf3b34a51127cba7d6d2e1471907c7a7c7c3
+  Building wheel for allox-recovery-checks (pyproject.toml): started
+  Building wheel for allox-recovery-checks (pyproject.toml): finished with status 'done'
+  Created wheel for allox-recovery-checks: filename=allox_recovery_checks-0.1.0-py3-none-any.whl size=9182 sha256=44710bda9dc8ffb4b57e9e9a20ac2025e475e2e632b2db207aaeb4763ff10752
+  Stored in directory: /tmp/pip-ephem-wheel-cache-0nnv8qu5/wheels/7a/50/66/a1679d058a720ff535bd424ba310a2c5ab179196465fac9725
+Successfully built allox-os allox-recovery-checks
+
+[notice] A new release of pip is available: 26.2.2 -> 26.3
+[notice] To update, run: /data/hy/Allox/agent-monitoring-main-20261030-v2/.validation-venv/bin/python -m pip install --upgrade pip
+AFFINITY [24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47] COMMAND ['/data/hy/Allox/agent-monitoring-main-20261030-v2/.validation-venv/bin/python', '-m', 'venv', '/data/hy/Allox/recovery-checks-20261112/package-env']
+AFFINITY [24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47] COMMAND ['/data/hy/Allox/recovery-checks-20261112/package-env/bin/python', '-m', 'pip', 'install', '--no-deps', '--force-reinstall', '/data/hy/Allox/recovery-checks-20261112/wheels/allox_os-0.1.0-py3-none-any.whl', '/data/hy/Allox/recovery-checks-20261112/wheels/allox_recovery_checks-0.1.0-py3-none-any.whl']
+Processing /data/hy/Allox/recovery-checks-20261112/wheels/allox_os-0.1.0-py3-none-any.whl
+Processing /data/hy/Allox/recovery-checks-20261112/wheels/allox_recovery_checks-0.1.0-py3-none-any.whl
+Installing collected packages: allox-recovery-checks, allox-os
+  Attempting uninstall: allox-recovery-checks
+    Found existing installation: allox-recovery-checks 0.1.0
+    Uninstalling allox-recovery-checks-0.1.0:
+      Successfully uninstalled allox-recovery-checks-0.1.0
+  Attempting uninstall: allox-os
+    Found existing installation: allox-os 0.1.0
+    Uninstalling allox-os-0.1.0:
+      Successfully uninstalled allox-os-0.1.0
+Successfully installed allox-os-0.1.0 allox-recovery-checks-0.1.0
+WARNING: You are using pip version 21.2.4; however, version 26.3 is available.
+You should consider upgrading via the '/data/hy/Allox/recovery-checks-20261112/package-env/bin/python -m pip install --upgrade pip' command.
+AFFINITY [24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47] COMMAND ['/data/hy/Allox/recovery-checks-20261112/package-env/bin/python', '/data/hy/Allox/recovery-checks-20261112/source/examples/recovery_checks/package_smoke.py']
+{"collector_dependencies": false, "entrypoint": "recovery-checks", "isolated_wheel_install": true, "result": {"admitted": true, "authorizes_effects": false, "descending_chain": [1], "pruning_causes": [], "scope": "DECLARED_FINITE_WORD_MODEL_ONLY", "survivors": [{"outcome": 0, "trace": ["safe"]}]}}

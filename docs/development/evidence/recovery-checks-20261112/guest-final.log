@@ -1,0 +1,57 @@
+	btrfs
+WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.
+btrfs-progs v4.9.1
+See http://btrfs.wiki.kernel.org for more information.
+
+Label:              allox-recovery
+UUID:               a446faf2-d583-4dbb-9da9-7c28673ab879
+Node size:          16384
+Sector size:        4096
+Filesystem size:    512.00MiB
+Block group profiles:
+  Data:             single            8.00MiB
+  Metadata:         single            8.00MiB
+  System:           single            4.00MiB
+SSD detected:       no
+Incompat features:  extref, skinny-metadata
+Number of devices:  1
+Devices:
+   ID        SIZE  PATH
+    1   512.00MiB  /dev/shm/recovery-btrfs.img
+
+PASS real Btrfs
+Create subvolume '/dev/shm/recovery-btrfs/agents/agent/workspace/sessions/target/current'
+Create subvolume '/dev/shm/recovery-btrfs/agents/agent/workspace/sessions/control/current'
+PASS automatic post-restore assertions
+PASS discarded listener pidfd exited
+PASS target cgroup empty
+PASS discarded socket removed
+PASS old /tmp listener unreachable
+PASS file and memory same c0
+PASS control session listener unaffected
+PASS automatic post-restore assertions
+PASS discarded listener pidfd exited
+PASS target cgroup empty
+PASS discarded socket removed
+PASS old /tmp listener unreachable
+PASS file and memory same c0
+PASS control session listener unaffected
+PASS automatic post-restore assertions
+PASS discarded listener pidfd exited
+PASS target cgroup empty
+PASS discarded socket removed
+PASS old /tmp listener unreachable
+PASS file and memory same c0
+PASS control session listener unaffected
+PASS injected memory divergence rejected
+PASS file success does not hide memory mismatch
+PASS failed restore cannot continue executing
+PASS control survives failed verification
+PASS verified retry clears fence
+PASS semantic rollback violation detected
+PASS rejected rollback neither killed listener nor erased external effect
+PASS control survives rejected rollback
+PASS prefix-robust model rejects unsafe common prefix
+ALLOX_RECOVERY_REPORT {"passed": true, "repetitions": 3, "reports": [{"schema": "allox.recovery-checks/v1", "agent_id": "agent", "session_id": "target", "checkpoint_id": "c0", "status": "CONSISTENT_WITHIN_SCOPE", "checks": {"checkpoint_binding": {"status": "CONSISTENT_WITHIN_SCOPE"}, "filesystem": {"status": "CONSISTENT_WITHIN_SCOPE", "changed_count": 0, "changed_paths": []}, "memory": {"status": "CONSISTENT_WITHIN_SCOPE"}, "runtime_reset": {"status": "CONSISTENT_WITHIN_SCOPE", "basis": "SESSION_CGROUP_EMPTY", "restores_checkpoint_processes": false}, "semantic": {"status": "CONSISTENT_WITHIN_SCOPE", "basis": "TRUSTED_ADAPTER_LEDGER", "coverage": {"adapter_id": "local-test-harness", "contract": "complete-effect-ledger/v1"}, "unrecorded_effects_checked": false}}, "scope": ["checkpoint_binding", "filesystem", "memory", "runtime_reset", "semantic"], "excluded": ["process heap restoration", "external service state", "unrecorded effects", "unmanaged writers", "xattrs/ACLs", "timestamps", "mounts", "workspace root metadata"]}, {"schema": "allox.recovery-checks/v1", "agent_id": "agent", "session_id": "target", "checkpoint_id": "c0", "status": "CONSISTENT_WITHIN_SCOPE", "checks": {"checkpoint_binding": {"status": "CONSISTENT_WITHIN_SCOPE"}, "filesystem": {"status": "CONSISTENT_WITHIN_SCOPE", "changed_count": 0, "changed_paths": []}, "memory": {"status": "CONSISTENT_WITHIN_SCOPE"}, "runtime_reset": {"status": "CONSISTENT_WITHIN_SCOPE", "basis": "SESSION_CGROUP_EMPTY", "restores_checkpoint_processes": false}, "semantic": {"status": "CONSISTENT_WITHIN_SCOPE", "basis": "TRUSTED_ADAPTER_LEDGER", "coverage": {"adapter_id": "local-test-harness", "contract": "complete-effect-ledger/v1"}, "unrecorded_effects_checked": false}}, "scope": ["checkpoint_binding", "filesystem", "memory", "runtime_reset", "semantic"], "excluded": ["process heap restoration", "external service state", "unrecorded effects", "unmanaged writers", "xattrs/ACLs", "timestamps", "mounts", "workspace root metadata"]}, {"schema": "allox.recovery-checks/v1", "agent_id": "agent", "session_id": "target", "checkpoint_id": "c0", "status": "CONSISTENT_WITHIN_SCOPE", "checks": {"checkpoint_binding": {"status": "CONSISTENT_WITHIN_SCOPE"}, "filesystem": {"status": "CONSISTENT_WITHIN_SCOPE", "changed_count": 0, "changed_paths": []}, "memory": {"status": "CONSISTENT_WITHIN_SCOPE"}, "runtime_reset": {"status": "CONSISTENT_WITHIN_SCOPE", "basis": "SESSION_CGROUP_EMPTY", "restores_checkpoint_processes": false}, "semantic": {"status": "CONSISTENT_WITHIN_SCOPE", "basis": "TRUSTED_ADAPTER_LEDGER", "coverage": {"adapter_id": "local-test-harness", "contract": "complete-effect-ledger/v1"}, "unrecorded_effects_checked": false}}, "scope": ["checkpoint_binding", "filesystem", "memory", "runtime_reset", "semantic"], "excluded": ["process heap restoration", "external service state", "unrecorded effects", "unmanaged writers", "xattrs/ACLs", "timestamps", "mounts", "workspace root metadata"]}], "semantic_preflight": "rejected-before-kill", "negative_memory": "fenced-and-recovered", "history_chain": [2, 1, 0], "kernel": "6.1.62-allox-joint-btrfs"}
+
+REPORT_PATH /data/hy/Allox/recovery-checks-20261112/guest-3t4i2stm/report.json

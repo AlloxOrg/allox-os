@@ -198,16 +198,17 @@ class WorkspaceService:
         monitor_socket_root: Path = Path("/dev/shm/allox-monitor"),
         session_memory: bool = False,
         correlation_config: dict[str, Any] | None = None,
+        recovery_checks_config: dict[str, Any] | None = None,
         system_effects_config: dict[str, Any] | None = None,
         process_service_factory=None,
         feature_factories=None,
     ):
         self.store = store
-        self.executions = ExecutionRegistry(store.require_memory_ready)
+        self.features: FeatureManager | None = None
+        self.executions = ExecutionRegistry(self._require_session_ready)
         if type(session_memory) is not bool:
             raise WorkspaceError("session_memory must be a boolean")
         self.session_memory = session_memory
-        self.features: FeatureManager | None = None
         self.processes: ProcessTrackingService | None = None
         self.process_tracking = process_tracking.strip().lower()
         session_network = session_network.strip().lower()
@@ -249,9 +250,15 @@ class WorkspaceService:
             if not isinstance(correlation_config, dict):
                 raise WorkspaceError("correlation configuration must be an object")
             feature_specs.append(("trace-correlation", dict(correlation_config)))
+        if recovery_checks_config is not None:
+            if not isinstance(recovery_checks_config, dict):
+                raise WorkspaceError("recovery checks configuration must be an object")
+            if system_effects_config is not None:
+                raise WorkspaceError("recovery-checks v1 cannot wrap system-effects internal rollback")
+            feature_specs.append(("recovery-checks", dict(recovery_checks_config)))
         execution_required = bool(
             self.process_tracking != "disabled"
-            or any(name != "trace-correlation" for name, _ in feature_specs)
+            or any(name not in {"trace-correlation", "recovery-checks"} for name, _ in feature_specs)
             or self.kill_session_processes_on_rollback
         )
         if execution_required:
@@ -294,6 +301,11 @@ class WorkspaceService:
     def feature_names(self) -> tuple[str, ...]:
         return self.features.names if self.features is not None else ()
 
+    def _require_session_ready(self, agent_id: str, session_id: str) -> None:
+        self.store.require_memory_ready(agent_id, session_id)
+        if self.features is not None:
+            self.features.assert_session_ready(agent_id, session_id)
+
     def close(self) -> None:
         if self.processes is not None:
             self.processes.close()
@@ -315,6 +327,16 @@ class WorkspaceService:
         return value
 
     def dispatch(self, action: str, params: dict[str, Any]) -> Any:
+        if self.features is not None and action in {
+            "checkpoint.create", "checkpoint.delete", "session.rollback",
+            "session.rollback_after_runtime_reset", "memory.restore",
+        }:
+            return self.features.management_mutation(
+                action, params, lambda: self._dispatch(action, params),
+            )
+        return self._dispatch(action, params)
+
+    def _dispatch(self, action: str, params: dict[str, Any]) -> Any:
         agent_id = params.get("agent_id")
         session_id = params.get("session_id")
         origin = str(params.get("origin", "allox-control-plane"))
@@ -534,7 +556,7 @@ class WorkspaceHTTPServer(ThreadingHTTPServer):
     def __init__(self, address, service: WorkspaceService, token: str):
         if service.session_memory and not token:
             raise WorkspaceError("Session memory requires an authenticated management endpoint")
-        if {"session-share", "agent-monitor", "trace-correlation"}.intersection(service.feature_names) and not token:
+        if {"session-share", "agent-monitor", "trace-correlation", "recovery-checks"}.intersection(service.feature_names) and not token:
             raise WorkspaceError("share/monitor tools require an authenticated management endpoint")
         super().__init__(address, WorkspaceRequestHandler)
         self.service = service
@@ -610,6 +632,8 @@ def build_parser() -> argparse.ArgumentParser:
                         help="Enable read-only post-hoc correlation from existing trace storage")
     parser.add_argument("--monitor-root", type=Path, default=None,
                         help="Enable agent-monitor; durable traces outside workspace store")
+    parser.add_argument("--recovery-checks-root", type=Path, default=None,
+                        help="Enable bounded restore verification with durable external fences")
     parser.add_argument("--monitor-socket-root", type=Path, default=Path("/dev/shm/allox-monitor"),
                         help="Trusted tmpfs for Session-scoped append-only telemetry sockets")
     parser.add_argument(
@@ -899,6 +923,8 @@ def main(argv: list[str] | None = None) -> int:
         monitor_socket_root=args.monitor_socket_root,
         session_memory=args.session_memory,
         correlation_config=correlation_config,
+        recovery_checks_config=({"root": args.recovery_checks_root}
+                                if args.recovery_checks_root is not None else None),
         system_effects_config=system_effects_config,
     )
     server = WorkspaceHTTPServer((host, int(port_raw)), service, token)
