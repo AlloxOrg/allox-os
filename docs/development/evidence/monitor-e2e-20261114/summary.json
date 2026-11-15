@@ -1,0 +1,211 @@
+{
+  "integration_attempt": "/data/hy/Allox/monitor-e2e-20261114/attempt-a4ea595629",
+  "benchmark_attempt": "/data/hy/Allox/monitor-e2e-20261114/attempt-885fe441fd",
+  "passed": true,
+  "model": "Qwen3.5-4B-CPU-Test",
+  "prompt": "test-only compact system prompt",
+  "llm_http_statuses": [
+    200,
+    200
+  ],
+  "agent_commands": 1,
+  "spans": 41,
+  "sdk_events": 72,
+  "effects": 4424,
+  "lifecycle": 265,
+  "global_evidence_status": "INCOMPLETE",
+  "lifecycle_status": "PARTIAL",
+  "effects_dropped": 0,
+  "lifecycle_dropped": 0,
+  "kernel_sha256": "f34e59d041e53725ad37100c186c71e9328eea3bbde04b5e7718bba4f9e9d105",
+  "benchmark": {
+    "pairs": 10,
+    "model_calls": 0,
+    "statistics": {
+      "wall_ms": {
+        "off_median": 3386.8270405,
+        "on_median": 7475.066388,
+        "paired_delta_median": 4084.0350175,
+        "on_min": 7012.995594,
+        "on_max": 8862.388719,
+        "ratio_of_medians": 2.207100126050857
+      },
+      "task_including_sdk_close_ms": {
+        "off_median": 1999.012283,
+        "on_median": 2343.3091649999997,
+        "paired_delta_median": 414.8434900000001,
+        "on_min": 2183.035276,
+        "on_max": 3114.052782,
+        "ratio_of_medians": 1.1722334999779487
+      }
+    },
+    "rows": [
+      {
+        "label": "pair-0-off",
+        "mode": "off",
+        "wall_ms": 3349.342812,
+        "task_including_sdk_close_ms": 1911.386857,
+        "sdk_events": 0,
+        "transactions": 0
+      },
+      {
+        "label": "pair-0-batch",
+        "mode": "batch",
+        "wall_ms": 7414.184846,
+        "task_including_sdk_close_ms": 2277.763378,
+        "sdk_events": 72,
+        "transactions": 19
+      },
+      {
+        "label": "pair-1-batch",
+        "mode": "batch",
+        "wall_ms": 7012.995594,
+        "task_including_sdk_close_ms": 2242.025922,
+        "sdk_events": 72,
+        "transactions": 19
+      },
+      {
+        "label": "pair-1-off",
+        "mode": "off",
+        "wall_ms": 4014.447074,
+        "task_including_sdk_close_ms": 2157.222123,
+        "sdk_events": 0,
+        "transactions": 0
+      },
+      {
+        "label": "pair-2-off",
+        "mode": "off",
+        "wall_ms": 3385.308714,
+        "task_including_sdk_close_ms": 2031.775097,
+        "sdk_events": 0,
+        "transactions": 0
+      },
+      {
+        "label": "pair-2-batch",
+        "mode": "batch",
+        "wall_ms": 7441.13901,
+        "task_including_sdk_close_ms": 2498.446594,
+        "sdk_events": 72,
+        "transactions": 19
+      },
+      {
+        "label": "pair-3-batch",
+        "mode": "batch",
+        "wall_ms": 7139.37532,
+        "task_including_sdk_close_ms": 2183.035276,
+        "sdk_events": 72,
+        "transactions": 19
+      },
+      {
+        "label": "pair-3-off",
+        "mode": "off",
+        "wall_ms": 3879.760124,
+        "task_including_sdk_close_ms": 1928.746191,
+        "sdk_events": 0,
+        "transactions": 0
+      },
+      {
+        "label": "pair-4-off",
+        "mode": "off",
+        "wall_ms": 3388.345367,
+        "task_including_sdk_close_ms": 2021.612562,
+        "sdk_events": 0,
+        "transactions": 0
+      },
+      {
+        "label": "pair-4-batch",
+        "mode": "batch",
+        "wall_ms": 7501.102181,
+        "task_including_sdk_close_ms": 2301.756317,
+        "sdk_events": 72,
+        "transactions": 19
+      },
+      {
+        "label": "pair-5-batch",
+        "mode": "batch",
+        "wall_ms": 7660.765597,
+        "task_including_sdk_close_ms": 2384.862013,
+        "sdk_events": 72,
+        "transactions": 19
+      },
+      {
+        "label": "pair-5-off",
+        "mode": "off",
+        "wall_ms": 3127.759569,
+        "task_including_sdk_close_ms": 1910.542313,
+        "sdk_events": 0,
+        "transactions": 0
+      },
+      {
+        "label": "pair-6-off",
+        "mode": "off",
+        "wall_ms": 3291.944474,
+        "task_including_sdk_close_ms": 1976.412004,
+        "sdk_events": 0,
+        "transactions": 0
+      },
+      {
+        "label": "pair-6-batch",
+        "mode": "batch",
+        "wall_ms": 8862.388719,
+        "task_including_sdk_close_ms": 2439.722463,
+        "sdk_events": 72,
+        "transactions": 19
+      },
+      {
+        "label": "pair-7-batch",
+        "mode": "batch",
+        "wall_ms": 7449.030595,
+        "task_including_sdk_close_ms": 2481.9134,
+        "sdk_events": 72,
+        "transactions": 19
+      },
+      {
+        "label": "pair-7-off",
+        "mode": "off",
+        "wall_ms": 3825.878238,
+        "task_including_sdk_close_ms": 2207.712947,
+        "sdk_events": 0,
+        "transactions": 0
+      },
+      {
+        "label": "pair-8-off",
+        "mode": "off",
+        "wall_ms": 3993.458956,
+        "task_including_sdk_close_ms": 2291.661068,
+        "sdk_events": 0,
+        "transactions": 0
+      },
+      {
+        "label": "pair-8-batch",
+        "mode": "batch",
+        "wall_ms": 8096.686957,
+        "task_including_sdk_close_ms": 3114.052782,
+        "sdk_events": 72,
+        "transactions": 19
+      },
+      {
+        "label": "pair-9-batch",
+        "mode": "batch",
+        "wall_ms": 7552.132896,
+        "task_including_sdk_close_ms": 2299.245807,
+        "sdk_events": 72,
+        "transactions": 18
+      },
+      {
+        "label": "pair-9-off",
+        "mode": "off",
+        "wall_ms": 3088.189629,
+        "task_including_sdk_close_ms": 1789.481006,
+        "sdk_events": 0,
+        "transactions": 0
+      }
+    ]
+  },
+  "timing_scope": "wall: Core start through observer finalization and framework close; task: action loop through SDK close; excludes VM boot, DB init and posthoc queries",
+  "caveats": [
+    "partial lifecycle enrollment, not whole-tree completeness",
+    "shared 117 disk/cache contention is not controlled",
+    "full monitoring off/on, not an isolated eBPF or SDK microbenchmark"
+  ]
+}

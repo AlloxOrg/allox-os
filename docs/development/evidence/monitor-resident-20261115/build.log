@@ -1,0 +1,67 @@
+BUILD_CPUS 24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47
+Reading package lists...
+Building dependency tree...
+Reading state information...
+The following additional packages will be installed:
+  libpkgconf3 pkgconf pkgconf-bin
+The following NEW packages will be installed:
+  libpkgconf3 pkg-config pkgconf pkgconf-bin
+0 upgraded, 4 newly installed, 0 to remove and 44 not upgraded.
+Need to get 107 kB of archives.
+After this operation, 285 kB of additional disk space will be used.
+Get:1 http://deb.debian.org/debian trixie/main amd64 libpkgconf3 amd64 1.8.1-4 [36.4 kB]
+Get:2 http://deb.debian.org/debian trixie/main amd64 pkgconf-bin amd64 1.8.1-4 [30.2 kB]
+Get:3 http://deb.debian.org/debian trixie/main amd64 pkgconf amd64 1.8.1-4 [26.2 kB]
+Get:4 http://deb.debian.org/debian trixie/main amd64 pkg-config amd64 1.8.1-4 [14.0 kB]
+debconf: unable to initialize frontend: Dialog
+debconf: (TERM is not set, so the dialog frontend is not usable.)
+debconf: falling back to frontend: Readline
+debconf: unable to initialize frontend: Readline
+debconf: (Can't locate Term/ReadLine.pm in @INC (you may need to install the Term::ReadLine module) (@INC entries checked: /etc/perl /usr/local/lib/x86_64-linux-gnu/perl/5.40.1 /usr/local/share/perl/5.40.1 /usr/lib/x86_64-linux-gnu/perl5/5.40 /usr/share/perl5 /usr/lib/x86_64-linux-gnu/perl-base /usr/lib/x86_64-linux-gnu/perl/5.40 /usr/share/perl/5.40 /usr/local/lib/site_perl) at /usr/share/perl5/Debconf/FrontEnd/Readline.pm line 8, <STDIN> line 4.)
+debconf: falling back to frontend: Teletype
+debconf: unable to initialize frontend: Teletype
+debconf: (This frontend requires a controlling tty.)
+debconf: falling back to frontend: Noninteractive
+Fetched 107 kB in 1s (74.9 kB/s)
+Selecting previously unselected package libpkgconf3:amd64.
+(Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 19818 files and directories currently installed.)
+Preparing to unpack .../libpkgconf3_1.8.1-4_amd64.deb ...
+Unpacking libpkgconf3:amd64 (1.8.1-4) ...
+Selecting previously unselected package pkgconf-bin.
+Preparing to unpack .../pkgconf-bin_1.8.1-4_amd64.deb ...
+Unpacking pkgconf-bin (1.8.1-4) ...
+Selecting previously unselected package pkgconf:amd64.
+Preparing to unpack .../pkgconf_1.8.1-4_amd64.deb ...
+Unpacking pkgconf:amd64 (1.8.1-4) ...
+Selecting previously unselected package pkg-config:amd64.
+Preparing to unpack .../pkg-config_1.8.1-4_amd64.deb ...
+Unpacking pkg-config:amd64 (1.8.1-4) ...
+Setting up libpkgconf3:amd64 (1.8.1-4) ...
+Setting up pkgconf-bin (1.8.1-4) ...
+Setting up pkgconf:amd64 (1.8.1-4) ...
+Setting up pkg-config:amd64 (1.8.1-4) ...
+Processing triggers for libc-bin (2.41-12+deb13u3) ...
+   Compiling bpf-observer-linux-state-confirmers v0.1.0 (/observer/crates/linux-state-confirmers)
+   Compiling bpf-observer-system-effects v0.1.0 (/observer/crates/system-effects-recorder)
+warning: variable does not need to be mutable
+   --> crates/system-effects-recorder/src/lifecycle.rs:994:17
+    |
+994 |             let mut resources = KernelResources::new(object);
+    |                 ----^^^^^^^^^
+    |                 |
+    |                 help: remove this `mut`
+    |
+    = note: `#[warn(unused_mut)]` (part of `#[warn(unused)]`) on by default
+
+warning: variable does not need to be mutable
+   --> crates/system-effects-recorder/src/lib.rs:604:17
+    |
+604 |             let mut resources = KernelResources::new(object);
+    |                 ----^^^^^^^^^
+    |                 |
+    |                 help: remove this `mut`
+
+   Compiling bpf-observer-deployment-observer v0.1.0 (/observer/crates/deployment-observer)
+warning: `bpf-observer-system-effects` (lib) generated 2 warnings (run `cargo fix --lib -p bpf-observer-system-effects` to apply 2 suggestions)
+    Finished `release` profile [optimized] target(s) in 1m 34s
+RESIDENT_BUILD_OK

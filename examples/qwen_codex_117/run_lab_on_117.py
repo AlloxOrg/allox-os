@@ -182,9 +182,17 @@ class Gateway(BaseHTTPRequestHandler):
             request = json.loads(self.rfile.read(length))
             tool_names = [item.get('name', item.get('type')) for item in request.get('tools') or []]
             body, mapping = chat_request(request, server.config['model'])
+            # Opt-in constrained integration fixture; never enabled for lab defaults.
+            compact = server.config.get('compact_system_prompt')
+            if compact:
+                body['messages'] = [{'role': 'system', 'content': compact}]+[
+                    message for message in body['messages'] if message['role'] != 'system']
+                for tool in body.get('tools', []):
+                    tool['function']['description'] = ''
+                body['max_tokens'] = min(body['max_tokens'], server.config.get('max_output_tokens', 512))
             target = urlsplit(server.config['base_url'])
             connection_type = http.client.HTTPSConnection if target.scheme == 'https' else http.client.HTTPConnection
-            connection = connection_type(target.hostname, target.port, timeout=90)
+            connection = connection_type(target.hostname, target.port, timeout=server.config.get('timeout', 90))
             try:
                 connection.request('POST', target.path.rstrip('/')+'/chat/completions',
                     json.dumps(body).encode(), {'Content-Type': 'application/json',

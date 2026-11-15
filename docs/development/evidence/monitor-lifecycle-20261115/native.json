@@ -1,0 +1,529 @@
+{
+  "attempt": "/data/hy/Allox/monitor-e2e-20261114/attempt-53d1eaf47d",
+  "rows": [
+    {
+      "label": "pair-0-batch",
+      "python_finish_wait_ms": 3084.590196609497,
+      "finish_syscalls": {
+        "close:other": {
+          "count": 59,
+          "total_ms": 10.694,
+          "max_ms": 0.392
+        },
+        "bpf:BPF_MAP_LOOKUP_ELEM": {
+          "count": 24,
+          "total_ms": 2.0730000000000004,
+          "max_ms": 0.187
+        },
+        "close:BPF_LINK_CREATE": {
+          "count": 25,
+          "total_ms": 1727.2830000000001,
+          "max_ms": 101.86399999999999
+        },
+        "bpf:BPF_MAP_GET_NEXT_KEY": {
+          "count": 1,
+          "total_ms": 0.22,
+          "max_ms": 0.22
+        },
+        "epoll_wait": {
+          "count": 4,
+          "total_ms": 40.573,
+          "max_ms": 20.268
+        },
+        "fsync": {
+          "count": 14,
+          "total_ms": 424.65999999999997,
+          "max_ms": 76.88799999999999
+        },
+        "bpf:BPF_MAP_UPDATE_ELEM": {
+          "count": 2,
+          "total_ms": 0.177,
+          "max_ms": 0.104
+        },
+        "bpf:BPF_MAP_DELETE_ELEM": {
+          "count": 5,
+          "total_ms": 0.42500000000000004,
+          "max_ms": 0.095
+        },
+        "close:BPF_MAP_CREATE": {
+          "count": 19,
+          "total_ms": 1.542,
+          "max_ms": 0.095
+        },
+        "close:BPF_PROG_LOAD": {
+          "count": 25,
+          "total_ms": 2.188,
+          "max_ms": 0.16799999999999998
+        },
+        "close:BPF_BTF_LOAD": {
+          "count": 2,
+          "total_ms": 0.21700000000000003,
+          "max_ms": 0.132
+        }
+      },
+      "slowest_finish_calls": [
+        {
+          "thread": 78,
+          "start_epoch_s": 1794673064.723596,
+          "duration_ms": 101.86399999999999,
+          "kind": "close:BPF_LINK_CREATE",
+          "in_finish": true
+        },
+        {
+          "thread": 78,
+          "start_epoch_s": 1794673066.182191,
+          "duration_ms": 100.925,
+          "kind": "close:BPF_LINK_CREATE",
+          "in_finish": true
+        },
+        {
+          "thread": 78,
+          "start_epoch_s": 1794673064.830084,
+          "duration_ms": 100.408,
+          "kind": "close:BPF_LINK_CREATE",
+          "in_finish": true
+        },
+        {
+          "thread": 78,
+          "start_epoch_s": 1794673065.246141,
+          "duration_ms": 98.525,
+          "kind": "close:BPF_LINK_CREATE",
+          "in_finish": true
+        },
+        {
+          "thread": 78,
+          "start_epoch_s": 1794673065.558278,
+          "duration_ms": 97.941,
+          "kind": "close:BPF_LINK_CREATE",
+          "in_finish": true
+        },
+        {
+          "thread": 78,
+          "start_epoch_s": 1794673065.039153,
+          "duration_ms": 97.526,
+          "kind": "close:BPF_LINK_CREATE",
+          "in_finish": true
+        },
+        {
+          "thread": 78,
+          "start_epoch_s": 1794673066.078145,
+          "duration_ms": 97.481,
+          "kind": "close:BPF_LINK_CREATE",
+          "in_finish": true
+        },
+        {
+          "thread": 78,
+          "start_epoch_s": 1794673065.454139,
+          "duration_ms": 97.473,
+          "kind": "close:BPF_LINK_CREATE",
+          "in_finish": true
+        },
+        {
+          "thread": 78,
+          "start_epoch_s": 1794673065.766328,
+          "duration_ms": 97.44800000000001,
+          "kind": "close:BPF_LINK_CREATE",
+          "in_finish": true
+        },
+        {
+          "thread": 78,
+          "start_epoch_s": 1794673065.350226,
+          "duration_ms": 97.359,
+          "kind": "close:BPF_LINK_CREATE",
+          "in_finish": true
+        },
+        {
+          "thread": 78,
+          "start_epoch_s": 1794673065.974151,
+          "duration_ms": 97.337,
+          "kind": "close:BPF_LINK_CREATE",
+          "in_finish": true
+        },
+        {
+          "thread": 78,
+          "start_epoch_s": 1794673065.143002,
+          "duration_ms": 97.121,
+          "kind": "close:BPF_LINK_CREATE",
+          "in_finish": true
+        }
+      ],
+      "native_telemetry": {
+        "purpose": "DIAGNOSTIC_ONLY_NOT_TRUSTED_EVIDENCE",
+        "clock": "RUST_STD_INSTANT_MONOTONIC_V1",
+        "trusted_evidence": false,
+        "affects_verdict": false,
+        "s0_endpoint_capture": {
+          "total_duration_ns": 0,
+          "bpf_duration_ns": null,
+          "filesystem_duration_ns": null,
+          "linux_duration_ns": null
+        },
+        "closing_drain": {
+          "total_duration_ns": 386947159,
+          "system_effects_duration_ns": 252977528,
+          "process_lifecycle_duration_ns": 133969631
+        },
+        "s1_endpoint_capture": {
+          "total_duration_ns": 0,
+          "bpf_duration_ns": null,
+          "filesystem_duration_ns": null,
+          "linux_duration_ns": null
+        }
+      }
+    },
+    {
+      "label": "pair-1-batch",
+      "python_finish_wait_ms": 2937.0336532592773,
+      "finish_syscalls": {
+        "close:other": {
+          "count": 59,
+          "total_ms": 9.012,
+          "max_ms": 0.35300000000000004
+        },
+        "bpf:BPF_MAP_LOOKUP_ELEM": {
+          "count": 24,
+          "total_ms": 1.6930000000000003,
+          "max_ms": 0.102
+        },
+        "close:BPF_LINK_CREATE": {
+          "count": 25,
+          "total_ms": 1725.6000000000001,
+          "max_ms": 100.363
+        },
+        "bpf:BPF_MAP_GET_NEXT_KEY": {
+          "count": 1,
+          "total_ms": 0.163,
+          "max_ms": 0.163
+        },
+        "epoll_wait": {
+          "count": 4,
+          "total_ms": 40.730999999999995,
+          "max_ms": 20.28
+        },
+        "fsync": {
+          "count": 14,
+          "total_ms": 322.687,
+          "max_ms": 68.47699999999999
+        },
+        "bpf:BPF_MAP_UPDATE_ELEM": {
+          "count": 2,
+          "total_ms": 0.118,
+          "max_ms": 0.077
+        },
+        "bpf:BPF_MAP_DELETE_ELEM": {
+          "count": 5,
+          "total_ms": 0.34,
+          "max_ms": 0.07100000000000001
+        },
+        "close:BPF_MAP_CREATE": {
+          "count": 19,
+          "total_ms": 1.5579999999999998,
+          "max_ms": 0.11
+        },
+        "close:BPF_PROG_LOAD": {
+          "count": 25,
+          "total_ms": 1.953,
+          "max_ms": 0.133
+        },
+        "close:BPF_BTF_LOAD": {
+          "count": 2,
+          "total_ms": 0.14500000000000002,
+          "max_ms": 0.08600000000000001
+        }
+      },
+      "slowest_finish_calls": [
+        {
+          "thread": 161,
+          "start_epoch_s": 1794673044.822939,
+          "duration_ms": 100.363,
+          "kind": "close:BPF_LINK_CREATE",
+          "in_finish": true
+        },
+        {
+          "thread": 161,
+          "start_epoch_s": 1794673044.19878,
+          "duration_ms": 99.868,
+          "kind": "close:BPF_LINK_CREATE",
+          "in_finish": true
+        },
+        {
+          "thread": 161,
+          "start_epoch_s": 1794673044.92952,
+          "duration_ms": 98.908,
+          "kind": "close:BPF_LINK_CREATE",
+          "in_finish": true
+        },
+        {
+          "thread": 161,
+          "start_epoch_s": 1794673044.718862,
+          "duration_ms": 98.55600000000001,
+          "kind": "close:BPF_LINK_CREATE",
+          "in_finish": true
+        },
+        {
+          "thread": 161,
+          "start_epoch_s": 1794673044.614778,
+          "duration_ms": 98.448,
+          "kind": "close:BPF_LINK_CREATE",
+          "in_finish": true
+        },
+        {
+          "thread": 161,
+          "start_epoch_s": 1794673044.510787,
+          "duration_ms": 98.111,
+          "kind": "close:BPF_LINK_CREATE",
+          "in_finish": true
+        },
+        {
+          "thread": 161,
+          "start_epoch_s": 1794673044.094779,
+          "duration_ms": 97.96100000000001,
+          "kind": "close:BPF_LINK_CREATE",
+          "in_finish": true
+        },
+        {
+          "thread": 161,
+          "start_epoch_s": 1794673043.993045,
+          "duration_ms": 97.791,
+          "kind": "close:BPF_LINK_CREATE",
+          "in_finish": true
+        },
+        {
+          "thread": 161,
+          "start_epoch_s": 1794673044.406868,
+          "duration_ms": 97.715,
+          "kind": "close:BPF_LINK_CREATE",
+          "in_finish": true
+        },
+        {
+          "thread": 161,
+          "start_epoch_s": 1794673045.034729,
+          "duration_ms": 97.607,
+          "kind": "close:BPF_LINK_CREATE",
+          "in_finish": true
+        },
+        {
+          "thread": 161,
+          "start_epoch_s": 1794673045.243034,
+          "duration_ms": 97.43599999999999,
+          "kind": "close:BPF_LINK_CREATE",
+          "in_finish": true
+        },
+        {
+          "thread": 161,
+          "start_epoch_s": 1794673045.346907,
+          "duration_ms": 97.39200000000001,
+          "kind": "close:BPF_LINK_CREATE",
+          "in_finish": true
+        }
+      ],
+      "native_telemetry": {
+        "purpose": "DIAGNOSTIC_ONLY_NOT_TRUSTED_EVIDENCE",
+        "clock": "RUST_STD_INSTANT_MONOTONIC_V1",
+        "trusted_evidence": false,
+        "affects_verdict": false,
+        "s0_endpoint_capture": {
+          "total_duration_ns": 0,
+          "bpf_duration_ns": null,
+          "filesystem_duration_ns": null,
+          "linux_duration_ns": null
+        },
+        "closing_drain": {
+          "total_duration_ns": 318133664,
+          "system_effects_duration_ns": 225321377,
+          "process_lifecycle_duration_ns": 92812287
+        },
+        "s1_endpoint_capture": {
+          "total_duration_ns": 0,
+          "bpf_duration_ns": null,
+          "filesystem_duration_ns": null,
+          "linux_duration_ns": null
+        }
+      }
+    },
+    {
+      "label": "pair-2-batch",
+      "python_finish_wait_ms": 3012.3469829559326,
+      "finish_syscalls": {
+        "close:other": {
+          "count": 59,
+          "total_ms": 10.741999999999999,
+          "max_ms": 0.399
+        },
+        "bpf:BPF_MAP_LOOKUP_ELEM": {
+          "count": 24,
+          "total_ms": 1.846,
+          "max_ms": 0.115
+        },
+        "close:BPF_LINK_CREATE": {
+          "count": 25,
+          "total_ms": 1735.326,
+          "max_ms": 101.12
+        },
+        "bpf:BPF_MAP_GET_NEXT_KEY": {
+          "count": 1,
+          "total_ms": 0.17200000000000001,
+          "max_ms": 0.17200000000000001
+        },
+        "epoll_wait": {
+          "count": 4,
+          "total_ms": 40.628,
+          "max_ms": 20.298000000000002
+        },
+        "fsync": {
+          "count": 14,
+          "total_ms": 392.267,
+          "max_ms": 60.034
+        },
+        "bpf:BPF_MAP_UPDATE_ELEM": {
+          "count": 2,
+          "total_ms": 0.17099999999999999,
+          "max_ms": 0.095
+        },
+        "bpf:BPF_MAP_DELETE_ELEM": {
+          "count": 5,
+          "total_ms": 0.45999999999999996,
+          "max_ms": 0.107
+        },
+        "close:BPF_MAP_CREATE": {
+          "count": 19,
+          "total_ms": 1.56,
+          "max_ms": 0.106
+        },
+        "close:BPF_PROG_LOAD": {
+          "count": 25,
+          "total_ms": 2.551000000000001,
+          "max_ms": 0.154
+        },
+        "close:BPF_BTF_LOAD": {
+          "count": 2,
+          "total_ms": 0.11100000000000002,
+          "max_ms": 0.07200000000000001
+        }
+      },
+      "slowest_finish_calls": [
+        {
+          "thread": 324,
+          "start_epoch_s": 1794673063.598794,
+          "duration_ms": 101.12,
+          "kind": "close:BPF_LINK_CREATE",
+          "in_finish": true
+        },
+        {
+          "thread": 324,
+          "start_epoch_s": 1794673062.974923,
+          "duration_ms": 100.35900000000001,
+          "kind": "close:BPF_LINK_CREATE",
+          "in_finish": true
+        },
+        {
+          "thread": 324,
+          "start_epoch_s": 1794673063.810771,
+          "duration_ms": 99.82000000000001,
+          "kind": "close:BPF_LINK_CREATE",
+          "in_finish": true
+        },
+        {
+          "thread": 324,
+          "start_epoch_s": 1794673064.1228,
+          "duration_ms": 99.536,
+          "kind": "close:BPF_LINK_CREATE",
+          "in_finish": true
+        },
+        {
+          "thread": 324,
+          "start_epoch_s": 1794673063.391006,
+          "duration_ms": 98.41900000000001,
+          "kind": "close:BPF_LINK_CREATE",
+          "in_finish": true
+        },
+        {
+          "thread": 324,
+          "start_epoch_s": 1794673063.286833,
+          "duration_ms": 97.87700000000001,
+          "kind": "close:BPF_LINK_CREATE",
+          "in_finish": true
+        },
+        {
+          "thread": 324,
+          "start_epoch_s": 1794673064.330803,
+          "duration_ms": 97.842,
+          "kind": "close:BPF_LINK_CREATE",
+          "in_finish": true
+        },
+        {
+          "thread": 324,
+          "start_epoch_s": 1794673063.49487,
+          "duration_ms": 97.78399999999999,
+          "kind": "close:BPF_LINK_CREATE",
+          "in_finish": true
+        },
+        {
+          "thread": 324,
+          "start_epoch_s": 1794673063.18279,
+          "duration_ms": 97.71000000000001,
+          "kind": "close:BPF_LINK_CREATE",
+          "in_finish": true
+        },
+        {
+          "thread": 324,
+          "start_epoch_s": 1794673063.706768,
+          "duration_ms": 97.339,
+          "kind": "close:BPF_LINK_CREATE",
+          "in_finish": true
+        },
+        {
+          "thread": 324,
+          "start_epoch_s": 1794673062.870888,
+          "duration_ms": 97.108,
+          "kind": "close:BPF_LINK_CREATE",
+          "in_finish": true
+        },
+        {
+          "thread": 324,
+          "start_epoch_s": 1794673064.018982,
+          "duration_ms": 97.05,
+          "kind": "close:BPF_LINK_CREATE",
+          "in_finish": true
+        }
+      ],
+      "native_telemetry": {
+        "purpose": "DIAGNOSTIC_ONLY_NOT_TRUSTED_EVIDENCE",
+        "clock": "RUST_STD_INSTANT_MONOTONIC_V1",
+        "trusted_evidence": false,
+        "affects_verdict": false,
+        "s0_endpoint_capture": {
+          "total_duration_ns": 0,
+          "bpf_duration_ns": null,
+          "filesystem_duration_ns": null,
+          "linux_duration_ns": null
+        },
+        "closing_drain": {
+          "total_duration_ns": 337539585,
+          "system_effects_duration_ns": 225339972,
+          "process_lifecycle_duration_ns": 112199613
+        },
+        "s1_endpoint_capture": {
+          "total_duration_ns": 0,
+          "bpf_duration_ns": null,
+          "filesystem_duration_ns": null,
+          "linux_duration_ns": null
+        }
+      }
+    }
+  ],
+  "median_finish_syscall_total_ms": {
+    "bpf:BPF_MAP_DELETE_ELEM": 0.42500000000000004,
+    "bpf:BPF_MAP_GET_NEXT_KEY": 0.17200000000000001,
+    "bpf:BPF_MAP_LOOKUP_ELEM": 1.846,
+    "bpf:BPF_MAP_UPDATE_ELEM": 0.17099999999999999,
+    "close:BPF_BTF_LOAD": 0.14500000000000002,
+    "close:BPF_LINK_CREATE": 1727.2830000000001,
+    "close:BPF_MAP_CREATE": 1.5579999999999998,
+    "close:BPF_PROG_LOAD": 2.188,
+    "close:other": 10.694,
+    "epoll_wait": 40.628,
+    "fsync": 392.267
+  },
+  "caveat": "syscall durations include blocking, not CPU; across-thread totals can overlap"
+}

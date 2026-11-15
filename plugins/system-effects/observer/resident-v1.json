@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "license": "GPL-2.0-only",
+  "patch": "resident-v1.patch",
+  "strip": 2,
+  "base": "117 monitor-e2e-20261114/observer; file identities below, not an upstream release claim",
+  "files": [
+    {"path":"crates/deployment-observer/src/lib.rs","base_sha256":"ec505f0f83dfeeebfb4504f3436e657f7671ab57372589fbf772291ea5c59f01","result_sha256":"794d3d6d3fe3b699a0470893579fa74dcd8723bb81741bc64964de0b893c04f2"},
+    {"path":"crates/deployment-observer/src/session.rs","base_sha256":"6004370f7eb0b8b61a4f15380291d62664b3a134d1ac02eea3f6269a6db8e2ca","result_sha256":"86adc5105dbc963cd5f1c962e45d806c0973790d4db0cbf72ad4784967ec871d"},
+    {"path":"crates/deployment-observer/src/bin/deployment-observe.rs","base_sha256":"214d0537472f73eed6c1c2b63f1d9650e26df2ca618ab6fd308e80c2468e414f","result_sha256":"12631c7ef05fea700d457f3351f6b9e119d77806be2a24d9ac2b6b7480f0a99c"},
+    {"path":"crates/system-effects-recorder/src/ancestor.rs","base_sha256":"e0dbebec25af4a41cb148f402dbfb4049618df46be306ac4174e008d9d940eb4","result_sha256":"37694f3a9fcab692c2e3e817223c823b027871119110f7ed8e7b959742875be0"},
+    {"path":"crates/system-effects-recorder/src/lib.rs","base_sha256":"a469ce99b1499d05b6338d58c60be297bf7ca9a73d48ca9bdc3b36a586b4491a","result_sha256":"03151003ded14c527d9675f9d830cb24206502b2091f8c1f5b5a6001eca48282"},
+    {"path":"crates/system-effects-recorder/src/lifecycle.rs","base_sha256":"4190f18a480b6494a61b5c751a1e6a2b447afd4796bf46d8b8ec694c96781616","result_sha256":"4f54bf20b27d546477b022b5e5a678e1016e60da53918be56e1e03ffde28d3e0"}
+  ]
+}

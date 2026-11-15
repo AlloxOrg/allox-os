@@ -1,0 +1,287 @@
+{
+  "guest_required": false,
+  "rows": [
+    {
+      "case": "baseline-0-one-shot",
+      "stream": "system-effects.jsonl",
+      "events": 562,
+      "turn_status": "declared_parent_turn",
+      "passed": true
+    },
+    {
+      "case": "baseline-0-one-shot",
+      "stream": "process-lifecycle.jsonl",
+      "events": 63,
+      "turn_status": "declared_parent_turn",
+      "passed": true
+    },
+    {
+      "case": "baseline-1-one-shot",
+      "stream": "system-effects.jsonl",
+      "events": 562,
+      "turn_status": "declared_parent_turn",
+      "passed": true
+    },
+    {
+      "case": "baseline-1-one-shot",
+      "stream": "process-lifecycle.jsonl",
+      "events": 63,
+      "turn_status": "declared_parent_turn",
+      "passed": true
+    },
+    {
+      "case": "baseline-2-one-shot",
+      "stream": "system-effects.jsonl",
+      "events": 562,
+      "turn_status": "declared_parent_turn",
+      "passed": true
+    },
+    {
+      "case": "baseline-2-one-shot",
+      "stream": "process-lifecycle.jsonl",
+      "events": 63,
+      "turn_status": "declared_parent_turn",
+      "passed": true
+    },
+    {
+      "case": "baseline-3-one-shot",
+      "stream": "system-effects.jsonl",
+      "events": 526,
+      "turn_status": "declared_parent_turn",
+      "passed": true
+    },
+    {
+      "case": "baseline-3-one-shot",
+      "stream": "process-lifecycle.jsonl",
+      "events": 63,
+      "turn_status": "declared_parent_turn",
+      "passed": true
+    },
+    {
+      "case": "baseline-4-one-shot",
+      "stream": "system-effects.jsonl",
+      "events": 550,
+      "turn_status": "declared_parent_turn",
+      "passed": true
+    },
+    {
+      "case": "baseline-4-one-shot",
+      "stream": "process-lifecycle.jsonl",
+      "events": 63,
+      "turn_status": "declared_parent_turn",
+      "passed": true
+    },
+    {
+      "case": "baseline-5-one-shot",
+      "stream": "system-effects.jsonl",
+      "events": 562,
+      "turn_status": "declared_parent_turn",
+      "passed": true
+    },
+    {
+      "case": "baseline-5-one-shot",
+      "stream": "process-lifecycle.jsonl",
+      "events": 63,
+      "turn_status": "declared_parent_turn",
+      "passed": true
+    },
+    {
+      "case": "baseline-6-one-shot",
+      "stream": "system-effects.jsonl",
+      "events": 562,
+      "turn_status": "declared_parent_turn",
+      "passed": true
+    },
+    {
+      "case": "baseline-6-one-shot",
+      "stream": "process-lifecycle.jsonl",
+      "events": 63,
+      "turn_status": "declared_parent_turn",
+      "passed": true
+    },
+    {
+      "case": "baseline-7-one-shot",
+      "stream": "system-effects.jsonl",
+      "events": 562,
+      "turn_status": "declared_parent_turn",
+      "passed": true
+    },
+    {
+      "case": "baseline-7-one-shot",
+      "stream": "process-lifecycle.jsonl",
+      "events": 63,
+      "turn_status": "declared_parent_turn",
+      "passed": true
+    },
+    {
+      "case": "baseline-8-one-shot",
+      "stream": "system-effects.jsonl",
+      "events": 550,
+      "turn_status": "declared_parent_turn",
+      "passed": true
+    },
+    {
+      "case": "baseline-8-one-shot",
+      "stream": "process-lifecycle.jsonl",
+      "events": 63,
+      "turn_status": "declared_parent_turn",
+      "passed": true
+    },
+    {
+      "case": "baseline-9-one-shot",
+      "stream": "system-effects.jsonl",
+      "events": 562,
+      "turn_status": "declared_parent_turn",
+      "passed": true
+    },
+    {
+      "case": "baseline-9-one-shot",
+      "stream": "process-lifecycle.jsonl",
+      "events": 63,
+      "turn_status": "declared_parent_turn",
+      "passed": true
+    },
+    {
+      "case": "resident-0-resident",
+      "stream": "system-effects.jsonl",
+      "events": 550,
+      "turn_status": "declared_parent_turn",
+      "passed": true
+    },
+    {
+      "case": "resident-0-resident",
+      "stream": "process-lifecycle.jsonl",
+      "events": 63,
+      "turn_status": "declared_parent_turn",
+      "passed": true
+    },
+    {
+      "case": "resident-1-resident",
+      "stream": "system-effects.jsonl",
+      "events": 562,
+      "turn_status": "declared_parent_turn",
+      "passed": true
+    },
+    {
+      "case": "resident-1-resident",
+      "stream": "process-lifecycle.jsonl",
+      "events": 63,
+      "turn_status": "declared_parent_turn",
+      "passed": true
+    },
+    {
+      "case": "resident-2-resident",
+      "stream": "system-effects.jsonl",
+      "events": 550,
+      "turn_status": "declared_parent_turn",
+      "passed": true
+    },
+    {
+      "case": "resident-2-resident",
+      "stream": "process-lifecycle.jsonl",
+      "events": 63,
+      "turn_status": "declared_parent_turn",
+      "passed": true
+    },
+    {
+      "case": "resident-3-resident",
+      "stream": "system-effects.jsonl",
+      "events": 562,
+      "turn_status": "declared_parent_turn",
+      "passed": true
+    },
+    {
+      "case": "resident-3-resident",
+      "stream": "process-lifecycle.jsonl",
+      "events": 63,
+      "turn_status": "declared_parent_turn",
+      "passed": true
+    },
+    {
+      "case": "resident-4-resident",
+      "stream": "system-effects.jsonl",
+      "events": 550,
+      "turn_status": "declared_parent_turn",
+      "passed": true
+    },
+    {
+      "case": "resident-4-resident",
+      "stream": "process-lifecycle.jsonl",
+      "events": 63,
+      "turn_status": "declared_parent_turn",
+      "passed": true
+    },
+    {
+      "case": "resident-5-resident",
+      "stream": "system-effects.jsonl",
+      "events": 562,
+      "turn_status": "declared_parent_turn",
+      "passed": true
+    },
+    {
+      "case": "resident-5-resident",
+      "stream": "process-lifecycle.jsonl",
+      "events": 63,
+      "turn_status": "declared_parent_turn",
+      "passed": true
+    },
+    {
+      "case": "resident-6-resident",
+      "stream": "system-effects.jsonl",
+      "events": 550,
+      "turn_status": "declared_parent_turn",
+      "passed": true
+    },
+    {
+      "case": "resident-6-resident",
+      "stream": "process-lifecycle.jsonl",
+      "events": 63,
+      "turn_status": "declared_parent_turn",
+      "passed": true
+    },
+    {
+      "case": "resident-7-resident",
+      "stream": "system-effects.jsonl",
+      "events": 562,
+      "turn_status": "declared_parent_turn",
+      "passed": true
+    },
+    {
+      "case": "resident-7-resident",
+      "stream": "process-lifecycle.jsonl",
+      "events": 63,
+      "turn_status": "declared_parent_turn",
+      "passed": true
+    },
+    {
+      "case": "resident-8-resident",
+      "stream": "system-effects.jsonl",
+      "events": 526,
+      "turn_status": "declared_parent_turn",
+      "passed": true
+    },
+    {
+      "case": "resident-8-resident",
+      "stream": "process-lifecycle.jsonl",
+      "events": 63,
+      "turn_status": "declared_parent_turn",
+      "passed": true
+    },
+    {
+      "case": "resident-9-resident",
+      "stream": "system-effects.jsonl",
+      "events": 526,
+      "turn_status": "declared_parent_turn",
+      "passed": true
+    },
+    {
+      "case": "resident-9-resident",
+      "stream": "process-lifecycle.jsonl",
+      "events": 63,
+      "turn_status": "declared_parent_turn",
+      "passed": true
+    }
+  ],
+  "limited_contract_passed": true,
+  "passed": true
+}

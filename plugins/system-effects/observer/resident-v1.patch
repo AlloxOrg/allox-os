@@ -1,0 +1,629 @@
+diff --git a/original/crates/deployment-observer/src/bin/deployment-observe.rs b/modified/crates/deployment-observer/src/bin/deployment-observe.rs
+index 7a6bd2b..41a5e51 100644
+--- a/original/crates/deployment-observer/src/bin/deployment-observe.rs
++++ b/modified/crates/deployment-observer/src/bin/deployment-observe.rs
+@@ -1,7 +1,7 @@
+ // SPDX-License-Identifier: GPL-2.0-only
+ 
+ use anyhow::{bail, Context, Result};
+-use bpf_observer_deployment_observer::{run_stdio, DeploymentObserverConfig};
++use bpf_observer_deployment_observer::{run_resident_stdio, run_stdio, DeploymentObserverConfig};
+ use std::path::Path;
+ 
+ fn main() {
+@@ -17,6 +17,12 @@ fn run() -> Result<()> {
+     let first = arguments
+         .next()
+         .context("usage: deployment-observe --config PATH")?;
++    if first == "--resident-stdio" {
++        if arguments.next().is_some() {
++            bail!("resident mode accepts no trailing args");
++        }
++        return run_resident_stdio();
++    }
+     if first == "--help" || first == "-h" {
+         println!("usage: deployment-observe --config PATH");
+         return Ok(());
+diff --git a/original/crates/deployment-observer/src/lib.rs b/modified/crates/deployment-observer/src/lib.rs
+index 10d3776..889fa3b 100644
+--- a/original/crates/deployment-observer/src/lib.rs
++++ b/modified/crates/deployment-observer/src/lib.rs
+@@ -69,8 +69,8 @@ pub use scope::{
+     MAX_ANCESTOR_ROOTS,
+ };
+ pub use session::{
+-    run_stdio, DeploymentObserverConfig, DeploymentSession, FilesystemNamespaceMode,
+-    RegistrationPlan,
++    run_resident_stdio, run_stdio, DeploymentObserverConfig, DeploymentSession,
++    FilesystemNamespaceMode, RegistrationPlan,
+ };
+ pub use verify::{verify_artifacts, OfflineVerification, VerificationExpectation};
+ 
+diff --git a/original/crates/deployment-observer/src/session.rs b/modified/crates/deployment-observer/src/session.rs
+index d58d6f9..dc008db 100644
+--- a/original/crates/deployment-observer/src/session.rs
++++ b/modified/crates/deployment-observer/src/session.rs
+@@ -1678,6 +1678,11 @@ impl DeploymentSession {
+             report_sha256: report_digest.sha256,
+             artifact_manifest_sha256: artifact_manifest_digest.sha256,
+         };
++        // Preserve every drain/barrier/artifact operation above. Only after
++        // successful durable commit may an opt-in resident server retain the
++        // inert kernel objects. Failure tears the process down, never reuses.
++        self.recorder.recycle_resident()?;
++        self.lifecycle_recorder.recycle_resident()?;
+         Ok((report, artifact_manifest, terminal))
+     }
+ }
+@@ -1712,6 +1717,127 @@ pub fn run_stdio(config: DeploymentObserverConfig) -> Result<()> {
+     emit_line(&terminal)
+ }
+ 
++/// Serial resident outer protocol. Run-level protocol-v2 artifacts and verifier
++/// are unchanged. No recovery/global snapshots are admitted in this first mode.
++pub fn run_resident_stdio() -> Result<()> {
++    use bpf_observer_system_effects::{
++        enable_resident_resources, resident_resource_count, resident_resource_identity,
++        shutdown_resident_resources,
++    };
++    use std::collections::HashSet;
++    enable_resident_resources();
++    let (sender, receiver) = mpsc::sync_channel(1);
++    std::thread::spawn(move || {
++        let stdin = std::io::stdin();
++        let mut input = stdin.lock();
++        loop {
++            let result = read_protocol_line(&mut input).map_err(|error| format!("{error:#}"));
++            let failed = result.is_err();
++            if sender.send(result).is_err() || failed {
++                break;
++            }
++        }
++    });
++    let mut fingerprint: Option<String> = None;
++    let mut seen = HashSet::new();
++    let mut bindings = HashSet::new();
++    for sequence in 1u64.. {
++        let line = receiver
++            .recv()
++            .context("resident command reader ended")?
++            .map_err(|error| anyhow::anyhow!(error))?;
++        let start: ResidentCommand =
++            serde_json::from_slice(&line).context("resident START schema")?;
++        if start.command == "SHUTDOWN" && start.config_path.is_none() {
++            shutdown_resident_resources();
++            emit_line(&serde_json::json!({"resident_protocol": 1, "status": "CLOSED"}))?;
++            return Ok(());
++        }
++        if start.command != "START" {
++            bail!("resident expects START or SHUTDOWN");
++        }
++        if sequence > 4096 {
++            bail!("resident run bound reached; restart worker");
++        }
++        let path = start
++            .config_path
++            .context("resident START needs config_path")?;
++        let config = DeploymentObserverConfig::from_path(Path::new(&path))?;
++        if config.protocol_version != 2
++            || config.recovery.is_some()
++            || config.bpf_state_scope.is_some()
++            || config.filesystem_state_scope.is_some()
++            || config.linux_state_scope.is_some()
++            || config.profile != PolicyProfile::Balanced
++            || config.object_resolution_mode
++                != FileObjectResolutionMode::KernelObjectExpandedPartial
++        {
++            bail!("resident mode requires balanced expanded observation-only protocol v2");
++        }
++        let current = serde_json::to_string(&(
++            config.recorder_object_path.clone(),
++            config.recorder_object_sha256.clone(),
++            config.lifecycle_object_path.clone(),
++            config.lifecycle_object_sha256.clone(),
++            config.profile,
++            config.object_resolution_mode,
++        ))?;
++        if fingerprint.as_ref().is_some_and(|old| old != &current) {
++            bail!("resident immutable BPF configuration changed");
++        }
++        fingerprint = Some(current);
++        if !seen.insert(config.run_id.clone()) {
++            bail!("resident run_id replay");
++        }
++        let reused = resident_resource_count() == 2;
++        let (mut session, ready) = DeploymentSession::prepare(config)?;
++        if ready.registration_cgroup_ids.len() != 1
++            || !bindings.insert((ready.registration_cgroup_ids[0], ready.epoch))
++        {
++            bail!("resident cgroup/epoch reuse or multi-root request");
++        }
++        let nonce = ready.finish_nonce.clone();
++        emit_line(&ready)?;
++        let command = loop {
++            match receiver.try_recv() {
++                Ok(Ok(line)) => {
++                    break serde_json::from_slice::<FinishCommand>(&line)
++                        .context("resident FINISH schema")?
++                }
++                Ok(Err(error)) => bail!("resident FINISH read: {error}"),
++                Err(TryRecvError::Disconnected) => bail!("resident FINISH reader lost"),
++                Err(TryRecvError::Empty) => {
++                    session.poll_once()?;
++                }
++            }
++        };
++        let (_, _, terminal) = session.finish(command)?;
++        if resident_resource_count() != 2 {
++            bail!("resident resources not safely recycled");
++        }
++        emit_line(&terminal)?;
++        // This ACK is separate from v2 FINISHED. The Python caller must check
++        // it before authorizing the next run or releasing its execution lease.
++        emit_line(
++            &serde_json::json!({"resident_protocol": 1, "status": "IDLE",
++            "run_id": terminal.run_id, "epoch": ready.epoch, "finish_nonce": nonce,
++            "report_sha256": terminal.report_sha256,
++            "artifact_manifest_sha256": terminal.artifact_manifest_sha256,
++            "sequence": sequence, "kernel_objects_reused": reused,
++            "resident_resources": resident_resource_count(),
++            "resident_objects": resident_resource_identity()?}),
++        )?;
++    }
++    bail!("resident run bound reached; restart the worker");
++}
++
++#[derive(Deserialize)]
++#[serde(deny_unknown_fields)]
++struct ResidentCommand {
++    command: String,
++    config_path: Option<String>,
++}
++
+ fn require_barrier(barrier: &RootFreezeBarrier, phase: &str) -> Result<()> {
+     if !barrier.all_roots_frozen {
+         let failures = barrier
+diff --git a/original/crates/system-effects-recorder/src/ancestor.rs b/modified/crates/system-effects-recorder/src/ancestor.rs
+index 7a740f4..2c72e42 100644
+--- a/original/crates/system-effects-recorder/src/ancestor.rs
++++ b/modified/crates/system-effects-recorder/src/ancestor.rs
+@@ -100,6 +100,15 @@ impl AncestorRootSet {
+                 .context("ancestor root count overflow")?,
+             reserved: 0,
+         };
++        let mut existing = AncestorConfig::default();
++        map_lookup(self.config_fd, &0_u32, &mut existing)?;
++        if super::RESIDENT_ENABLED.with(std::cell::Cell::get) && existing == config {
++            // A recycled object retains its immutable slot count. Per-run
++            // identities were disabled/deleted before reuse, and are bound to
++            // fresh retained cgroup FDs while the new target stays frozen.
++            self.sealed = true;
++            return self.verify();
++        }
+         map_update(self.config_fd, &0_u32, &config, libbpf::BPF_ANY as u64)
+             .context("publish immutable ancestor-root count")?;
+         check_rc(
+@@ -110,6 +119,20 @@ impl AncestorRootSet {
+         self.verify()
+     }
+ 
++    pub(crate) fn verify_idle(&self) -> Result<()> {
++        if !self.sealed || !self.bindings.is_empty() {
++            bail!("resident root set is not idle");
++        }
++        for slot in 0..MAX_ANCESTOR_ROOTS {
++            let mut identity = 0u64;
++            map_lookup(self.root_ids_fd, &slot, &mut identity)?;
++            if identity != 0 {
++                bail!("resident root identity slot remains enabled");
++            }
++        }
++        Ok(())
++    }
++
+     pub(crate) fn verify(&self) -> Result<()> {
+         if !self.sealed || self.bindings.is_empty() {
+             bail!("ancestor-root set is not sealed");
+diff --git a/original/crates/system-effects-recorder/src/lib.rs b/modified/crates/system-effects-recorder/src/lib.rs
+index 9f14ab9..7e5fc2d 100644
+--- a/original/crates/system-effects-recorder/src/lib.rs
++++ b/modified/crates/system-effects-recorder/src/lib.rs
+@@ -57,6 +57,7 @@ use socket_state::{
+     receive_socket_state_event, socket_state_health, SocketStateClosingBoundary, SocketStateHealth,
+     SocketStateOutputs, SocketStateRunState,
+ };
++use std::cell::{Cell, RefCell};
+ use std::collections::{HashMap, HashSet, VecDeque};
+ use std::ffi::{c_void, CString};
+ use std::fs::{self, File, OpenOptions};
+@@ -360,6 +361,61 @@ struct KernelResources {
+     async_socket_state_links: Vec<AsyncSocketStateLink>,
+     detached_link_ids: HashSet<u32>,
+     ring: *mut libbpf::ring_buffer,
++    resident_key: Option<String>,
++}
++
++thread_local! {
++    static RESIDENT_ENABLED: Cell<bool> = const { Cell::new(false) };
++    static RESIDENT_OBJECTS: RefCell<HashMap<String, KernelResources>> = RefCell::new(HashMap::new());
++}
++
++/// Explicit opt-in by the serial resident server, never by a one-shot run.
++pub fn enable_resident_resources() {
++    RESIDENT_ENABLED.with(|value| value.set(true));
++}
++
++pub fn shutdown_resident_resources() {
++    let objects = RESIDENT_OBJECTS.with(|pool| std::mem::take(&mut *pool.borrow_mut()));
++    drop(objects);
++}
++
++pub fn resident_resource_count() -> usize {
++    RESIDENT_OBJECTS.with(|pool| pool.borrow().len())
++}
++
++pub fn resident_resource_identity() -> Result<Vec<ObjectExclusions>> {
++    RESIDENT_OBJECTS.with(|pool| {
++        let pool = pool.borrow();
++        let mut keys = pool.keys().collect::<Vec<_>>();
++        keys.sort();
++        keys.into_iter()
++            .map(|key| {
++                let resources = &pool[key];
++                let mut identity = collect_exclusions(resources)?;
++                for id in &resources.detached_link_ids {
++                    identity.link_ids.remove(id);
++                }
++                Ok(identity)
++            })
++            .collect()
++    })
++}
++
++fn take_resident(key: &str) -> Option<KernelResources> {
++    if !RESIDENT_ENABLED.with(Cell::get) {
++        return None;
++    }
++    RESIDENT_OBJECTS.with(|pool| pool.borrow_mut().remove(key))
++}
++
++fn require_empty_map(object: *mut libbpf::bpf_object, name: &str) -> Result<()> {
++    let fd = find_map_fd(object, name)?;
++    let mut key = [0u8; 64];
++    let rc = unsafe { libbpf::bpf_map_get_next_key(fd, ptr::null(), key.as_mut_ptr().cast()) };
++    if rc != -libc::ENOENT {
++        bail!("resident map {name} is not proven empty: {rc}");
++    }
++    Ok(())
+ }
+ 
+ impl KernelResources {
+@@ -370,8 +426,30 @@ impl KernelResources {
+             async_socket_state_links: Vec::new(),
+             detached_link_ids: HashSet::new(),
+             ring: ptr::null_mut(),
++            resident_key: None,
+         }
+     }
++
++    fn recycle(&mut self) -> Result<()> {
++        let Some(key) = self.resident_key.as_ref().cloned() else {
++            return Ok(());
++        };
++        RESIDENT_OBJECTS.with(|pool| -> Result<()> {
++            let mut pool = pool.borrow_mut();
++            if pool.contains_key(&key) {
++                bail!("duplicate resident resource slot");
++            }
++            if !self.ring.is_null() {
++                unsafe {
++                    libbpf::ring_buffer__free(self.ring);
++                }
++                self.ring = ptr::null_mut();
++            }
++            let resources = std::mem::replace(self, Self::new(ptr::null_mut()));
++            pool.insert(key, resources);
++            Ok(())
++        })
++    }
+ }
+ 
+ impl Drop for KernelResources {
+@@ -508,20 +586,32 @@ impl SystemEffectRecorder {
+ 
+         let (object_bytes, object_sha256) = read_object(object_path)?;
+         verify_digest(&object_sha256, expected_object_sha256)?;
+-        let object = unsafe {
+-            libbpf::bpf_object__open_mem(
+-                object_bytes.as_ptr().cast(),
+-                object_bytes.len() as u64,
+-                ptr::null(),
+-            )
++        let resident_key =
++            format!("effects:{object_sha256}:{boot_id}:{profile:?}:{object_resolution_mode:?}");
++        let pooled = take_resident(&resident_key);
++        let reused = pooled.is_some();
++        let mut resources = if let Some(resources) = pooled {
++            resources
++        } else {
++            let object = unsafe {
++                libbpf::bpf_object__open_mem(
++                    object_bytes.as_ptr().cast(),
++                    object_bytes.len() as u64,
++                    ptr::null(),
++                )
++            };
++            check_pointer(object.cast(), "open system-effect BPF object")?;
++            let mut resources = KernelResources::new(object);
++            configure_object_autoload(resources.object, object_resolution_mode)?;
++            check_rc(
++                unsafe { libbpf::bpf_object__load(resources.object) },
++                "load system-effect BPF object",
++            )?;
++            resources
+         };
+-        check_pointer(object.cast(), "open system-effect BPF object")?;
+-        let mut resources = KernelResources::new(object);
+-        configure_object_autoload(resources.object, object_resolution_mode)?;
+-        check_rc(
+-            unsafe { libbpf::bpf_object__load(resources.object) },
+-            "load system-effect BPF object",
+-        )?;
++        if RESIDENT_ENABLED.with(Cell::get) {
++            resources.resident_key = Some(resident_key);
++        }
+ 
+         let policy_fd = find_map_fd(resources.object, MAP_POLICY)?;
+         let run_states_fd = find_map_fd(resources.object, MAP_RUNS)?;
+@@ -638,16 +728,18 @@ impl SystemEffectRecorder {
+                 )
+                 .with_flags(0),
+             )?;
+-            let config = ObjectConfig {
+-                resolver_mask: object_resolution_mode.resolver_mask(),
+-                capture_path: 1,
+-            };
+-            map_update(config_fd, &0u32, &config, libbpf::BPF_ANY as u64)
+-                .context("enable kernel file-object resolution")?;
+-            check_rc(
+-                unsafe { libbpf::bpf_map_freeze(config_fd) },
+-                "freeze immutable file-object resolution config",
+-            )?;
++            if !reused {
++                let config = ObjectConfig {
++                    resolver_mask: object_resolution_mode.resolver_mask(),
++                    capture_path: 1,
++                };
++                map_update(config_fd, &0u32, &config, libbpf::BPF_ANY as u64)
++                    .context("enable kernel file-object resolution")?;
++                check_rc(
++                    unsafe { libbpf::bpf_map_freeze(config_fd) },
++                    "freeze immutable file-object resolution config",
++                )?;
++            }
+         }
+         if let Some(socket_objects_fd) = socket_objects_fd {
+             validate_map_abi(
+@@ -695,46 +787,58 @@ impl SystemEffectRecorder {
+             )?;
+         }
+ 
+-        for (number, policy) in kernel_policies(profile)? {
+-            map_update(policy_fd, &number, &policy, libbpf::BPF_ANY as u64)
+-                .with_context(|| format!("install syscall policy for number {number}"))?;
+-        }
+-        check_rc(
+-            unsafe { libbpf::bpf_map_freeze(policy_fd) },
+-            "freeze immutable system-effect syscall policy",
+-        )?;
+-        attach_tracepoint(&mut resources, PROGRAM_ENTER, "raw_syscalls", "sys_enter")?;
+-        if object_resolution_mode.kernel_file_object_enabled() {
+-            attach_tracepoint(
+-                &mut resources,
+-                if object_resolution_mode.expanded_object_enabled() {
+-                    PROGRAM_EXPANDED_EXIT
+-                } else {
+-                    PROGRAM_FILE_EXIT
+-                },
+-                "raw_syscalls",
+-                "sys_exit",
+-            )?;
+-            attach_lsm(&mut resources, PROGRAM_FILE_OBJECT)?;
+-            if object_resolution_mode.kernel_file_write_enabled() {
+-                attach_lsm(&mut resources, PROGRAM_FILE_PERMISSION)?;
++        if !reused {
++            for (number, policy) in kernel_policies(profile)? {
++                map_update(policy_fd, &number, &policy, libbpf::BPF_ANY as u64)
++                    .with_context(|| format!("install syscall policy for number {number}"))?;
+             }
+-            if object_resolution_mode.expanded_object_enabled() {
+-                for program in PROGRAM_EXPANDED_OBJECT_HOOKS {
+-                    attach_lsm(&mut resources, program)?;
+-                }
+-                attach_auto(&mut resources, PROGRAM_ACCEPT_EXIT)?;
+-                for producer in ASYNC_SOCKET_STATE_PRODUCERS {
+-                    attach_async_socket_state(&mut resources, producer)?;
++            check_rc(
++                unsafe { libbpf::bpf_map_freeze(policy_fd) },
++                "freeze immutable system-effect syscall policy",
++            )?;
++            attach_tracepoint(&mut resources, PROGRAM_ENTER, "raw_syscalls", "sys_enter")?;
++            if object_resolution_mode.kernel_file_object_enabled() {
++                attach_tracepoint(
++                    &mut resources,
++                    if object_resolution_mode.expanded_object_enabled() {
++                        PROGRAM_EXPANDED_EXIT
++                    } else {
++                        PROGRAM_FILE_EXIT
++                    },
++                    "raw_syscalls",
++                    "sys_exit",
++                )?;
++                attach_lsm(&mut resources, PROGRAM_FILE_OBJECT)?;
++                if object_resolution_mode.kernel_file_write_enabled() {
++                    attach_lsm(&mut resources, PROGRAM_FILE_PERMISSION)?;
+                 }
+-                if resources.async_socket_state_links.len()
+-                    != ASYNC_SOCKET_STATE_PRODUCER_LINKS as usize
+-                {
+-                    bail!("expanded recorder did not attach the closed async socket producer set");
++                if object_resolution_mode.expanded_object_enabled() {
++                    for program in PROGRAM_EXPANDED_OBJECT_HOOKS {
++                        attach_lsm(&mut resources, program)?;
++                    }
++                    attach_auto(&mut resources, PROGRAM_ACCEPT_EXIT)?;
++                    for producer in ASYNC_SOCKET_STATE_PRODUCERS {
++                        attach_async_socket_state(&mut resources, producer)?;
++                    }
++                    if resources.async_socket_state_links.len()
++                        != ASYNC_SOCKET_STATE_PRODUCER_LINKS as usize
++                    {
++                        bail!(
++                            "expanded recorder did not attach the closed async socket producer set"
++                        );
++                    }
+                 }
++            } else {
++                attach_tracepoint(&mut resources, PROGRAM_EXIT, "raw_syscalls", "sys_exit")?;
++            }
++        } else if object_resolution_mode.expanded_object_enabled() {
++            // The task-bound hooks stay attached. Only the two async producers
++            // were synchronously detached at the previous run's sealed boundary.
++            resources.async_socket_state_links.clear();
++            resources.detached_link_ids.clear();
++            for producer in ASYNC_SOCKET_STATE_PRODUCERS {
++                attach_async_socket_state(&mut resources, producer)?;
+             }
+-        } else {
+-            attach_tracepoint(&mut resources, PROGRAM_EXIT, "raw_syscalls", "sys_exit")?;
+         }
+ 
+         let mut callback = Box::<CallbackState>::default();
+@@ -807,6 +911,31 @@ impl SystemEffectRecorder {
+         &self.object_sha256
+     }
+ 
++    /// Called only after drain, root unregistration and durable artifact commit.
++    pub fn recycle_resident(&mut self) -> Result<()> {
++        if self.resources.resident_key.is_none() {
++            return Ok(());
++        }
++        if !self.persisted.is_empty() || !self.callback.queue.is_empty() {
++            bail!("resident effects still have registered runs or queued records");
++        }
++        for name in [
++            MAP_RUNS,
++            MAP_PENDING,
++            MAP_FILE_OBJECTS,
++            MAP_SOCKET_OBJECTS,
++            MAP_SOCKET_STATE_RUNS,
++            MAP_SOCKET_OWNERS,
++        ] {
++            require_empty_map(self.resources.object, name)?;
++        }
++        self.ancestor_roots.verify_idle()?;
++        if !self.async_socket_producer_seal.evidence().complete {
++            bail!("resident async producers were not sealed");
++        }
++        self.resources.recycle()
++    }
++
+     pub fn policy_sha256(&self) -> &str {
+         &self.policy_sha256
+     }
+diff --git a/original/crates/system-effects-recorder/src/lifecycle.rs b/modified/crates/system-effects-recorder/src/lifecycle.rs
+index d0fb5c4..e7a3337 100644
+--- a/original/crates/system-effects-recorder/src/lifecycle.rs
++++ b/modified/crates/system-effects-recorder/src/lifecycle.rs
+@@ -9,8 +9,8 @@
+ use super::ancestor::{AncestorConfig, AncestorRootSet, MAX_ANCESTOR_ROOTS};
+ use super::{
+     check_pointer, check_rc, collect_exclusions, find_map_fd, find_program, libbpf_error,
+-    map_delete, map_lookup, map_update, read_object, validate_map_abi, verify_digest,
+-    CgroupMatchMode, KernelResources, MapAbi,
++    map_delete, map_lookup, map_update, read_object, require_empty_map, take_resident,
++    validate_map_abi, verify_digest, CgroupMatchMode, KernelResources, MapAbi, RESIDENT_ENABLED,
+ };
+ use anyhow::{bail, Context, Result};
+ use bpf_observer_schema::ObjectExclusions;
+@@ -977,19 +977,30 @@ impl ProcessLifecycleRecorder {
+ 
+         let (object_bytes, object_sha256) = read_object(object_path)?;
+         verify_digest(&object_sha256, expected_object_sha256)?;
+-        let object = unsafe {
+-            libbpf::bpf_object__open_mem(
+-                object_bytes.as_ptr().cast(),
+-                object_bytes.len() as u64,
+-                ptr::null(),
+-            )
++        let resident_key = format!("lifecycle:{object_sha256}:{boot_id}");
++        let pooled = take_resident(&resident_key);
++        let reused = pooled.is_some();
++        let mut resources = if let Some(resources) = pooled {
++            resources
++        } else {
++            let object = unsafe {
++                libbpf::bpf_object__open_mem(
++                    object_bytes.as_ptr().cast(),
++                    object_bytes.len() as u64,
++                    ptr::null(),
++                )
++            };
++            check_pointer(object.cast(), "open process-lifecycle BPF object")?;
++            let mut resources = KernelResources::new(object);
++            check_rc(
++                unsafe { libbpf::bpf_object__load(resources.object) },
++                "load process-lifecycle BPF object",
++            )?;
++            resources
+         };
+-        check_pointer(object.cast(), "open process-lifecycle BPF object")?;
+-        let mut resources = KernelResources::new(object);
+-        check_rc(
+-            unsafe { libbpf::bpf_object__load(resources.object) },
+-            "load process-lifecycle BPF object",
+-        )?;
++        if RESIDENT_ENABLED.with(std::cell::Cell::get) {
++            resources.resident_key = Some(resident_key);
++        }
+         let run_states_fd = find_map_fd(resources.object, MAP_LIFECYCLE_RUNS)?;
+         let events_fd = find_map_fd(resources.object, MAP_LIFECYCLE_EVENTS)?;
+         let root_cgroups_fd = find_map_fd(resources.object, MAP_LIFECYCLE_ROOTS)?;
+@@ -1045,11 +1056,13 @@ impl ProcessLifecycleRecorder {
+                 1,
+             ),
+         )?;
+-        for program_name in PROGRAM_LIFECYCLE_HOOKS {
+-            let program = find_program(resources.object, program_name)?;
+-            let link = unsafe { libbpf::bpf_program__attach(program) };
+-            check_pointer(link.cast(), "attach process-lifecycle tp_btf program")?;
+-            resources.links.push(link);
++        if !reused {
++            for program_name in PROGRAM_LIFECYCLE_HOOKS {
++                let program = find_program(resources.object, program_name)?;
++                let link = unsafe { libbpf::bpf_program__attach(program) };
++                check_pointer(link.cast(), "attach process-lifecycle tp_btf program")?;
++                resources.links.push(link);
++            }
+         }
+ 
+         let mut callback = Box::<ProcessLifecycleCallbackState>::default();
+@@ -1092,6 +1105,18 @@ impl ProcessLifecycleRecorder {
+         &self.object_sha256
+     }
+ 
++    pub fn recycle_resident(&mut self) -> Result<()> {
++        if self.resources.resident_key.is_none() {
++            return Ok(());
++        }
++        if !self.persisted.is_empty() || !self.callback.queue.is_empty() {
++            bail!("resident lifecycle still has registered runs or queued records");
++        }
++        require_empty_map(self.resources.object, MAP_LIFECYCLE_RUNS)?;
++        self.ancestor_roots.verify_idle()?;
++        self.resources.recycle()
++    }
++
+     pub fn object_exclusions(&self) -> Result<ObjectExclusions> {
+         collect_exclusions(&self.resources)
+             .context("resolve every process-lifecycle recorder-owned BPF object ID")

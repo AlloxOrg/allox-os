@@ -1,0 +1,6 @@
+{
+  "deployment-observe": "1421a65df7f357170dc4995a4c259f6cf0f8f64614f37639ffee8f577c179b06",
+  "deployment-observe-verify": "fca2776f058a56b8fc1284a2cb13f5e52b5bda0358cea2ecc2eccca5ab2bb2d9",
+  "system_effects.bpf.o": "032fad9aefa0993400f734f86fb0b2a6b32a9cec2b2b79c384d84ee73e45970c",
+  "process_lifecycle.bpf.o": "d42ab44f4623c3857c8debd50470d45722e57bf4e524d4c7ba535302fa775ef6"
+}

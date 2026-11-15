@@ -21,6 +21,7 @@ from typing import Any
 
 from allox.workspace.store import WorkspaceError
 from allox_system_effects.config import MAX_CONFIG_BYTES, SystemEffectsConfig, is_sha256
+from allox_system_effects.resident import ResidentInvocation, ResidentObserver
 
 PROTOCOL_VERSION = 2
 RECOVERY_PROTOCOL_VERSION = 3
@@ -267,8 +268,10 @@ class SystemEffectsRun:
         config: SystemEffectsConfig,
         context: object,
         on_close: Callable[[SystemEffectsRun], None],
+        *, resident: ResidentObserver | None = None,
     ) -> None:
         self._config = config
+        self._resident = resident
         self._binding = RunBinding.from_context(context)
         self._on_close = on_close
         self._evidence_directory = self._binding.audit_directory / "system-effects"
@@ -289,7 +292,7 @@ class SystemEffectsRun:
         self._final_result: dict[str, Any] | None = None
         self._ready: dict[str, Any] | None = None
         self._finish_nonce: str | None = None
-        self._process: subprocess.Popen[bytes] | None = None
+        self._process: subprocess.Popen[bytes] | ResidentInvocation | None = None
         self._verifier_process: subprocess.Popen[bytes] | None = None
         self._reader: threading.Thread | None = None
         self._errors: threading.Thread | None = None
@@ -314,7 +317,10 @@ class SystemEffectsRun:
         _write_new_file(self._config_path, encoded)
 
         try:
-            self._process = subprocess.Popen(
+            if resident is not None:
+                self._process = resident.begin(self._config_path, self._binding)
+            else:
+                self._process = subprocess.Popen(
                 [str(config.observer_path), "--config", str(self._config_path)],
                 stdin=subprocess.PIPE,
                 stdout=subprocess.PIPE,
@@ -721,6 +727,9 @@ class SystemEffectsRun:
             self._validate_offline_verification(verification, terminal, report, manifest)
             _write_new_file(self._verification_path, verification_bytes)
             receipt = self._build_receipt(outcome, barrier, terminal, verification)
+            if self._resident is not None:
+                assert isinstance(self._process, ResidentInvocation)
+                receipt["resident_observer"] = self._process.evidence
             _write_new_file(self._receipt_path, _canonical_json(receipt) + b"\n")
             with self._lock:
                 self._phase = "FINISHED"
@@ -784,6 +793,10 @@ class SystemEffectsRun:
             raise WorkspaceError("deployment-observe FINISHED binding mismatch")
 
     def _require_observer_exit(self, deadline: float) -> None:
+        """One-shot: waitpid. Resident: wait for the native nonce/hash-bound
+        IDLE ACK after root/pending/owner cleanup; the worker stays alive.
+        Independent artifact verification below is required in both modes.
+        """
         process = self._process
         assert process is not None
         remaining = deadline - time.monotonic()
@@ -1019,6 +1032,8 @@ class SystemEffectsRun:
         self._shutdown(preserve_phase=True)
 
     def _shutdown(self, *, preserve_phase: bool) -> None:
+        if getattr(self, "_resident", None) is not None and self._phase != "FINISHED":
+            self._resident._fail("run closed without independent verified finalization")
         with self._lock:
             if self._expected_shutdown:
                 self._retire()
@@ -1055,7 +1070,7 @@ class SystemEffectsRun:
         self._on_close(self)
 
 
-def _terminate_process_group(process: subprocess.Popen[bytes]) -> None:
+def _terminate_process_group(process: subprocess.Popen[bytes] | ResidentInvocation) -> None:
     if process.poll() is not None:
         return
     try:

@@ -1,0 +1,77 @@
+{
+  "guest_required": false,
+  "rows": [
+    {
+      "case": "probe",
+      "stream": "system-effects.jsonl",
+      "events": 562,
+      "turn_status": "declared_parent_turn",
+      "passed": true
+    },
+    {
+      "case": "probe",
+      "stream": "process-lifecycle.jsonl",
+      "events": 63,
+      "turn_status": "declared_parent_turn",
+      "passed": true
+    },
+    {
+      "case": "agent-batch",
+      "stream": "system-effects.jsonl",
+      "events": 4424,
+      "turn_status": "declared_parent_turn",
+      "passed": true
+    },
+    {
+      "case": "agent-batch",
+      "stream": "process-lifecycle.jsonl",
+      "events": 265,
+      "turn_status": "declared_parent_turn",
+      "passed": true
+    },
+    {
+      "case": "other-session",
+      "stream": "system-effects.jsonl",
+      "events": 562,
+      "turn_status": "declared_parent_turn",
+      "passed": true
+    },
+    {
+      "case": "other-session",
+      "stream": "process-lifecycle.jsonl",
+      "events": 63,
+      "turn_status": "declared_parent_turn",
+      "passed": true
+    },
+    {
+      "case": "other-agent",
+      "stream": "system-effects.jsonl",
+      "events": 562,
+      "turn_status": "declared_parent_turn",
+      "passed": true
+    },
+    {
+      "case": "other-agent",
+      "stream": "process-lifecycle.jsonl",
+      "events": 63,
+      "turn_status": "declared_parent_turn",
+      "passed": true
+    },
+    {
+      "case": "multi-turn",
+      "stream": "system-effects.jsonl",
+      "events": 550,
+      "turn_status": "ambiguous",
+      "passed": true
+    },
+    {
+      "case": "multi-turn",
+      "stream": "process-lifecycle.jsonl",
+      "events": 63,
+      "turn_status": "ambiguous",
+      "passed": true
+    }
+  ],
+  "limited_contract_passed": true,
+  "passed": true
+}

@@ -1,0 +1,66 @@
+{
+  "passed": true,
+  "source_base": "d81c7ac",
+  "runtime": "kata-allox-ebpf",
+  "model": "Qwen3.5-4B-CPU-Test",
+  "host_cpus": [
+    24,
+    25,
+    26,
+    27,
+    28,
+    29,
+    30,
+    31,
+    32,
+    33,
+    34,
+    35,
+    36,
+    37,
+    38,
+    39,
+    40,
+    41,
+    42,
+    43,
+    44,
+    45,
+    46,
+    47
+  ],
+  "provider_key_in_guest": false,
+  "provider_kind": "cached-local-cpu",
+  "prompt_mode": "test-only compact system prompt for 4096-token CPU fixture",
+  "kernel": "/data/hy/Allox/monitor-e2e-20261114/linux-6.12.107/arch/x86/boot/bzImage",
+  "guest_image": "/data/hy/Allox/monitor-e2e-20261114/kata-ubuntu-3.10-monitor.image",
+  "shared_fs": "virtio-9p; owned per-Guest override",
+  "scope": "real BPF + real Agent; no snapshot/resume or power-loss claim",
+  "boot_pids": [
+    {
+      "pid": 2256102,
+      "qemu": false,
+      "virtiofsd": false
+    },
+    {
+      "pid": 2256114,
+      "qemu": true,
+      "virtiofsd": false
+    }
+  ],
+  "vmm_affinity": [
+    {
+      "pid": 2256102,
+      "qemu": false,
+      "virtiofsd": false
+    },
+    {
+      "pid": 2256114,
+      "qemu": true,
+      "virtiofsd": false
+    }
+  ],
+  "container_exit_code": 0,
+  "removed_owned_container": true,
+  "gateway_requests": []
+}

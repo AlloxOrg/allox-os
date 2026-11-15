@@ -1,0 +1,24 @@
+CPUS 24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47 CHECK [PosixPath('/data/hy/Allox/agent-monitoring-main-20261030-v2/.validation-venv/bin/ruff'), 'check', '--select', 'E4,E7,E9,F,I', 'plugins/system-effects']
+All checks passed!
+CPUS 24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47 CHECK [PosixPath('/data/hy/Allox/agent-monitoring-main-20261030-v2/.validation-venv/bin/ruff'), 'check', '--select', 'E4,E7,E9,F', 'examples/monitor_resident']
+All checks passed!
+CPUS 24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47 CHECK ['docker', 'run', '--rm', '--network', 'none', '-v', '/data/hy/Allox/monitor-resident-20261115/source:/work:ro', '-v', '/data/hy/Allox/agent-monitoring-main-20261030-v2/.validation-venv/lib/python3.10/site-packages/pyright:/checker:ro', '-w', '/work', 'node:22-alpine', 'node', '/checker/dist/dist/pyright.js', '--typeshedpath', '/checker/dist/dist/typeshed-fallback']
+0 errors, 0 warnings, 0 informations
+CPUS 24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47 CHECK [PosixPath('/data/hy/Allox/agent-monitoring-main-20261030-v2/.validation-venv/bin/python'), PosixPath('/data/hy/Allox/monitor-resident-20261115/source/examples/monitor_resident/apply_observer_patch.py'), '/data/hy/Allox/monitor-resident-20261115/resident-patch-iwkxhs80']
+patching file crates/deployment-observer/src/bin/deployment-observe.rs
+patching file crates/deployment-observer/src/lib.rs
+patching file crates/deployment-observer/src/session.rs
+patching file crates/system-effects-recorder/src/ancestor.rs
+patching file crates/system-effects-recorder/src/lib.rs
+patching file crates/system-effects-recorder/src/lifecycle.rs
+RESIDENT_PATCH_VERIFIED
+CPUS 24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47 CHECK [PosixPath('/data/hy/Allox/agent-monitoring-main-20261030-v2/.validation-venv/bin/python'), PosixPath('/data/hy/Allox/monitor-resident-20261115/source/examples/monitor_resident/apply_observer_patch.py'), '/data/hy/Allox/monitor-resident-20261115/resident-patch-iwkxhs80']
+RESIDENT_PATCH_ALREADY_MATCHES
+CPUS 24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47 CHECK [PosixPath('/data/hy/Allox/agent-monitoring-main-20261030-v2/.validation-venv/bin/python'), '-m', 'pytest', '-q', '--maxfail=5', 'tests', 'plugins/system-effects/tests']
+........................................................................ [ 17%]
+................................................................ssssss.. [ 34%]
+..............s..s.......s.sssssssss.................................... [ 51%]
+...................s..............ss.................................... [ 69%]
+........................................................................ [ 86%]
+........................................................                 [100%]
+395 passed, 21 skipped in 50.17s

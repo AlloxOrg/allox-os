@@ -1,0 +1,4077 @@
+{
+  "passed": true,
+  "cases": [
+    {
+      "label": "agent-a-s1",
+      "mode": "batch",
+      "real_llm": false,
+      "checks": {
+        "workload": true,
+        "identity": true,
+        "no_management_token": true,
+        "sdk_complete": true,
+        "all_received_spans_ended": true,
+        "profile_complete": true,
+        "one_trace": true,
+        "one_clock": true,
+        "sdk_event_count": true,
+        "session_sdk": true,
+        "sdk_run_binding": true,
+        "system-effects.jsonl_nonempty": true,
+        "system-effects.jsonl_turn": true,
+        "system-effects.jsonl_sampled_hooks_no_known_loss": true,
+        "system-effects.jsonl_conservative_status_preserved": true,
+        "system-effects.jsonl_provenance_digest": true,
+        "file_and_network_syscalls": true,
+        "process-lifecycle.jsonl_nonempty": true,
+        "process-lifecycle.jsonl_turn": true,
+        "process-lifecycle.jsonl_sampled_hooks_no_known_loss": true,
+        "process-lifecycle.jsonl_conservative_status_preserved": true,
+        "process-lifecycle.jsonl_provenance_digest": true,
+        "fork_exec_exit": true,
+        "wrong_agent_rejected": true,
+        "tampered_stream_rejected": true
+      },
+      "wall_ns": 5218206797,
+      "run_id": "0d2f932fd74a4786ab4f5eb7bff1de21",
+      "process": {
+        "run_id": "0d2f932fd74a4786ab4f5eb7bff1de21",
+        "run_epoch": 1,
+        "agent_id": "agent-a",
+        "session_id": "s1",
+        "backend": "disabled",
+        "isolation": "bubblewrap",
+        "boot_id": "9ada39c1-b74a-432a-bb7e-96fc4884c4e9",
+        "state": "completed",
+        "created_ns": 1794684184144069478,
+        "event_count": 0,
+        "processes": {},
+        "audit_directory": "/results/agent-a-s1/audit/0d2f932fd74a4786ab4f5eb7bff1de21",
+        "trace_complete": false,
+        "cookie": 584913997138924649,
+        "feature_runs": {
+          "system-effects": {
+            "protocol_version": 2,
+            "status": "FINISHED",
+            "run_id": "0d2f932fd74a4786ab4f5eb7bff1de21",
+            "run_epoch": 1,
+            "agent_id": "agent-a",
+            "session_id": "s1",
+            "cgroup_id": 754,
+            "outcome": "completed",
+            "quiescence": {
+              "status": "QUIESCENT_WITHIN_CGROUP",
+              "basis": "CGROUP_V2_EMPTY_FROZEN_VERIFIED",
+              "cgroup_path": "/sys/fs/cgroup/allox-e2e/agent-a-s1/agents/agent-a/sessions/s1",
+              "cgroup_id": 754
+            },
+            "observer_evidence_status": "INCOMPLETE",
+            "offline_verification": "VERIFIED",
+            "artifact_count": 17,
+            "committed_artifact_total_bytes": 1234035,
+            "evidence_directory": "/results/agent-a-s1/audit/0d2f932fd74a4786ab4f5eb7bff1de21/system-effects",
+            "config_path": "/results/agent-a-s1/audit/0d2f932fd74a4786ab4f5eb7bff1de21/system-effects-config.json",
+            "config_sha256": "748fe8e0f153b0b1455911fb0cb1a35a212941cf4a1895046f6c079324f7ec11",
+            "expectation_path": "/results/agent-a-s1/audit/0d2f932fd74a4786ab4f5eb7bff1de21/system-effects-verification-expectation.json",
+            "verification_result_path": "/results/agent-a-s1/audit/0d2f932fd74a4786ab4f5eb7bff1de21/system-effects-verification.json",
+            "report_path": "/results/agent-a-s1/audit/0d2f932fd74a4786ab4f5eb7bff1de21/system-effects/deployment-observation-report.json",
+            "report_sha256": "b3e8c3e68b949a3cab18828adab0be783dd5215d31e84455c138e46fab663c92",
+            "artifact_manifest_path": "/results/agent-a-s1/audit/0d2f932fd74a4786ab4f5eb7bff1de21/system-effects/artifact-manifest.json",
+            "artifact_manifest_sha256": "81821f28d7a30cc521a8761463cd6171ddae5c018712203c36d7d995adf505a4",
+            "resident_observer": {
+              "worker_pid": 34,
+              "artifact_manifest_sha256": "81821f28d7a30cc521a8761463cd6171ddae5c018712203c36d7d995adf505a4",
+              "epoch": 1,
+              "finish_nonce": "07894c53a6bd0b6f5248f744f6f19852c6253e65268e858e14cfdc3e1958817c",
+              "kernel_objects_reused": false,
+              "report_sha256": "b3e8c3e68b949a3cab18828adab0be783dd5215d31e84455c138e46fab663c92",
+              "resident_objects": [
+                {
+                  "link_ids": [
+                    1,
+                    2,
+                    3,
+                    4,
+                    5,
+                    6,
+                    7,
+                    8,
+                    9,
+                    10,
+                    11,
+                    12,
+                    13,
+                    14,
+                    15,
+                    16,
+                    17,
+                    18,
+                    19,
+                    20
+                  ],
+                  "map_ids": [
+                    1,
+                    2,
+                    3,
+                    4,
+                    5,
+                    6,
+                    7,
+                    8,
+                    9,
+                    10,
+                    11,
+                    12,
+                    13,
+                    14
+                  ],
+                  "program_ids": [
+                    7,
+                    8,
+                    9,
+                    10,
+                    11,
+                    12,
+                    13,
+                    14,
+                    15,
+                    16,
+                    17,
+                    18,
+                    19,
+                    20,
+                    21,
+                    22,
+                    23,
+                    24,
+                    25,
+                    26,
+                    27,
+                    28
+                  ]
+                },
+                {
+                  "link_ids": [
+                    23,
+                    24,
+                    25
+                  ],
+                  "map_ids": [
+                    15,
+                    16,
+                    17,
+                    18,
+                    19
+                  ],
+                  "program_ids": [
+                    31,
+                    32,
+                    33
+                  ]
+                }
+              ],
+              "resident_protocol": 1,
+              "resident_resources": 2,
+              "run_id": "0d2f932fd74a4786ab4f5eb7bff1de21",
+              "sequence": 1,
+              "status": "IDLE"
+            }
+          }
+        },
+        "agent_monitor": true,
+        "trace_context": {
+          "trace_id": "3828faa3259a426884f53bf7b91cddd6",
+          "span_id": "6a1d37582beb425189099aacc9bb0dca"
+        },
+        "root_pid": 32,
+        "launcher_pid": 30,
+        "cgroup": "/sys/fs/cgroup/allox-e2e/agent-a-s1/agents/agent-a/sessions/s1",
+        "monitor_trace_id": "3828faa3259a426884f53bf7b91cddd6",
+        "monitor_span_id": "process-0d2f932fd74a4786ab4f5eb7bff1de21",
+        "root_exit_code": 0,
+        "lifecycle_complete": true,
+        "session_fenced": false,
+        "finished_ns": 1794684189100886948,
+        "cgroup_removed": true
+      },
+      "proof": {
+        "agent": "agent-a",
+        "session": "s1",
+        "steps": 12,
+        "rows": [
+          {
+            "index": 0,
+            "bytes": 11,
+            "child": {
+              "pid": 6,
+              "ppid": 4
+            }
+          },
+          {
+            "index": 1,
+            "bytes": 11,
+            "child": {
+              "pid": 7,
+              "ppid": 4
+            }
+          },
+          {
+            "index": 2,
+            "bytes": 11,
+            "child": {
+              "pid": 8,
+              "ppid": 4
+            }
+          },
+          {
+            "index": 3,
+            "bytes": 11,
+            "child": {
+              "pid": 9,
+              "ppid": 4
+            }
+          },
+          {
+            "index": 4,
+            "bytes": 11,
+            "child": {
+              "pid": 10,
+              "ppid": 4
+            }
+          },
+          {
+            "index": 5,
+            "bytes": 11,
+            "child": {
+              "pid": 11,
+              "ppid": 4
+            }
+          },
+          {
+            "index": 6,
+            "bytes": 11,
+            "child": {
+              "pid": 12,
+              "ppid": 4
+            }
+          },
+          {
+            "index": 7,
+            "bytes": 11,
+            "child": {
+              "pid": 13,
+              "ppid": 4
+            }
+          },
+          {
+            "index": 8,
+            "bytes": 11,
+            "child": {
+              "pid": 14,
+              "ppid": 4
+            }
+          },
+          {
+            "index": 9,
+            "bytes": 11,
+            "child": {
+              "pid": 15,
+              "ppid": 4
+            }
+          },
+          {
+            "index": 10,
+            "bytes": 12,
+            "child": {
+              "pid": 16,
+              "ppid": 4
+            }
+          },
+          {
+            "index": 11,
+            "bytes": 12,
+            "child": {
+              "pid": 17,
+              "ppid": 4
+            }
+          }
+        ],
+        "health": {
+          "attempted_events": 72,
+          "acknowledged_events": 72,
+          "failed_events": 0,
+          "pending_events": 0,
+          "pending_bytes": 0,
+          "peak_pending_events": 6,
+          "peak_pending_bytes": 2106,
+          "serialized_bytes": 25262,
+          "emit_ns": 476110799,
+          "batch_requests": 13,
+          "worker_alive": false,
+          "action_batch_size": 8,
+          "action_flush_interval": 0.05,
+          "completed_actions": 12,
+          "durable_actions": 12,
+          "flush_requests": 13,
+          "closed": true,
+          "complete": true,
+          "enabled": true,
+          "delivery": "queued",
+          "batch_size": 32,
+          "metric_errors": 0,
+          "strict": true
+        },
+        "wall_ns_including_close": 2038581672,
+        "management_token_absent": true
+      },
+      "profile": {
+        "runs": 1,
+        "spans": 39,
+        "complete": true,
+        "warnings": [],
+        "groups": [
+          {
+            "semantic_path": [
+              "e2e"
+            ],
+            "kind": "phase",
+            "name": "tool_execution",
+            "model": null,
+            "calls": 12,
+            "runs": 1,
+            "errors": 0,
+            "inclusive_ns": 1995159616,
+            "self_ns": 1995159616,
+            "p50_ns": 167360861,
+            "p95_ns": 179173738,
+            "timing_samples": [],
+            "metrics": {
+              "executor.execution_ns": {
+                "sum": 1994024982,
+                "samples": 12
+              },
+              "executor.thread_cpu_ns": {
+                "sum": 31696946,
+                "samples": 12
+              }
+            }
+          },
+          {
+            "semantic_path": [
+              "e2e"
+            ],
+            "kind": "process",
+            "name": "allox.execution",
+            "model": null,
+            "calls": 1,
+            "runs": 1,
+            "errors": 0,
+            "inclusive_ns": 2657193098,
+            "self_ns": 655750826,
+            "p50_ns": 2657193098,
+            "p95_ns": 2657193098,
+            "timing_samples": [],
+            "metrics": {
+              "cgroup.cpu_usage_usec": {
+                "sum": 790403,
+                "samples": 1
+              }
+            }
+          },
+          {
+            "semantic_path": [
+              "e2e"
+            ],
+            "kind": "run",
+            "name": "experiment",
+            "model": null,
+            "calls": 1,
+            "runs": 1,
+            "errors": 0,
+            "inclusive_ns": 5192927919,
+            "self_ns": 65764325,
+            "p50_ns": 5192927919,
+            "p95_ns": 5192927919,
+            "timing_samples": [],
+            "metrics": {}
+          },
+          {
+            "semantic_path": [
+              "e2e"
+            ],
+            "kind": "tool",
+            "name": "file-network-socket-child",
+            "model": null,
+            "calls": 12,
+            "runs": 1,
+            "errors": 0,
+            "inclusive_ns": 1998949847,
+            "self_ns": 3790231,
+            "p50_ns": 167600605,
+            "p95_ns": 179434980,
+            "timing_samples": [
+              {
+                "executor_internal_ns": 177093296,
+                "non_execution_ns": 1675032
+              },
+              {
+                "executor_internal_ns": 152294946,
+                "non_execution_ns": 283682
+              },
+              {
+                "executor_internal_ns": 167295005,
+                "non_execution_ns": 313234
+              },
+              {
+                "executor_internal_ns": 162052231,
+                "non_execution_ns": 337824
+              },
+              {
+                "executor_internal_ns": 165352309,
+                "non_execution_ns": 337437
+              },
+              {
+                "executor_internal_ns": 179117661,
+                "non_execution_ns": 317319
+              },
+              {
+                "executor_internal_ns": 174022512,
+                "non_execution_ns": 236641
+              },
+              {
+                "executor_internal_ns": 156494621,
+                "non_execution_ns": 225160
+              },
+              {
+                "executor_internal_ns": 147346564,
+                "non_execution_ns": 347135
+              },
+              {
+                "executor_internal_ns": 169797053,
+                "non_execution_ns": 261620
+              },
+              {
+                "executor_internal_ns": 175851993,
+                "non_execution_ns": 295967
+              },
+              {
+                "executor_internal_ns": 167306791,
+                "non_execution_ns": 293814
+              }
+            ],
+            "metrics": {}
+          },
+          {
+            "semantic_path": [
+              "e2e"
+            ],
+            "kind": "turn",
+            "name": "action-0",
+            "model": null,
+            "calls": 1,
+            "runs": 1,
+            "errors": 0,
+            "inclusive_ns": 179449462,
+            "self_ns": 681134,
+            "p50_ns": 179449462,
+            "p95_ns": 179449462,
+            "timing_samples": [],
+            "metrics": {}
+          },
+          {
+            "semantic_path": [
+              "e2e"
+            ],
+            "kind": "turn",
+            "name": "action-1",
+            "model": null,
+            "calls": 1,
+            "runs": 1,
+            "errors": 0,
+            "inclusive_ns": 152763564,
+            "self_ns": 184936,
+            "p50_ns": 152763564,
+            "p95_ns": 152763564,
+            "timing_samples": [],
+            "metrics": {}
+          },
+          {
+            "semantic_path": [
+              "e2e"
+            ],
+            "kind": "turn",
+            "name": "action-10",
+            "model": null,
+            "calls": 1,
+            "runs": 1,
+            "errors": 0,
+            "inclusive_ns": 176314913,
+            "self_ns": 166953,
+            "p50_ns": 176314913,
+            "p95_ns": 176314913,
+            "timing_samples": [],
+            "metrics": {}
+          },
+          {
+            "semantic_path": [
+              "e2e"
+            ],
+            "kind": "turn",
+            "name": "action-11",
+            "model": null,
+            "calls": 1,
+            "runs": 1,
+            "errors": 0,
+            "inclusive_ns": 167776653,
+            "self_ns": 176048,
+            "p50_ns": 167776653,
+            "p95_ns": 167776653,
+            "timing_samples": [],
+            "metrics": {}
+          },
+          {
+            "semantic_path": [
+              "e2e"
+            ],
+            "kind": "turn",
+            "name": "action-2",
+            "model": null,
+            "calls": 1,
+            "runs": 1,
+            "errors": 0,
+            "inclusive_ns": 167783606,
+            "self_ns": 175367,
+            "p50_ns": 167783606,
+            "p95_ns": 167783606,
+            "timing_samples": [],
+            "metrics": {}
+          },
+          {
+            "semantic_path": [
+              "e2e"
+            ],
+            "kind": "turn",
+            "name": "action-3",
+            "model": null,
+            "calls": 1,
+            "runs": 1,
+            "errors": 0,
+            "inclusive_ns": 162563158,
+            "self_ns": 173103,
+            "p50_ns": 162563158,
+            "p95_ns": 162563158,
+            "timing_samples": [],
+            "metrics": {}
+          },
+          {
+            "semantic_path": [
+              "e2e"
+            ],
+            "kind": "turn",
+            "name": "action-4",
+            "model": null,
+            "calls": 1,
+            "runs": 1,
+            "errors": 0,
+            "inclusive_ns": 165863983,
+            "self_ns": 174237,
+            "p50_ns": 165863983,
+            "p95_ns": 165863983,
+            "timing_samples": [],
+            "metrics": {}
+          },
+          {
+            "semantic_path": [
+              "e2e"
+            ],
+            "kind": "turn",
+            "name": "action-5",
+            "model": null,
+            "calls": 1,
+            "runs": 1,
+            "errors": 0,
+            "inclusive_ns": 179603705,
+            "self_ns": 168725,
+            "p50_ns": 179603705,
+            "p95_ns": 179603705,
+            "timing_samples": [],
+            "metrics": {}
+          },
+          {
+            "semantic_path": [
+              "e2e"
+            ],
+            "kind": "turn",
+            "name": "action-6",
+            "model": null,
+            "calls": 1,
+            "runs": 1,
+            "errors": 0,
+            "inclusive_ns": 174437312,
+            "self_ns": 178159,
+            "p50_ns": 174437312,
+            "p95_ns": 174437312,
+            "timing_samples": [],
+            "metrics": {}
+          },
+          {
+            "semantic_path": [
+              "e2e"
+            ],
+            "kind": "turn",
+            "name": "action-7",
+            "model": null,
+            "calls": 1,
+            "runs": 1,
+            "errors": 0,
+            "inclusive_ns": 156818651,
+            "self_ns": 98870,
+            "p50_ns": 156818651,
+            "p95_ns": 156818651,
+            "timing_samples": [],
+            "metrics": {}
+          },
+          {
+            "semantic_path": [
+              "e2e"
+            ],
+            "kind": "turn",
+            "name": "action-8",
+            "model": null,
+            "calls": 1,
+            "runs": 1,
+            "errors": 0,
+            "inclusive_ns": 147842311,
+            "self_ns": 148612,
+            "p50_ns": 147842311,
+            "p95_ns": 147842311,
+            "timing_samples": [],
+            "metrics": {}
+          },
+          {
+            "semantic_path": [
+              "e2e"
+            ],
+            "kind": "turn",
+            "name": "action-9",
+            "model": null,
+            "calls": 1,
+            "runs": 1,
+            "errors": 0,
+            "inclusive_ns": 170224954,
+            "self_ns": 166281,
+            "p50_ns": 170224954,
+            "p95_ns": 170224954,
+            "timing_samples": [],
+            "metrics": {}
+          },
+          {
+            "semantic_path": [
+              "e2e"
+            ],
+            "kind": "turn",
+            "name": "agent-turn",
+            "model": null,
+            "calls": 1,
+            "runs": 1,
+            "errors": 0,
+            "inclusive_ns": 5127163594,
+            "self_ns": 2469970496,
+            "p50_ns": 5127163594,
+            "p95_ns": 5127163594,
+            "timing_samples": [],
+            "metrics": {}
+          }
+        ],
+        "completeness_scope": "received spans only; reconcile producer health separately",
+        "time_semantics": "inclusive sums are work, not elapsed wall time; self subtracts child union",
+        "unobserved": [
+          "transport unless instrumented",
+          "server timings unless provider reports"
+        ]
+      },
+      "evidence_health": {
+        "effects": {
+          "schema_version": 1,
+          "run_id": "0d2f932fd74a4786ab4f5eb7bff1de21",
+          "run_epoch": 1,
+          "cgroup_id": 754,
+          "profile": "balanced",
+          "object_resolution_mode": "KERNEL_OBJECT_EXPANDED_PARTIAL",
+          "transport_status": "COMPLETE",
+          "coverage_status": "PARTIAL",
+          "object_resolution_status": "PARTIAL",
+          "operation_attempted": 281,
+          "operation_completed": 281,
+          "event_attempted": 562,
+          "event_published": 562,
+          "event_dropped": 0,
+          "events_persisted": 562,
+          "pending_insert_failed": 0,
+          "pending_missing": 0,
+          "pending_remaining": 0,
+          "userspace_failures": 0,
+          "fatal_kernel_flags": 0,
+          "capture_read_failures": 0,
+          "capture_truncations": 0,
+          "capture_invalid_lengths": 50,
+          "object_resolution_attempted": 157,
+          "object_resolution_resolved": 142,
+          "object_resolution_unresolved": 15,
+          "object_resolution_failed_syscalls": 3,
+          "object_join_missing": 0,
+          "object_join_ambiguous": 0,
+          "object_read_failed": 0,
+          "object_delete_failed": 0,
+          "object_path_unavailable": 0,
+          "object_pending_remaining": 0,
+          "task_read_failed": 0,
+          "object_unsupported": 12,
+          "socket_state": {
+            "schema_version": 2,
+            "run_id": "0d2f932fd74a4786ab4f5eb7bff1de21",
+            "boot_id": "9ada39c1-b74a-432a-bb7e-96fc4884c4e9",
+            "run_epoch": 1,
+            "cgroup_id": 754,
+            "cgroup_match_mode": "ANCESTOR_ROOT",
+            "status": "COMPLETE",
+            "event_attempted": 72,
+            "event_published": 72,
+            "event_dropped": 0,
+            "events_persisted": 72,
+            "final_event_seq": 72,
+            "destroy_events_persisted": 12,
+            "owner_insert_failed": 0,
+            "owner_conflict": 0,
+            "owner_delete_failed": 0,
+            "owner_remaining": 0,
+            "owners_retired_at_barrier": 0,
+            "state_read_failed": 0,
+            "unsupported_sockets": 62,
+            "userspace_failures": 0,
+            "async_producer_seal": {
+              "complete": true,
+              "links_expected": 2,
+              "links_detached": 2
+            },
+            "producer_barrier_complete": true,
+            "drain_completed": true,
+            "wal_durable": true,
+            "callback_queue_high_water": 6,
+            "callback_queue_capacity": 4096,
+            "reasons": [],
+            "coverage_gaps": [
+              "state ownership covers directly observed AF_INET/AF_INET6 TCP bind/connect/accept operations only",
+              "accepted sockets receive a post-do_accept snapshot; TCP transitions before ownership publication are not claimed",
+              "owners still present after the producer barrier are retired from attribution; retirement is counted separately and is never projected as an observed TCP DESTROY event",
+              "UDP, Unix-domain, raw, packet, inherited, SCM_RIGHTS, io_uring, and delegated sockets are explicitly outside this partial state contract"
+            ]
+          },
+          "producer_barrier_complete": true,
+          "drain_completed": true,
+          "wal_durable": true,
+          "poll_calls": 571,
+          "maximum_events_per_poll": 27,
+          "callback_queue_high_water": 22,
+          "callback_queue_capacity": 4096,
+          "reasons": [],
+          "coverage_gaps": [
+            "native syscall ABI only; compat/x32 calls are not reliably classified",
+            "successful operation results are not proof that durable state differs",
+            "MAP_SHARED memory writes are not observed after the mapping is established",
+            "io_uring requests and completions are not decoded or causally joined",
+            "namespace creation through clone/clone3 is not recorded by this syscall-pair sensor",
+            "kernel-worker, writeback, softirq, and delayed async effects are not causally attributed",
+            "exact cgroup attribution identifies an unclassified run-execution-domain caller; it does not identify Agent code or observe delegated effects",
+            "netlink and generic ioctl payload semantics are not decoded",
+            "cooperative controlled workloads only; a privileged adversarial workload can evade the exact cgroup or tamper with enumerable BPF maps",
+            "KERNEL_OBJECT_EXPANDED resolves successful selected ordinary opens to the final user-visible file through file_post_open after filesystem callbacks complete (including stackable-filesystem opens), create parent directories, hard-link source inodes in the destination mount, unlink/rmdir targets, chmod/chown targets (including fchmodat2), mountless xattr inodes with bounded attribute-name capture, rename sources, eligible file-backed MAP_SHARED+PROT_WRITE mmap targets, and single shared file-backed VMA mprotect(PROT_WRITE) requests; it also resolves bind/connect requested socket endpoints, successful accept/accept4 accepted-socket peers, and a separately verified AF_INET/AF_INET6 TCP accept/transition/destroy stream. O_PATH/O_TMPFILE, missing or duplicate post-open joins, hard-link destination children, rename destinations, other created children, actual dirty-page writes after mmap/mprotect, multi-VMA or anonymous/private mprotect targets, non-INET/TCP socket state, io_uring, SCM_RIGHTS provenance, and delegated effects remain explicitly outside this partial contract",
+            "process-lifecycle schema v2 has no authoritative S0 task/thread enrollment ledger and no cgroup migration or CLONE_INTO_CGROUP enrollment hook; EXEC/EXIT may introduce identities during replay, so whole-tree lifecycle association is PARTIAL",
+            "FD object identity remains unresolved for truncate, setattr, allocation, range-transfer, sync, mmap, ioctl, and other non-write FD operations",
+            "balanced profile omits mmap/mprotect, fsync, ioctl, prctl, and setsockopt events"
+          ]
+        },
+        "lifecycle": {
+          "schema_version": 2,
+          "run_id": "0d2f932fd74a4786ab4f5eb7bff1de21",
+          "run_epoch": 1,
+          "cgroup_id": 754,
+          "status": "PARTIAL",
+          "event_attempted": 63,
+          "event_published": 63,
+          "event_dropped": 0,
+          "events_persisted": 63,
+          "task_read_failed": 0,
+          "exec_path_read_failed": 0,
+          "exec_path_truncated": 0,
+          "userspace_failures": 0,
+          "producer_barrier_complete": true,
+          "drain_completed": true,
+          "wal_durable": true,
+          "poll_calls": 571,
+          "maximum_events_per_poll": 2,
+          "callback_queue_high_water": 2,
+          "callback_queue_capacity": 4096,
+          "lineage": {
+            "event_count": 63,
+            "task_identities": 23,
+            "exited_task_identities": 23,
+            "group_dead_exits": 22,
+            "enrollment": {
+              "initial_task_ledger_present": false,
+              "initial_tasks_enrolled": 0,
+              "migration_hook_present": false,
+              "clone_into_cgroup_covered": false,
+              "migration_enrolled_task_identities": 0,
+              "fork_enrolled_task_identities": 20,
+              "exec_introduced_task_identities": 0,
+              "exit_introduced_task_identities": 3,
+              "forks_with_unenrolled_parent": 7,
+              "complete": false
+            },
+            "correlation": "PARTIAL_FORK_EXEC_EXIT_BY_BOOT_ID_PID_START_BOOTTIME_AND_EXEC_OLD_PID"
+          },
+          "reasons": [],
+          "limitations": [
+            "process-lifecycle schema v2 has no authoritative S0 task/thread enrollment ledger and no cgroup migration or CLONE_INTO_CGROUP enrollment hook; EXEC/EXIT may introduce identities during replay, so whole-tree lifecycle association is PARTIAL",
+            "EXEC filename is a bounded kernel-copied description, not executable FILE_OBJECT identity",
+            "direct exact-cgroup lifecycle attribution does not establish delegated causality",
+            "lossless terminal WAL replay applies only to lifecycle events admitted by the three scheduler hooks"
+          ]
+        },
+        "overall_status": "INCOMPLETE"
+      },
+      "coverage_gaps": [
+        "process-lifecycle schema v2 has no authoritative S0 task/thread enrollment ledger and no cgroup migration or CLONE_INTO_CGROUP enrollment hook; EXEC/EXIT may introduce identities during replay, so whole-tree lifecycle association is PARTIAL",
+        "EXEC filename is a bounded kernel-copied description, not executable FILE_OBJECT identity",
+        "direct exact-cgroup lifecycle attribution does not establish delegated causality",
+        "lossless terminal WAL replay applies only to lifecycle events admitted by the three scheduler hooks",
+        "read syscall is absent from the current side-effect policy; file-open/SDK timing is not read coverage"
+      ],
+      "correlation": {
+        "system-effects.jsonl": {
+          "schema": "allox.trace-correlation/v1",
+          "agent_id": "agent-a",
+          "session_id": "s1",
+          "run_id": "0d2f932fd74a4786ab4f5eb7bff1de21",
+          "trace_id": "3828faa3259a426884f53bf7b91cddd6",
+          "process_span_id": "process-0d2f932fd74a4786ab4f5eb7bff1de21",
+          "parent_span_id": "6a1d37582beb425189099aacc9bb0dca",
+          "span_refs": [
+            {
+              "span_id": "07b8366d7f864a568fa025e082512251",
+              "kind": "turn"
+            },
+            {
+              "span_id": "0a4c60ccbe504fc3aba2fcb27fe4faa8",
+              "kind": "turn"
+            },
+            {
+              "span_id": "0a51a27023e94a42a5170acbd574c5f0",
+              "kind": "phase"
+            },
+            {
+              "span_id": "0cbc8720f2804b3d827ae7000ec63ab9",
+              "kind": "tool"
+            },
+            {
+              "span_id": "26b9646f791b4cbd811cae3914017b35",
+              "kind": "turn"
+            },
+            {
+              "span_id": "287ca84464d148ceb6c66e7fbc77886e",
+              "kind": "tool"
+            },
+            {
+              "span_id": "2b7d83271f9b404d9244153b3af916b5",
+              "kind": "tool"
+            },
+            {
+              "span_id": "3e87ebfc1b4c48e4b562eae0175a6966",
+              "kind": "turn"
+            },
+            {
+              "span_id": "41b7f6d211a64019b9d8ca7b273315ee",
+              "kind": "turn"
+            },
+            {
+              "span_id": "42060c7c80a4426e8754ccab49288f27",
+              "kind": "tool"
+            },
+            {
+              "span_id": "45a1ad59f2f0479b8b3d5fc3aec89ae2",
+              "kind": "turn"
+            },
+            {
+              "span_id": "4673a6cd82714a37848ff8426d540ad1",
+              "kind": "tool"
+            },
+            {
+              "span_id": "5a7e134d4c6d4fbeb946de00b6a9fde9",
+              "kind": "turn"
+            },
+            {
+              "span_id": "61e7f0733d7c4c20ac110e261db90101",
+              "kind": "turn"
+            },
+            {
+              "span_id": "633f39b06c324e10bcbfcb3bab149d38",
+              "kind": "phase"
+            },
+            {
+              "span_id": "7066aa0ba758427ead9ced8678a8f676",
+              "kind": "tool"
+            },
+            {
+              "span_id": "722f1b13d845462e94c783bb79b8812a",
+              "kind": "phase"
+            },
+            {
+              "span_id": "793723cfa96f49e4bba7bd1b1407101e",
+              "kind": "phase"
+            },
+            {
+              "span_id": "7dc911086c8346d5b76213c55d0d0c69",
+              "kind": "tool"
+            },
+            {
+              "span_id": "8219260a9d314d4ba747129ceedbd28f",
+              "kind": "phase"
+            },
+            {
+              "span_id": "83576f3309e64ba3a7007321f885c1e9",
+              "kind": "phase"
+            },
+            {
+              "span_id": "95b7e23a65884d88a8c001e4fab5e068",
+              "kind": "turn"
+            },
+            {
+              "span_id": "9e6d4fb1f7164a4897a8b62c50eb0263",
+              "kind": "turn"
+            },
+            {
+              "span_id": "a27ad1dfbfa642e3bfed34a38252ccc1",
+              "kind": "phase"
+            },
+            {
+              "span_id": "a9a80271434143478ef04c71ef4eb06d",
+              "kind": "tool"
+            },
+            {
+              "span_id": "ac728494bdb44f69bff146f286174239",
+              "kind": "phase"
+            },
+            {
+              "span_id": "af5e30393076434eb39817a82e62c134",
+              "kind": "turn"
+            },
+            {
+              "span_id": "b3fcad1a5e9a4c428483977775bbae32",
+              "kind": "tool"
+            },
+            {
+              "span_id": "b498f37522444050be65d307c90cfd65",
+              "kind": "phase"
+            },
+            {
+              "span_id": "b89e0760b6af412eba860e44721858f1",
+              "kind": "phase"
+            },
+            {
+              "span_id": "b9f6f4c47bf04272bbd67dbd60ae8ac1",
+              "kind": "tool"
+            },
+            {
+              "span_id": "c1deda20f33247a08003bb5f0a4cc31d",
+              "kind": "turn"
+            },
+            {
+              "span_id": "e7145d3792ef46329a839c3e16cb1047",
+              "kind": "tool"
+            },
+            {
+              "span_id": "edfc75246d3b4ca8b9f719a2c07d51b8",
+              "kind": "phase"
+            },
+            {
+              "span_id": "f75953364d6e4efbb8dede89eab3d6df",
+              "kind": "tool"
+            },
+            {
+              "span_id": "fee6675050534706ad39f0d044295ec4",
+              "kind": "phase"
+            },
+            {
+              "span_id": "process-0d2f932fd74a4786ab4f5eb7bff1de21",
+              "kind": "process"
+            }
+          ],
+          "turn": {
+            "status": "declared_parent_turn",
+            "turn_id": "agent-turn-1",
+            "candidates": [
+              "agent-turn-1"
+            ],
+            "basis": "recorded context, not kernel semantic proof"
+          },
+          "status": "correlated",
+          "recorded_verification": "VERIFIED",
+          "integrity": "matched_recorded_sha256",
+          "observer_evidence_status": "INCOMPLETE",
+          "recovery_verdict": null,
+          "stream": "system-effects.jsonl",
+          "event_count": 562,
+          "next_offset": null,
+          "provenance": {
+            "receipt": "0d2f932fd74a4786ab4f5eb7bff1de21/system-effects-receipt.json",
+            "manifest": "0d2f932fd74a4786ab4f5eb7bff1de21/system-effects/artifact-manifest.json",
+            "stream": "0d2f932fd74a4786ab4f5eb7bff1de21/system-effects/system-effects.jsonl",
+            "stream_sha256": "eeccbbc57118d786bc22d78f920415d7d0457d307a175aeb7a7cfa8c3fc5ff88"
+          },
+          "warning": "Recorded hashes are not signatures; independent verifier is not rerun. Run attribution does not prove delegated effects or a precise tool span.",
+          "syscalls": {
+            "openat": 28,
+            "write": 54,
+            "rename": 24,
+            "chmod": 26,
+            "socket": 124,
+            "connect": 100,
+            "sendto": 100,
+            "bind": 24,
+            "listen": 24,
+            "accept4": 24,
+            "unlink": 24,
+            "unlinkat": 4,
+            "mkdir": 4,
+            "renameat2": 2
+          },
+          "domains": {
+            "FILESYSTEM": 112,
+            "IO": 54,
+            "NETWORK": 396
+          },
+          "kinds": {
+            "OPERATION_ATTEMPT": 281,
+            "OPERATION_RESULT": 281
+          },
+          "read_syscalls_covered": false
+        },
+        "process-lifecycle.jsonl": {
+          "schema": "allox.trace-correlation/v1",
+          "agent_id": "agent-a",
+          "session_id": "s1",
+          "run_id": "0d2f932fd74a4786ab4f5eb7bff1de21",
+          "trace_id": "3828faa3259a426884f53bf7b91cddd6",
+          "process_span_id": "process-0d2f932fd74a4786ab4f5eb7bff1de21",
+          "parent_span_id": "6a1d37582beb425189099aacc9bb0dca",
+          "span_refs": [
+            {
+              "span_id": "07b8366d7f864a568fa025e082512251",
+              "kind": "turn"
+            },
+            {
+              "span_id": "0a4c60ccbe504fc3aba2fcb27fe4faa8",
+              "kind": "turn"
+            },
+            {
+              "span_id": "0a51a27023e94a42a5170acbd574c5f0",
+              "kind": "phase"
+            },
+            {
+              "span_id": "0cbc8720f2804b3d827ae7000ec63ab9",
+              "kind": "tool"
+            },
+            {
+              "span_id": "26b9646f791b4cbd811cae3914017b35",
+              "kind": "turn"
+            },
+            {
+              "span_id": "287ca84464d148ceb6c66e7fbc77886e",
+              "kind": "tool"
+            },
+            {
+              "span_id": "2b7d83271f9b404d9244153b3af916b5",
+              "kind": "tool"
+            },
+            {
+              "span_id": "3e87ebfc1b4c48e4b562eae0175a6966",
+              "kind": "turn"
+            },
+            {
+              "span_id": "41b7f6d211a64019b9d8ca7b273315ee",
+              "kind": "turn"
+            },
+            {
+              "span_id": "42060c7c80a4426e8754ccab49288f27",
+              "kind": "tool"
+            },
+            {
+              "span_id": "45a1ad59f2f0479b8b3d5fc3aec89ae2",
+              "kind": "turn"
+            },
+            {
+              "span_id": "4673a6cd82714a37848ff8426d540ad1",
+              "kind": "tool"
+            },
+            {
+              "span_id": "5a7e134d4c6d4fbeb946de00b6a9fde9",
+              "kind": "turn"
+            },
+            {
+              "span_id": "61e7f0733d7c4c20ac110e261db90101",
+              "kind": "turn"
+            },
+            {
+              "span_id": "633f39b06c324e10bcbfcb3bab149d38",
+              "kind": "phase"
+            },
+            {
+              "span_id": "7066aa0ba758427ead9ced8678a8f676",
+              "kind": "tool"
+            },
+            {
+              "span_id": "722f1b13d845462e94c783bb79b8812a",
+              "kind": "phase"
+            },
+            {
+              "span_id": "793723cfa96f49e4bba7bd1b1407101e",
+              "kind": "phase"
+            },
+            {
+              "span_id": "7dc911086c8346d5b76213c55d0d0c69",
+              "kind": "tool"
+            },
+            {
+              "span_id": "8219260a9d314d4ba747129ceedbd28f",
+              "kind": "phase"
+            },
+            {
+              "span_id": "83576f3309e64ba3a7007321f885c1e9",
+              "kind": "phase"
+            },
+            {
+              "span_id": "95b7e23a65884d88a8c001e4fab5e068",
+              "kind": "turn"
+            },
+            {
+              "span_id": "9e6d4fb1f7164a4897a8b62c50eb0263",
+              "kind": "turn"
+            },
+            {
+              "span_id": "a27ad1dfbfa642e3bfed34a38252ccc1",
+              "kind": "phase"
+            },
+            {
+              "span_id": "a9a80271434143478ef04c71ef4eb06d",
+              "kind": "tool"
+            },
+            {
+              "span_id": "ac728494bdb44f69bff146f286174239",
+              "kind": "phase"
+            },
+            {
+              "span_id": "af5e30393076434eb39817a82e62c134",
+              "kind": "turn"
+            },
+            {
+              "span_id": "b3fcad1a5e9a4c428483977775bbae32",
+              "kind": "tool"
+            },
+            {
+              "span_id": "b498f37522444050be65d307c90cfd65",
+              "kind": "phase"
+            },
+            {
+              "span_id": "b89e0760b6af412eba860e44721858f1",
+              "kind": "phase"
+            },
+            {
+              "span_id": "b9f6f4c47bf04272bbd67dbd60ae8ac1",
+              "kind": "tool"
+            },
+            {
+              "span_id": "c1deda20f33247a08003bb5f0a4cc31d",
+              "kind": "turn"
+            },
+            {
+              "span_id": "e7145d3792ef46329a839c3e16cb1047",
+              "kind": "tool"
+            },
+            {
+              "span_id": "edfc75246d3b4ca8b9f719a2c07d51b8",
+              "kind": "phase"
+            },
+            {
+              "span_id": "f75953364d6e4efbb8dede89eab3d6df",
+              "kind": "tool"
+            },
+            {
+              "span_id": "fee6675050534706ad39f0d044295ec4",
+              "kind": "phase"
+            },
+            {
+              "span_id": "process-0d2f932fd74a4786ab4f5eb7bff1de21",
+              "kind": "process"
+            }
+          ],
+          "turn": {
+            "status": "declared_parent_turn",
+            "turn_id": "agent-turn-1",
+            "candidates": [
+              "agent-turn-1"
+            ],
+            "basis": "recorded context, not kernel semantic proof"
+          },
+          "status": "correlated",
+          "recorded_verification": "VERIFIED",
+          "integrity": "matched_recorded_sha256",
+          "observer_evidence_status": "INCOMPLETE",
+          "recovery_verdict": null,
+          "stream": "process-lifecycle.jsonl",
+          "event_count": 63,
+          "next_offset": null,
+          "provenance": {
+            "receipt": "0d2f932fd74a4786ab4f5eb7bff1de21/system-effects-receipt.json",
+            "manifest": "0d2f932fd74a4786ab4f5eb7bff1de21/system-effects/artifact-manifest.json",
+            "stream": "0d2f932fd74a4786ab4f5eb7bff1de21/system-effects/process-lifecycle.jsonl",
+            "stream_sha256": "fc78ae8fbe60832f7b9cbcc66bd40e401690783093e12eb7b15c2c2dee97e381"
+          },
+          "warning": "Recorded hashes are not signatures; independent verifier is not rerun. Run attribution does not prove delegated effects or a precise tool span.",
+          "kinds": {
+            "FORK": 20,
+            "EXEC": 20,
+            "EXIT": 23
+          }
+        }
+      },
+      "collector": {
+        "accepted_events_this_process": 78,
+        "rejected_events_this_process": 0,
+        "collector_ns_this_process": 598590413,
+        "storage_bytes": 382976,
+        "delivery": "explicit-queued-or-synchronous; only flush confirms queued durability",
+        "event_loss_rate": null,
+        "committed_transactions_this_process": 19,
+        "event_loss_note": "no claim about events never submitted by a producer",
+        "write_queue": {
+          "collector_id": "359d47995b9049608c896aba80c00779",
+          "pending_events": 0,
+          "pending_bytes": 0,
+          "failed_channels": 0,
+          "complete": true,
+          "group_commits": 13,
+          "channels": 1,
+          "crash_durable": "only flush-confirmed sequences; memory queue is not durable"
+        }
+      },
+      "passed": true
+    },
+    {
+      "label": "agent-b-s1",
+      "mode": "batch",
+      "real_llm": false,
+      "checks": {
+        "workload": true,
+        "identity": true,
+        "no_management_token": true,
+        "sdk_complete": true,
+        "all_received_spans_ended": true,
+        "profile_complete": true,
+        "one_trace": true,
+        "one_clock": true,
+        "sdk_event_count": true,
+        "session_sdk": true,
+        "sdk_run_binding": true,
+        "system-effects.jsonl_nonempty": true,
+        "system-effects.jsonl_turn": true,
+        "system-effects.jsonl_sampled_hooks_no_known_loss": true,
+        "system-effects.jsonl_conservative_status_preserved": true,
+        "system-effects.jsonl_provenance_digest": true,
+        "file_and_network_syscalls": true,
+        "process-lifecycle.jsonl_nonempty": true,
+        "process-lifecycle.jsonl_turn": true,
+        "process-lifecycle.jsonl_sampled_hooks_no_known_loss": true,
+        "process-lifecycle.jsonl_conservative_status_preserved": true,
+        "process-lifecycle.jsonl_provenance_digest": true,
+        "fork_exec_exit": true,
+        "wrong_agent_rejected": true,
+        "tampered_stream_rejected": true
+      },
+      "wall_ns": 6131427266,
+      "run_id": "12df75a37d8444c6b1ab9f622e73e544",
+      "process": {
+        "run_id": "12df75a37d8444c6b1ab9f622e73e544",
+        "run_epoch": 1,
+        "agent_id": "agent-b",
+        "session_id": "s1",
+        "backend": "disabled",
+        "isolation": "bubblewrap",
+        "boot_id": "9ada39c1-b74a-432a-bb7e-96fc4884c4e9",
+        "state": "completed",
+        "created_ns": 1794684191035186704,
+        "event_count": 0,
+        "processes": {},
+        "audit_directory": "/results/agent-b-s1/audit/12df75a37d8444c6b1ab9f622e73e544",
+        "trace_complete": false,
+        "cookie": 4112014152196703658,
+        "feature_runs": {
+          "system-effects": {
+            "protocol_version": 2,
+            "status": "FINISHED",
+            "run_id": "12df75a37d8444c6b1ab9f622e73e544",
+            "run_epoch": 1,
+            "agent_id": "agent-b",
+            "session_id": "s1",
+            "cgroup_id": 824,
+            "outcome": "completed",
+            "quiescence": {
+              "status": "QUIESCENT_WITHIN_CGROUP",
+              "basis": "CGROUP_V2_EMPTY_FROZEN_VERIFIED",
+              "cgroup_path": "/sys/fs/cgroup/allox-e2e/agent-b-s1/agents/agent-b/sessions/s1",
+              "cgroup_id": 824
+            },
+            "observer_evidence_status": "INCOMPLETE",
+            "offline_verification": "VERIFIED",
+            "artifact_count": 17,
+            "committed_artifact_total_bytes": 1234073,
+            "evidence_directory": "/results/agent-b-s1/audit/12df75a37d8444c6b1ab9f622e73e544/system-effects",
+            "config_path": "/results/agent-b-s1/audit/12df75a37d8444c6b1ab9f622e73e544/system-effects-config.json",
+            "config_sha256": "0d470c6375c6779c075a2f86978303e85a5330590d0c34a9a48fc5ca726e6cee",
+            "expectation_path": "/results/agent-b-s1/audit/12df75a37d8444c6b1ab9f622e73e544/system-effects-verification-expectation.json",
+            "verification_result_path": "/results/agent-b-s1/audit/12df75a37d8444c6b1ab9f622e73e544/system-effects-verification.json",
+            "report_path": "/results/agent-b-s1/audit/12df75a37d8444c6b1ab9f622e73e544/system-effects/deployment-observation-report.json",
+            "report_sha256": "300d5424e5850d907524e5e8423898e79034ded04269cd656efbb210dd645ffe",
+            "artifact_manifest_path": "/results/agent-b-s1/audit/12df75a37d8444c6b1ab9f622e73e544/system-effects/artifact-manifest.json",
+            "artifact_manifest_sha256": "5453d5422e19b63f0de50e3948305c48a6b1552a57e8a4052842488c5936280d",
+            "resident_observer": {
+              "worker_pid": 34,
+              "artifact_manifest_sha256": "5453d5422e19b63f0de50e3948305c48a6b1552a57e8a4052842488c5936280d",
+              "epoch": 1,
+              "finish_nonce": "808bda7e0ac3c7cb4cc58d53f786f69cb6d17894599fc3fb9d77a2365e967854",
+              "kernel_objects_reused": true,
+              "report_sha256": "300d5424e5850d907524e5e8423898e79034ded04269cd656efbb210dd645ffe",
+              "resident_objects": [
+                {
+                  "link_ids": [
+                    1,
+                    2,
+                    3,
+                    4,
+                    5,
+                    6,
+                    7,
+                    8,
+                    9,
+                    10,
+                    11,
+                    12,
+                    13,
+                    14,
+                    15,
+                    16,
+                    17,
+                    18,
+                    19,
+                    20
+                  ],
+                  "map_ids": [
+                    1,
+                    2,
+                    3,
+                    4,
+                    5,
+                    6,
+                    7,
+                    8,
+                    9,
+                    10,
+                    11,
+                    12,
+                    13,
+                    14
+                  ],
+                  "program_ids": [
+                    7,
+                    8,
+                    9,
+                    10,
+                    11,
+                    12,
+                    13,
+                    14,
+                    15,
+                    16,
+                    17,
+                    18,
+                    19,
+                    20,
+                    21,
+                    22,
+                    23,
+                    24,
+                    25,
+                    26,
+                    27,
+                    28
+                  ]
+                },
+                {
+                  "link_ids": [
+                    23,
+                    24,
+                    25
+                  ],
+                  "map_ids": [
+                    15,
+                    16,
+                    17,
+                    18,
+                    19
+                  ],
+                  "program_ids": [
+                    31,
+                    32,
+                    33
+                  ]
+                }
+              ],
+              "resident_protocol": 1,
+              "resident_resources": 2,
+              "run_id": "12df75a37d8444c6b1ab9f622e73e544",
+              "sequence": 2,
+              "status": "IDLE"
+            }
+          }
+        },
+        "agent_monitor": true,
+        "trace_context": {
+          "trace_id": "c9049e196bf44d66813374439d84009d",
+          "span_id": "513d9c2b297347908144502b7a99866d"
+        },
+        "root_pid": 111,
+        "launcher_pid": 109,
+        "cgroup": "/sys/fs/cgroup/allox-e2e/agent-b-s1/agents/agent-b/sessions/s1",
+        "monitor_trace_id": "c9049e196bf44d66813374439d84009d",
+        "monitor_span_id": "process-12df75a37d8444c6b1ab9f622e73e544",
+        "root_exit_code": 0,
+        "lifecycle_complete": true,
+        "session_fenced": false,
+        "finished_ns": 1794684164451273577,
+        "cgroup_removed": true
+      },
+      "proof": {
+        "agent": "agent-b",
+        "session": "s1",
+        "steps": 12,
+        "rows": [
+          {
+            "index": 0,
+            "bytes": 11,
+            "child": {
+              "pid": 6,
+              "ppid": 4
+            }
+          },
+          {
+            "index": 1,
+            "bytes": 11,
+            "child": {
+              "pid": 7,
+              "ppid": 4
+            }
+          },
+          {
+            "index": 2,
+            "bytes": 11,
+            "child": {
+              "pid": 8,
+              "ppid": 4
+            }
+          },
+          {
+            "index": 3,
+            "bytes": 11,
+            "child": {
+              "pid": 9,
+              "ppid": 4
+            }
+          },
+          {
+            "index": 4,
+            "bytes": 11,
+            "child": {
+              "pid": 10,
+              "ppid": 4
+            }
+          },
+          {
+            "index": 5,
+            "bytes": 11,
+            "child": {
+              "pid": 11,
+              "ppid": 4
+            }
+          },
+          {
+            "index": 6,
+            "bytes": 11,
+            "child": {
+              "pid": 12,
+              "ppid": 4
+            }
+          },
+          {
+            "index": 7,
+            "bytes": 11,
+            "child": {
+              "pid": 13,
+              "ppid": 4
+            }
+          },
+          {
+            "index": 8,
+            "bytes": 11,
+            "child": {
+              "pid": 14,
+              "ppid": 4
+            }
+          },
+          {
+            "index": 9,
+            "bytes": 11,
+            "child": {
+              "pid": 15,
+              "ppid": 4
+            }
+          },
+          {
+            "index": 10,
+            "bytes": 12,
+            "child": {
+              "pid": 16,
+              "ppid": 4
+            }
+          },
+          {
+            "index": 11,
+            "bytes": 12,
+            "child": {
+              "pid": 17,
+              "ppid": 4
+            }
+          }
+        ],
+        "health": {
+          "attempted_events": 72,
+          "acknowledged_events": 72,
+          "failed_events": 0,
+          "pending_events": 0,
+          "pending_bytes": 0,
+          "peak_pending_events": 6,
+          "peak_pending_bytes": 2106,
+          "serialized_bytes": 25262,
+          "emit_ns": 561263843,
+          "batch_requests": 13,
+          "worker_alive": false,
+          "action_batch_size": 8,
+          "action_flush_interval": 0.05,
+          "completed_actions": 12,
+          "durable_actions": 12,
+          "flush_requests": 13,
+          "closed": true,
+          "complete": true,
+          "enabled": true,
+          "delivery": "queued",
+          "batch_size": 32,
+          "metric_errors": 0,
+          "strict": true
+        },
+        "wall_ns_including_close": 2012803804,
+        "management_token_absent": true
+      },
+      "profile": {
+        "runs": 1,
+        "spans": 39,
+        "complete": true,
+        "warnings": [],
+        "groups": [
+          {
+            "semantic_path": [
+              "e2e"
+            ],
+            "kind": "phase",
+            "name": "tool_execution",
+            "model": null,
+            "calls": 12,
+            "runs": 1,
+            "errors": 0,
+            "inclusive_ns": 1971011923,
+            "self_ns": 1971011923,
+            "p50_ns": 165793332,
+            "p95_ns": 180193496,
+            "timing_samples": [],
+            "metrics": {
+              "executor.execution_ns": {
+                "sum": 1970146251,
+                "samples": 12
+              },
+              "executor.thread_cpu_ns": {
+                "sum": 31488800,
+                "samples": 12
+              }
+            }
+          },
+          {
+            "semantic_path": [
+              "e2e"
+            ],
+            "kind": "process",
+            "name": "allox.execution",
+            "model": null,
+            "calls": 1,
+            "runs": 1,
+            "errors": 0,
+            "inclusive_ns": 2606171240,
+            "self_ns": 629115391,
+            "p50_ns": 2606171240,
+            "p95_ns": 2606171240,
+            "timing_samples": [],
+            "metrics": {
+              "cgroup.cpu_usage_usec": {
+                "sum": 779819,
+                "samples": 1
+              }
+            }
+          },
+          {
+            "semantic_path": [
+              "e2e"
+            ],
+            "kind": "run",
+            "name": "experiment",
+            "model": null,
+            "calls": 1,
+            "runs": 1,
+            "errors": 0,
+            "inclusive_ns": 6106374698,
+            "self_ns": 59208159,
+            "p50_ns": 6106374698,
+            "p95_ns": 6106374698,
+            "timing_samples": [],
+            "metrics": {}
+          },
+          {
+            "semantic_path": [
+              "e2e"
+            ],
+            "kind": "tool",
+            "name": "file-network-socket-child",
+            "model": null,
+            "calls": 12,
+            "runs": 1,
+            "errors": 0,
+            "inclusive_ns": 1974392419,
+            "self_ns": 3380496,
+            "p50_ns": 166030985,
+            "p95_ns": 180468786,
+            "timing_samples": [
+              {
+                "executor_internal_ns": 169286698,
+                "non_execution_ns": 781001
+              },
+              {
+                "executor_internal_ns": 166810859,
+                "non_execution_ns": 325124
+              },
+              {
+                "executor_internal_ns": 173670151,
+                "non_execution_ns": 572253
+              },
+              {
+                "executor_internal_ns": 165750778,
+                "non_execution_ns": 280207
+              },
+              {
+                "executor_internal_ns": 151241889,
+                "non_execution_ns": 338721
+              },
+              {
+                "executor_internal_ns": 180127615,
+                "non_execution_ns": 341171
+              },
+              {
+                "executor_internal_ns": 153269896,
+                "non_execution_ns": 297667
+              },
+              {
+                "executor_internal_ns": 177227848,
+                "non_execution_ns": 331438
+              },
+              {
+                "executor_internal_ns": 146056423,
+                "non_execution_ns": 303433
+              },
+              {
+                "executor_internal_ns": 145820951,
+                "non_execution_ns": 251942
+              },
+              {
+                "executor_internal_ns": 178537603,
+                "non_execution_ns": 239519
+              },
+              {
+                "executor_internal_ns": 162345540,
+                "non_execution_ns": 183692
+              }
+            ],
+            "metrics": {}
+          },
+          {
+            "semantic_path": [
+              "e2e"
+            ],
+            "kind": "turn",
+            "name": "action-0",
+            "model": null,
+            "calls": 1,
+            "runs": 1,
+            "errors": 0,
+            "inclusive_ns": 170768892,
+            "self_ns": 701193,
+            "p50_ns": 170768892,
+            "p95_ns": 170768892,
+            "timing_samples": [],
+            "metrics": {}
+          },
+          {
+            "semantic_path": [
+              "e2e"
+            ],
+            "kind": "turn",
+            "name": "action-1",
+            "model": null,
+            "calls": 1,
+            "runs": 1,
+            "errors": 0,
+            "inclusive_ns": 167373763,
+            "self_ns": 237780,
+            "p50_ns": 167373763,
+            "p95_ns": 167373763,
+            "timing_samples": [],
+            "metrics": {}
+          },
+          {
+            "semantic_path": [
+              "e2e"
+            ],
+            "kind": "turn",
+            "name": "action-10",
+            "model": null,
+            "calls": 1,
+            "runs": 1,
+            "errors": 0,
+            "inclusive_ns": 178907096,
+            "self_ns": 129974,
+            "p50_ns": 178907096,
+            "p95_ns": 178907096,
+            "timing_samples": [],
+            "metrics": {}
+          },
+          {
+            "semantic_path": [
+              "e2e"
+            ],
+            "kind": "turn",
+            "name": "action-11",
+            "model": null,
+            "calls": 1,
+            "runs": 1,
+            "errors": 0,
+            "inclusive_ns": 162650712,
+            "self_ns": 121480,
+            "p50_ns": 162650712,
+            "p95_ns": 162650712,
+            "timing_samples": [],
+            "metrics": {}
+          },
+          {
+            "semantic_path": [
+              "e2e"
+            ],
+            "kind": "turn",
+            "name": "action-2",
+            "model": null,
+            "calls": 1,
+            "runs": 1,
+            "errors": 0,
+            "inclusive_ns": 174430086,
+            "self_ns": 187682,
+            "p50_ns": 174430086,
+            "p95_ns": 174430086,
+            "timing_samples": [],
+            "metrics": {}
+          },
+          {
+            "semantic_path": [
+              "e2e"
+            ],
+            "kind": "turn",
+            "name": "action-3",
+            "model": null,
+            "calls": 1,
+            "runs": 1,
+            "errors": 0,
+            "inclusive_ns": 166169325,
+            "self_ns": 138340,
+            "p50_ns": 166169325,
+            "p95_ns": 166169325,
+            "timing_samples": [],
+            "metrics": {}
+          },
+          {
+            "semantic_path": [
+              "e2e"
+            ],
+            "kind": "turn",
+            "name": "action-4",
+            "model": null,
+            "calls": 1,
+            "runs": 1,
+            "errors": 0,
+            "inclusive_ns": 151807850,
+            "self_ns": 227240,
+            "p50_ns": 151807850,
+            "p95_ns": 151807850,
+            "timing_samples": [],
+            "metrics": {}
+          },
+          {
+            "semantic_path": [
+              "e2e"
+            ],
+            "kind": "turn",
+            "name": "action-5",
+            "model": null,
+            "calls": 1,
+            "runs": 1,
+            "errors": 0,
+            "inclusive_ns": 180662286,
+            "self_ns": 193500,
+            "p50_ns": 180662286,
+            "p95_ns": 180662286,
+            "timing_samples": [],
+            "metrics": {}
+          },
+          {
+            "semantic_path": [
+              "e2e"
+            ],
+            "kind": "turn",
+            "name": "action-6",
+            "model": null,
+            "calls": 1,
+            "runs": 1,
+            "errors": 0,
+            "inclusive_ns": 153745513,
+            "self_ns": 177950,
+            "p50_ns": 153745513,
+            "p95_ns": 153745513,
+            "timing_samples": [],
+            "metrics": {}
+          },
+          {
+            "semantic_path": [
+              "e2e"
+            ],
+            "kind": "turn",
+            "name": "action-7",
+            "model": null,
+            "calls": 1,
+            "runs": 1,
+            "errors": 0,
+            "inclusive_ns": 177735616,
+            "self_ns": 176330,
+            "p50_ns": 177735616,
+            "p95_ns": 177735616,
+            "timing_samples": [],
+            "metrics": {}
+          },
+          {
+            "semantic_path": [
+              "e2e"
+            ],
+            "kind": "turn",
+            "name": "action-8",
+            "model": null,
+            "calls": 1,
+            "runs": 1,
+            "errors": 0,
+            "inclusive_ns": 146543259,
+            "self_ns": 183403,
+            "p50_ns": 146543259,
+            "p95_ns": 146543259,
+            "timing_samples": [],
+            "metrics": {}
+          },
+          {
+            "semantic_path": [
+              "e2e"
+            ],
+            "kind": "turn",
+            "name": "action-9",
+            "model": null,
+            "calls": 1,
+            "runs": 1,
+            "errors": 0,
+            "inclusive_ns": 146261451,
+            "self_ns": 188558,
+            "p50_ns": 146261451,
+            "p95_ns": 146261451,
+            "timing_samples": [],
+            "metrics": {}
+          },
+          {
+            "semantic_path": [
+              "e2e"
+            ],
+            "kind": "turn",
+            "name": "agent-turn",
+            "model": null,
+            "calls": 1,
+            "runs": 1,
+            "errors": 0,
+            "inclusive_ns": 6047166539,
+            "self_ns": 3440995299,
+            "p50_ns": 6047166539,
+            "p95_ns": 6047166539,
+            "timing_samples": [],
+            "metrics": {}
+          }
+        ],
+        "completeness_scope": "received spans only; reconcile producer health separately",
+        "time_semantics": "inclusive sums are work, not elapsed wall time; self subtracts child union",
+        "unobserved": [
+          "transport unless instrumented",
+          "server timings unless provider reports"
+        ]
+      },
+      "evidence_health": {
+        "effects": {
+          "schema_version": 1,
+          "run_id": "12df75a37d8444c6b1ab9f622e73e544",
+          "run_epoch": 1,
+          "cgroup_id": 824,
+          "profile": "balanced",
+          "object_resolution_mode": "KERNEL_OBJECT_EXPANDED_PARTIAL",
+          "transport_status": "COMPLETE",
+          "coverage_status": "PARTIAL",
+          "object_resolution_status": "PARTIAL",
+          "operation_attempted": 281,
+          "operation_completed": 281,
+          "event_attempted": 562,
+          "event_published": 562,
+          "event_dropped": 0,
+          "events_persisted": 562,
+          "pending_insert_failed": 0,
+          "pending_missing": 0,
+          "pending_remaining": 0,
+          "userspace_failures": 0,
+          "fatal_kernel_flags": 0,
+          "capture_read_failures": 0,
+          "capture_truncations": 0,
+          "capture_invalid_lengths": 50,
+          "object_resolution_attempted": 157,
+          "object_resolution_resolved": 142,
+          "object_resolution_unresolved": 15,
+          "object_resolution_failed_syscalls": 3,
+          "object_join_missing": 0,
+          "object_join_ambiguous": 0,
+          "object_read_failed": 0,
+          "object_delete_failed": 0,
+          "object_path_unavailable": 0,
+          "object_pending_remaining": 0,
+          "task_read_failed": 0,
+          "object_unsupported": 12,
+          "socket_state": {
+            "schema_version": 2,
+            "run_id": "12df75a37d8444c6b1ab9f622e73e544",
+            "boot_id": "9ada39c1-b74a-432a-bb7e-96fc4884c4e9",
+            "run_epoch": 1,
+            "cgroup_id": 824,
+            "cgroup_match_mode": "ANCESTOR_ROOT",
+            "status": "COMPLETE",
+            "event_attempted": 72,
+            "event_published": 72,
+            "event_dropped": 0,
+            "events_persisted": 72,
+            "final_event_seq": 72,
+            "destroy_events_persisted": 12,
+            "owner_insert_failed": 0,
+            "owner_conflict": 0,
+            "owner_delete_failed": 0,
+            "owner_remaining": 0,
+            "owners_retired_at_barrier": 0,
+            "state_read_failed": 0,
+            "unsupported_sockets": 62,
+            "userspace_failures": 0,
+            "async_producer_seal": {
+              "complete": true,
+              "links_expected": 2,
+              "links_detached": 2
+            },
+            "producer_barrier_complete": true,
+            "drain_completed": true,
+            "wal_durable": true,
+            "callback_queue_high_water": 6,
+            "callback_queue_capacity": 4096,
+            "reasons": [],
+            "coverage_gaps": [
+              "state ownership covers directly observed AF_INET/AF_INET6 TCP bind/connect/accept operations only",
+              "accepted sockets receive a post-do_accept snapshot; TCP transitions before ownership publication are not claimed",
+              "owners still present after the producer barrier are retired from attribution; retirement is counted separately and is never projected as an observed TCP DESTROY event",
+              "UDP, Unix-domain, raw, packet, inherited, SCM_RIGHTS, io_uring, and delegated sockets are explicitly outside this partial state contract"
+            ]
+          },
+          "producer_barrier_complete": true,
+          "drain_completed": true,
+          "wal_durable": true,
+          "poll_calls": 593,
+          "maximum_events_per_poll": 30,
+          "callback_queue_high_water": 25,
+          "callback_queue_capacity": 4096,
+          "reasons": [],
+          "coverage_gaps": [
+            "native syscall ABI only; compat/x32 calls are not reliably classified",
+            "successful operation results are not proof that durable state differs",
+            "MAP_SHARED memory writes are not observed after the mapping is established",
+            "io_uring requests and completions are not decoded or causally joined",
+            "namespace creation through clone/clone3 is not recorded by this syscall-pair sensor",
+            "kernel-worker, writeback, softirq, and delayed async effects are not causally attributed",
+            "exact cgroup attribution identifies an unclassified run-execution-domain caller; it does not identify Agent code or observe delegated effects",
+            "netlink and generic ioctl payload semantics are not decoded",
+            "cooperative controlled workloads only; a privileged adversarial workload can evade the exact cgroup or tamper with enumerable BPF maps",
+            "KERNEL_OBJECT_EXPANDED resolves successful selected ordinary opens to the final user-visible file through file_post_open after filesystem callbacks complete (including stackable-filesystem opens), create parent directories, hard-link source inodes in the destination mount, unlink/rmdir targets, chmod/chown targets (including fchmodat2), mountless xattr inodes with bounded attribute-name capture, rename sources, eligible file-backed MAP_SHARED+PROT_WRITE mmap targets, and single shared file-backed VMA mprotect(PROT_WRITE) requests; it also resolves bind/connect requested socket endpoints, successful accept/accept4 accepted-socket peers, and a separately verified AF_INET/AF_INET6 TCP accept/transition/destroy stream. O_PATH/O_TMPFILE, missing or duplicate post-open joins, hard-link destination children, rename destinations, other created children, actual dirty-page writes after mmap/mprotect, multi-VMA or anonymous/private mprotect targets, non-INET/TCP socket state, io_uring, SCM_RIGHTS provenance, and delegated effects remain explicitly outside this partial contract",
+            "process-lifecycle schema v2 has no authoritative S0 task/thread enrollment ledger and no cgroup migration or CLONE_INTO_CGROUP enrollment hook; EXEC/EXIT may introduce identities during replay, so whole-tree lifecycle association is PARTIAL",
+            "FD object identity remains unresolved for truncate, setattr, allocation, range-transfer, sync, mmap, ioctl, and other non-write FD operations",
+            "balanced profile omits mmap/mprotect, fsync, ioctl, prctl, and setsockopt events"
+          ]
+        },
+        "lifecycle": {
+          "schema_version": 2,
+          "run_id": "12df75a37d8444c6b1ab9f622e73e544",
+          "run_epoch": 1,
+          "cgroup_id": 824,
+          "status": "PARTIAL",
+          "event_attempted": 63,
+          "event_published": 63,
+          "event_dropped": 0,
+          "events_persisted": 63,
+          "task_read_failed": 0,
+          "exec_path_read_failed": 0,
+          "exec_path_truncated": 0,
+          "userspace_failures": 0,
+          "producer_barrier_complete": true,
+          "drain_completed": true,
+          "wal_durable": true,
+          "poll_calls": 593,
+          "maximum_events_per_poll": 1,
+          "callback_queue_high_water": 1,
+          "callback_queue_capacity": 4096,
+          "lineage": {
+            "event_count": 63,
+            "task_identities": 23,
+            "exited_task_identities": 23,
+            "group_dead_exits": 22,
+            "enrollment": {
+              "initial_task_ledger_present": false,
+              "initial_tasks_enrolled": 0,
+              "migration_hook_present": false,
+              "clone_into_cgroup_covered": false,
+              "migration_enrolled_task_identities": 0,
+              "fork_enrolled_task_identities": 20,
+              "exec_introduced_task_identities": 0,
+              "exit_introduced_task_identities": 3,
+              "forks_with_unenrolled_parent": 7,
+              "complete": false
+            },
+            "correlation": "PARTIAL_FORK_EXEC_EXIT_BY_BOOT_ID_PID_START_BOOTTIME_AND_EXEC_OLD_PID"
+          },
+          "reasons": [],
+          "limitations": [
+            "process-lifecycle schema v2 has no authoritative S0 task/thread enrollment ledger and no cgroup migration or CLONE_INTO_CGROUP enrollment hook; EXEC/EXIT may introduce identities during replay, so whole-tree lifecycle association is PARTIAL",
+            "EXEC filename is a bounded kernel-copied description, not executable FILE_OBJECT identity",
+            "direct exact-cgroup lifecycle attribution does not establish delegated causality",
+            "lossless terminal WAL replay applies only to lifecycle events admitted by the three scheduler hooks"
+          ]
+        },
+        "overall_status": "INCOMPLETE"
+      },
+      "coverage_gaps": [
+        "process-lifecycle schema v2 has no authoritative S0 task/thread enrollment ledger and no cgroup migration or CLONE_INTO_CGROUP enrollment hook; EXEC/EXIT may introduce identities during replay, so whole-tree lifecycle association is PARTIAL",
+        "EXEC filename is a bounded kernel-copied description, not executable FILE_OBJECT identity",
+        "direct exact-cgroup lifecycle attribution does not establish delegated causality",
+        "lossless terminal WAL replay applies only to lifecycle events admitted by the three scheduler hooks",
+        "read syscall is absent from the current side-effect policy; file-open/SDK timing is not read coverage"
+      ],
+      "correlation": {
+        "system-effects.jsonl": {
+          "schema": "allox.trace-correlation/v1",
+          "agent_id": "agent-b",
+          "session_id": "s1",
+          "run_id": "12df75a37d8444c6b1ab9f622e73e544",
+          "trace_id": "c9049e196bf44d66813374439d84009d",
+          "process_span_id": "process-12df75a37d8444c6b1ab9f622e73e544",
+          "parent_span_id": "513d9c2b297347908144502b7a99866d",
+          "span_refs": [
+            {
+              "span_id": "195cf0804a7f4a1da4eac52389f54270",
+              "kind": "turn"
+            },
+            {
+              "span_id": "1de791958f84416b9148cfbd7a672a28",
+              "kind": "phase"
+            },
+            {
+              "span_id": "1e383d7aa8604d22b4667a0a47b5f10c",
+              "kind": "tool"
+            },
+            {
+              "span_id": "20951520ba874b93a9e7d814d2affedb",
+              "kind": "turn"
+            },
+            {
+              "span_id": "2611138fb3ed47f8995fb763c900e1c9",
+              "kind": "turn"
+            },
+            {
+              "span_id": "2dac71a0da9d4b3b8e1e1fbc0fadd114",
+              "kind": "turn"
+            },
+            {
+              "span_id": "34cbebc3b2f54259aa119a269ddce763",
+              "kind": "phase"
+            },
+            {
+              "span_id": "3c91a66770d74cbbb95c43e9828eb6f7",
+              "kind": "tool"
+            },
+            {
+              "span_id": "3cde431a55a34f1a828f150ef9460259",
+              "kind": "phase"
+            },
+            {
+              "span_id": "40951835264f4f4aa5c4fedcacf460e8",
+              "kind": "tool"
+            },
+            {
+              "span_id": "4f49b7e0f9c047c784e3407726886149",
+              "kind": "tool"
+            },
+            {
+              "span_id": "523a282013e84be78932333fa5f86f29",
+              "kind": "tool"
+            },
+            {
+              "span_id": "53e47c0305a14d70beb4fac0967d8d72",
+              "kind": "phase"
+            },
+            {
+              "span_id": "6beb220c2a5b46c5a062e5b3dec858b3",
+              "kind": "phase"
+            },
+            {
+              "span_id": "6ceb95bafa21441d8d823ae6023827d7",
+              "kind": "turn"
+            },
+            {
+              "span_id": "7645490251be4b49acd2f8ff6168e78b",
+              "kind": "turn"
+            },
+            {
+              "span_id": "7cf0d93c9b1c408fbcb6606ddb582418",
+              "kind": "phase"
+            },
+            {
+              "span_id": "7f43e2793211405298c46c3b84c65768",
+              "kind": "tool"
+            },
+            {
+              "span_id": "81a95b87211b403982a86a13a1eba3be",
+              "kind": "tool"
+            },
+            {
+              "span_id": "85925c0b957c45549a671d5a4618c014",
+              "kind": "phase"
+            },
+            {
+              "span_id": "892155b8454147308634906021fc28cb",
+              "kind": "tool"
+            },
+            {
+              "span_id": "8c5c417ab9604d008390755eba600659",
+              "kind": "turn"
+            },
+            {
+              "span_id": "9131756732554fd2ad5a91179d214f01",
+              "kind": "turn"
+            },
+            {
+              "span_id": "a1936dafafa3461a83c0d4014b5478b4",
+              "kind": "tool"
+            },
+            {
+              "span_id": "af16899d942a4bcab1418043b6c9b8de",
+              "kind": "phase"
+            },
+            {
+              "span_id": "b614e385fa434cfb93d2cbf5bf12de98",
+              "kind": "phase"
+            },
+            {
+              "span_id": "b6a7b3eb380547e2b0bf1ae3fdd9ed99",
+              "kind": "phase"
+            },
+            {
+              "span_id": "bed46fe1593a4048a8881f42ecdac418",
+              "kind": "phase"
+            },
+            {
+              "span_id": "c02410bcbd384823ae34cb514d6897ff",
+              "kind": "tool"
+            },
+            {
+              "span_id": "cf91d0991bbc4c4ea0f90a327d2d92c8",
+              "kind": "turn"
+            },
+            {
+              "span_id": "d19c7c70c4db46f891453faf0bee92fb",
+              "kind": "phase"
+            },
+            {
+              "span_id": "d7da32b91a41428688f97dba9fa4aca7",
+              "kind": "turn"
+            },
+            {
+              "span_id": "d83189111bba49a6988c0c8fe37dfd48",
+              "kind": "turn"
+            },
+            {
+              "span_id": "d8fc0e37d4cb4bc4804c0fa007128e27",
+              "kind": "tool"
+            },
+            {
+              "span_id": "dba2b632807948c589d82297039909f4",
+              "kind": "turn"
+            },
+            {
+              "span_id": "e9f1f41deb0c4536b4e3595a950816b0",
+              "kind": "tool"
+            },
+            {
+              "span_id": "process-12df75a37d8444c6b1ab9f622e73e544",
+              "kind": "process"
+            }
+          ],
+          "turn": {
+            "status": "declared_parent_turn",
+            "turn_id": "agent-turn-1",
+            "candidates": [
+              "agent-turn-1"
+            ],
+            "basis": "recorded context, not kernel semantic proof"
+          },
+          "status": "correlated",
+          "recorded_verification": "VERIFIED",
+          "integrity": "matched_recorded_sha256",
+          "observer_evidence_status": "INCOMPLETE",
+          "recovery_verdict": null,
+          "stream": "system-effects.jsonl",
+          "event_count": 562,
+          "next_offset": null,
+          "provenance": {
+            "receipt": "12df75a37d8444c6b1ab9f622e73e544/system-effects-receipt.json",
+            "manifest": "12df75a37d8444c6b1ab9f622e73e544/system-effects/artifact-manifest.json",
+            "stream": "12df75a37d8444c6b1ab9f622e73e544/system-effects/system-effects.jsonl",
+            "stream_sha256": "29572b5b98f73bc70d7f1c97e6ea39dcaa90a88fc50cd9e9ae1ecc9350ef6674"
+          },
+          "warning": "Recorded hashes are not signatures; independent verifier is not rerun. Run attribution does not prove delegated effects or a precise tool span.",
+          "syscalls": {
+            "openat": 28,
+            "write": 54,
+            "rename": 24,
+            "chmod": 26,
+            "socket": 124,
+            "connect": 100,
+            "sendto": 100,
+            "bind": 24,
+            "listen": 24,
+            "accept4": 24,
+            "unlink": 24,
+            "unlinkat": 4,
+            "mkdir": 4,
+            "renameat2": 2
+          },
+          "domains": {
+            "FILESYSTEM": 112,
+            "IO": 54,
+            "NETWORK": 396
+          },
+          "kinds": {
+            "OPERATION_ATTEMPT": 281,
+            "OPERATION_RESULT": 281
+          },
+          "read_syscalls_covered": false
+        },
+        "process-lifecycle.jsonl": {
+          "schema": "allox.trace-correlation/v1",
+          "agent_id": "agent-b",
+          "session_id": "s1",
+          "run_id": "12df75a37d8444c6b1ab9f622e73e544",
+          "trace_id": "c9049e196bf44d66813374439d84009d",
+          "process_span_id": "process-12df75a37d8444c6b1ab9f622e73e544",
+          "parent_span_id": "513d9c2b297347908144502b7a99866d",
+          "span_refs": [
+            {
+              "span_id": "195cf0804a7f4a1da4eac52389f54270",
+              "kind": "turn"
+            },
+            {
+              "span_id": "1de791958f84416b9148cfbd7a672a28",
+              "kind": "phase"
+            },
+            {
+              "span_id": "1e383d7aa8604d22b4667a0a47b5f10c",
+              "kind": "tool"
+            },
+            {
+              "span_id": "20951520ba874b93a9e7d814d2affedb",
+              "kind": "turn"
+            },
+            {
+              "span_id": "2611138fb3ed47f8995fb763c900e1c9",
+              "kind": "turn"
+            },
+            {
+              "span_id": "2dac71a0da9d4b3b8e1e1fbc0fadd114",
+              "kind": "turn"
+            },
+            {
+              "span_id": "34cbebc3b2f54259aa119a269ddce763",
+              "kind": "phase"
+            },
+            {
+              "span_id": "3c91a66770d74cbbb95c43e9828eb6f7",
+              "kind": "tool"
+            },
+            {
+              "span_id": "3cde431a55a34f1a828f150ef9460259",
+              "kind": "phase"
+            },
+            {
+              "span_id": "40951835264f4f4aa5c4fedcacf460e8",
+              "kind": "tool"
+            },
+            {
+              "span_id": "4f49b7e0f9c047c784e3407726886149",
+              "kind": "tool"
+            },
+            {
+              "span_id": "523a282013e84be78932333fa5f86f29",
+              "kind": "tool"
+            },
+            {
+              "span_id": "53e47c0305a14d70beb4fac0967d8d72",
+              "kind": "phase"
+            },
+            {
+              "span_id": "6beb220c2a5b46c5a062e5b3dec858b3",
+              "kind": "phase"
+            },
+            {
+              "span_id": "6ceb95bafa21441d8d823ae6023827d7",
+              "kind": "turn"
+            },
+            {
+              "span_id": "7645490251be4b49acd2f8ff6168e78b",
+              "kind": "turn"
+            },
+            {
+              "span_id": "7cf0d93c9b1c408fbcb6606ddb582418",
+              "kind": "phase"
+            },
+            {
+              "span_id": "7f43e2793211405298c46c3b84c65768",
+              "kind": "tool"
+            },
+            {
+              "span_id": "81a95b87211b403982a86a13a1eba3be",
+              "kind": "tool"
+            },
+            {
+              "span_id": "85925c0b957c45549a671d5a4618c014",
+              "kind": "phase"
+            },
+            {
+              "span_id": "892155b8454147308634906021fc28cb",
+              "kind": "tool"
+            },
+            {
+              "span_id": "8c5c417ab9604d008390755eba600659",
+              "kind": "turn"
+            },
+            {
+              "span_id": "9131756732554fd2ad5a91179d214f01",
+              "kind": "turn"
+            },
+            {
+              "span_id": "a1936dafafa3461a83c0d4014b5478b4",
+              "kind": "tool"
+            },
+            {
+              "span_id": "af16899d942a4bcab1418043b6c9b8de",
+              "kind": "phase"
+            },
+            {
+              "span_id": "b614e385fa434cfb93d2cbf5bf12de98",
+              "kind": "phase"
+            },
+            {
+              "span_id": "b6a7b3eb380547e2b0bf1ae3fdd9ed99",
+              "kind": "phase"
+            },
+            {
+              "span_id": "bed46fe1593a4048a8881f42ecdac418",
+              "kind": "phase"
+            },
+            {
+              "span_id": "c02410bcbd384823ae34cb514d6897ff",
+              "kind": "tool"
+            },
+            {
+              "span_id": "cf91d0991bbc4c4ea0f90a327d2d92c8",
+              "kind": "turn"
+            },
+            {
+              "span_id": "d19c7c70c4db46f891453faf0bee92fb",
+              "kind": "phase"
+            },
+            {
+              "span_id": "d7da32b91a41428688f97dba9fa4aca7",
+              "kind": "turn"
+            },
+            {
+              "span_id": "d83189111bba49a6988c0c8fe37dfd48",
+              "kind": "turn"
+            },
+            {
+              "span_id": "d8fc0e37d4cb4bc4804c0fa007128e27",
+              "kind": "tool"
+            },
+            {
+              "span_id": "dba2b632807948c589d82297039909f4",
+              "kind": "turn"
+            },
+            {
+              "span_id": "e9f1f41deb0c4536b4e3595a950816b0",
+              "kind": "tool"
+            },
+            {
+              "span_id": "process-12df75a37d8444c6b1ab9f622e73e544",
+              "kind": "process"
+            }
+          ],
+          "turn": {
+            "status": "declared_parent_turn",
+            "turn_id": "agent-turn-1",
+            "candidates": [
+              "agent-turn-1"
+            ],
+            "basis": "recorded context, not kernel semantic proof"
+          },
+          "status": "correlated",
+          "recorded_verification": "VERIFIED",
+          "integrity": "matched_recorded_sha256",
+          "observer_evidence_status": "INCOMPLETE",
+          "recovery_verdict": null,
+          "stream": "process-lifecycle.jsonl",
+          "event_count": 63,
+          "next_offset": null,
+          "provenance": {
+            "receipt": "12df75a37d8444c6b1ab9f622e73e544/system-effects-receipt.json",
+            "manifest": "12df75a37d8444c6b1ab9f622e73e544/system-effects/artifact-manifest.json",
+            "stream": "12df75a37d8444c6b1ab9f622e73e544/system-effects/process-lifecycle.jsonl",
+            "stream_sha256": "c16ad164e53466aae72f593201417600cdc980d91e8538099b3721c9eb587ad5"
+          },
+          "warning": "Recorded hashes are not signatures; independent verifier is not rerun. Run attribution does not prove delegated effects or a precise tool span.",
+          "kinds": {
+            "FORK": 20,
+            "EXEC": 20,
+            "EXIT": 23
+          }
+        }
+      },
+      "collector": {
+        "accepted_events_this_process": 78,
+        "rejected_events_this_process": 0,
+        "collector_ns_this_process": 862114020,
+        "storage_bytes": 382976,
+        "delivery": "explicit-queued-or-synchronous; only flush confirms queued durability",
+        "event_loss_rate": null,
+        "committed_transactions_this_process": 19,
+        "event_loss_note": "no claim about events never submitted by a producer",
+        "write_queue": {
+          "collector_id": "1fb528d34977489f9cd2ceed63adee00",
+          "pending_events": 0,
+          "pending_bytes": 0,
+          "failed_channels": 0,
+          "complete": true,
+          "group_commits": 13,
+          "channels": 1,
+          "crash_durable": "only flush-confirmed sequences; memory queue is not durable"
+        }
+      },
+      "passed": true
+    },
+    {
+      "label": "agent-a-s2",
+      "mode": "batch",
+      "real_llm": false,
+      "checks": {
+        "workload": true,
+        "identity": true,
+        "no_management_token": true,
+        "sdk_complete": true,
+        "all_received_spans_ended": true,
+        "profile_complete": true,
+        "one_trace": true,
+        "one_clock": true,
+        "sdk_event_count": true,
+        "session_sdk": true,
+        "sdk_run_binding": true,
+        "system-effects.jsonl_nonempty": true,
+        "system-effects.jsonl_turn": true,
+        "system-effects.jsonl_sampled_hooks_no_known_loss": true,
+        "system-effects.jsonl_conservative_status_preserved": true,
+        "system-effects.jsonl_provenance_digest": true,
+        "file_and_network_syscalls": true,
+        "process-lifecycle.jsonl_nonempty": true,
+        "process-lifecycle.jsonl_turn": true,
+        "process-lifecycle.jsonl_sampled_hooks_no_known_loss": true,
+        "process-lifecycle.jsonl_conservative_status_preserved": true,
+        "process-lifecycle.jsonl_provenance_digest": true,
+        "fork_exec_exit": true,
+        "wrong_agent_rejected": true,
+        "tampered_stream_rejected": true
+      },
+      "wall_ns": 4936474450,
+      "run_id": "57792014dbe248bdaacf9a7ce004644d",
+      "process": {
+        "run_id": "57792014dbe248bdaacf9a7ce004644d",
+        "run_epoch": 1,
+        "agent_id": "agent-a",
+        "session_id": "s2",
+        "backend": "disabled",
+        "isolation": "bubblewrap",
+        "boot_id": "9ada39c1-b74a-432a-bb7e-96fc4884c4e9",
+        "state": "completed",
+        "created_ns": 1794684165902228216,
+        "event_count": 0,
+        "processes": {},
+        "audit_directory": "/results/agent-a-s2/audit/57792014dbe248bdaacf9a7ce004644d",
+        "trace_complete": false,
+        "cookie": 4711736028871882561,
+        "feature_runs": {
+          "system-effects": {
+            "protocol_version": 2,
+            "status": "FINISHED",
+            "run_id": "57792014dbe248bdaacf9a7ce004644d",
+            "run_epoch": 1,
+            "agent_id": "agent-a",
+            "session_id": "s2",
+            "cgroup_id": 894,
+            "outcome": "completed",
+            "quiescence": {
+              "status": "QUIESCENT_WITHIN_CGROUP",
+              "basis": "CGROUP_V2_EMPTY_FROZEN_VERIFIED",
+              "cgroup_path": "/sys/fs/cgroup/allox-e2e/agent-a-s2/agents/agent-a/sessions/s2",
+              "cgroup_id": 894
+            },
+            "observer_evidence_status": "INCOMPLETE",
+            "offline_verification": "VERIFIED",
+            "artifact_count": 17,
+            "committed_artifact_total_bytes": 1233941,
+            "evidence_directory": "/results/agent-a-s2/audit/57792014dbe248bdaacf9a7ce004644d/system-effects",
+            "config_path": "/results/agent-a-s2/audit/57792014dbe248bdaacf9a7ce004644d/system-effects-config.json",
+            "config_sha256": "41ff24cf59646e35ff80dc11909ef25b2b38682f98708a3e3461193ef54caae3",
+            "expectation_path": "/results/agent-a-s2/audit/57792014dbe248bdaacf9a7ce004644d/system-effects-verification-expectation.json",
+            "verification_result_path": "/results/agent-a-s2/audit/57792014dbe248bdaacf9a7ce004644d/system-effects-verification.json",
+            "report_path": "/results/agent-a-s2/audit/57792014dbe248bdaacf9a7ce004644d/system-effects/deployment-observation-report.json",
+            "report_sha256": "47e25fd5d5eadfbf11449941630dee9572497840e7013eb91e6917eb9c2265bd",
+            "artifact_manifest_path": "/results/agent-a-s2/audit/57792014dbe248bdaacf9a7ce004644d/system-effects/artifact-manifest.json",
+            "artifact_manifest_sha256": "bfe14f4015080a87e1962b95a27d5a597ba86afc56a4aa384dcb35bf3ab794d4",
+            "resident_observer": {
+              "worker_pid": 34,
+              "artifact_manifest_sha256": "bfe14f4015080a87e1962b95a27d5a597ba86afc56a4aa384dcb35bf3ab794d4",
+              "epoch": 1,
+              "finish_nonce": "86e78f474d2816fd2e230fd5710a5ff222bb771a6f94c6b35e661136b6abd086",
+              "kernel_objects_reused": true,
+              "report_sha256": "47e25fd5d5eadfbf11449941630dee9572497840e7013eb91e6917eb9c2265bd",
+              "resident_objects": [
+                {
+                  "link_ids": [
+                    1,
+                    2,
+                    3,
+                    4,
+                    5,
+                    6,
+                    7,
+                    8,
+                    9,
+                    10,
+                    11,
+                    12,
+                    13,
+                    14,
+                    15,
+                    16,
+                    17,
+                    18,
+                    19,
+                    20
+                  ],
+                  "map_ids": [
+                    1,
+                    2,
+                    3,
+                    4,
+                    5,
+                    6,
+                    7,
+                    8,
+                    9,
+                    10,
+                    11,
+                    12,
+                    13,
+                    14
+                  ],
+                  "program_ids": [
+                    7,
+                    8,
+                    9,
+                    10,
+                    11,
+                    12,
+                    13,
+                    14,
+                    15,
+                    16,
+                    17,
+                    18,
+                    19,
+                    20,
+                    21,
+                    22,
+                    23,
+                    24,
+                    25,
+                    26,
+                    27,
+                    28
+                  ]
+                },
+                {
+                  "link_ids": [
+                    23,
+                    24,
+                    25
+                  ],
+                  "map_ids": [
+                    15,
+                    16,
+                    17,
+                    18,
+                    19
+                  ],
+                  "program_ids": [
+                    31,
+                    32,
+                    33
+                  ]
+                }
+              ],
+              "resident_protocol": 1,
+              "resident_resources": 2,
+              "run_id": "57792014dbe248bdaacf9a7ce004644d",
+              "sequence": 3,
+              "status": "IDLE"
+            }
+          }
+        },
+        "agent_monitor": true,
+        "trace_context": {
+          "trace_id": "fea953709ee54a50b9aa33412e5bc0cb",
+          "span_id": "d9a95b727ca64a31a68f1ce2e2ab1eaf"
+        },
+        "root_pid": 186,
+        "launcher_pid": 184,
+        "cgroup": "/sys/fs/cgroup/allox-e2e/agent-a-s2/agents/agent-a/sessions/s2",
+        "monitor_trace_id": "fea953709ee54a50b9aa33412e5bc0cb",
+        "monitor_span_id": "process-57792014dbe248bdaacf9a7ce004644d",
+        "root_exit_code": 0,
+        "lifecycle_complete": true,
+        "session_fenced": false,
+        "finished_ns": 1794684170546573934,
+        "cgroup_removed": true
+      },
+      "proof": {
+        "agent": "agent-a",
+        "session": "s2",
+        "steps": 12,
+        "rows": [
+          {
+            "index": 0,
+            "bytes": 11,
+            "child": {
+              "pid": 6,
+              "ppid": 4
+            }
+          },
+          {
+            "index": 1,
+            "bytes": 11,
+            "child": {
+              "pid": 7,
+              "ppid": 4
+            }
+          },
+          {
+            "index": 2,
+            "bytes": 11,
+            "child": {
+              "pid": 8,
+              "ppid": 4
+            }
+          },
+          {
+            "index": 3,
+            "bytes": 11,
+            "child": {
+              "pid": 9,
+              "ppid": 4
+            }
+          },
+          {
+            "index": 4,
+            "bytes": 11,
+            "child": {
+              "pid": 10,
+              "ppid": 4
+            }
+          },
+          {
+            "index": 5,
+            "bytes": 11,
+            "child": {
+              "pid": 11,
+              "ppid": 4
+            }
+          },
+          {
+            "index": 6,
+            "bytes": 11,
+            "child": {
+              "pid": 12,
+              "ppid": 4
+            }
+          },
+          {
+            "index": 7,
+            "bytes": 11,
+            "child": {
+              "pid": 13,
+              "ppid": 4
+            }
+          },
+          {
+            "index": 8,
+            "bytes": 11,
+            "child": {
+              "pid": 14,
+              "ppid": 4
+            }
+          },
+          {
+            "index": 9,
+            "bytes": 11,
+            "child": {
+              "pid": 15,
+              "ppid": 4
+            }
+          },
+          {
+            "index": 10,
+            "bytes": 12,
+            "child": {
+              "pid": 16,
+              "ppid": 4
+            }
+          },
+          {
+            "index": 11,
+            "bytes": 12,
+            "child": {
+              "pid": 17,
+              "ppid": 4
+            }
+          }
+        ],
+        "health": {
+          "attempted_events": 72,
+          "acknowledged_events": 72,
+          "failed_events": 0,
+          "pending_events": 0,
+          "pending_bytes": 0,
+          "peak_pending_events": 12,
+          "peak_pending_bytes": 4210,
+          "serialized_bytes": 25262,
+          "emit_ns": 753596091,
+          "batch_requests": 13,
+          "worker_alive": false,
+          "action_batch_size": 8,
+          "action_flush_interval": 0.05,
+          "completed_actions": 12,
+          "durable_actions": 12,
+          "flush_requests": 13,
+          "closed": true,
+          "complete": true,
+          "enabled": true,
+          "delivery": "queued",
+          "batch_size": 32,
+          "metric_errors": 0,
+          "strict": true
+        },
+        "wall_ns_including_close": 2127943531,
+        "management_token_absent": true
+      },
+      "profile": {
+        "runs": 1,
+        "spans": 39,
+        "complete": true,
+        "warnings": [],
+        "groups": [
+          {
+            "semantic_path": [
+              "e2e"
+            ],
+            "kind": "phase",
+            "name": "tool_execution",
+            "model": null,
+            "calls": 12,
+            "runs": 1,
+            "errors": 0,
+            "inclusive_ns": 2087446096,
+            "self_ns": 2087446096,
+            "p50_ns": 165347170,
+            "p95_ns": 197583654,
+            "timing_samples": [],
+            "metrics": {
+              "executor.execution_ns": {
+                "sum": 2086587164,
+                "samples": 12
+              },
+              "executor.thread_cpu_ns": {
+                "sum": 30952513,
+                "samples": 12
+              }
+            }
+          },
+          {
+            "semantic_path": [
+              "e2e"
+            ],
+            "kind": "process",
+            "name": "allox.execution",
+            "model": null,
+            "calls": 1,
+            "runs": 1,
+            "errors": 0,
+            "inclusive_ns": 2760627416,
+            "self_ns": 667135024,
+            "p50_ns": 2760627416,
+            "p95_ns": 2760627416,
+            "timing_samples": [],
+            "metrics": {
+              "cgroup.cpu_usage_usec": {
+                "sum": 804021,
+                "samples": 1
+              }
+            }
+          },
+          {
+            "semantic_path": [
+              "e2e"
+            ],
+            "kind": "run",
+            "name": "experiment",
+            "model": null,
+            "calls": 1,
+            "runs": 1,
+            "errors": 0,
+            "inclusive_ns": 4903069344,
+            "self_ns": 66036678,
+            "p50_ns": 4903069344,
+            "p95_ns": 4903069344,
+            "timing_samples": [],
+            "metrics": {}
+          },
+          {
+            "semantic_path": [
+              "e2e"
+            ],
+            "kind": "tool",
+            "name": "file-network-socket-child",
+            "model": null,
+            "calls": 12,
+            "runs": 1,
+            "errors": 0,
+            "inclusive_ns": 2090944253,
+            "self_ns": 3498157,
+            "p50_ns": 165533641,
+            "p95_ns": 198349282,
+            "timing_samples": [
+              {
+                "executor_internal_ns": 163752864,
+                "non_execution_ns": 823592
+              },
+              {
+                "executor_internal_ns": 165306192,
+                "non_execution_ns": 227449
+              },
+              {
+                "executor_internal_ns": 180243591,
+                "non_execution_ns": 302208
+              },
+              {
+                "executor_internal_ns": 163158952,
+                "non_execution_ns": 256857
+              },
+              {
+                "executor_internal_ns": 152374969,
+                "non_execution_ns": 177729
+              },
+              {
+                "executor_internal_ns": 165280258,
+                "non_execution_ns": 246846
+              },
+              {
+                "executor_internal_ns": 178767348,
+                "non_execution_ns": 305340
+              },
+              {
+                "executor_internal_ns": 143245389,
+                "non_execution_ns": 276749
+              },
+              {
+                "executor_internal_ns": 197474997,
+                "non_execution_ns": 874285
+              },
+              {
+                "executor_internal_ns": 196391863,
+                "non_execution_ns": 317372
+              },
+              {
+                "executor_internal_ns": 193040128,
+                "non_execution_ns": 267013
+              },
+              {
+                "executor_internal_ns": 187550613,
+                "non_execution_ns": 281649
+              }
+            ],
+            "metrics": {}
+          },
+          {
+            "semantic_path": [
+              "e2e"
+            ],
+            "kind": "turn",
+            "name": "action-0",
+            "model": null,
+            "calls": 1,
+            "runs": 1,
+            "errors": 0,
+            "inclusive_ns": 165371920,
+            "self_ns": 795464,
+            "p50_ns": 165371920,
+            "p95_ns": 165371920,
+            "timing_samples": [],
+            "metrics": {}
+          },
+          {
+            "semantic_path": [
+              "e2e"
+            ],
+            "kind": "turn",
+            "name": "action-1",
+            "model": null,
+            "calls": 1,
+            "runs": 1,
+            "errors": 0,
+            "inclusive_ns": 165651104,
+            "self_ns": 117463,
+            "p50_ns": 165651104,
+            "p95_ns": 165651104,
+            "timing_samples": [],
+            "metrics": {}
+          },
+          {
+            "semantic_path": [
+              "e2e"
+            ],
+            "kind": "turn",
+            "name": "action-10",
+            "model": null,
+            "calls": 1,
+            "runs": 1,
+            "errors": 0,
+            "inclusive_ns": 193475721,
+            "self_ns": 168580,
+            "p50_ns": 193475721,
+            "p95_ns": 193475721,
+            "timing_samples": [],
+            "metrics": {}
+          },
+          {
+            "semantic_path": [
+              "e2e"
+            ],
+            "kind": "turn",
+            "name": "action-11",
+            "model": null,
+            "calls": 1,
+            "runs": 1,
+            "errors": 0,
+            "inclusive_ns": 188030390,
+            "self_ns": 198128,
+            "p50_ns": 188030390,
+            "p95_ns": 188030390,
+            "timing_samples": [],
+            "metrics": {}
+          },
+          {
+            "semantic_path": [
+              "e2e"
+            ],
+            "kind": "turn",
+            "name": "action-2",
+            "model": null,
+            "calls": 1,
+            "runs": 1,
+            "errors": 0,
+            "inclusive_ns": 180700885,
+            "self_ns": 155086,
+            "p50_ns": 180700885,
+            "p95_ns": 180700885,
+            "timing_samples": [],
+            "metrics": {}
+          },
+          {
+            "semantic_path": [
+              "e2e"
+            ],
+            "kind": "turn",
+            "name": "action-3",
+            "model": null,
+            "calls": 1,
+            "runs": 1,
+            "errors": 0,
+            "inclusive_ns": 163569301,
+            "self_ns": 153492,
+            "p50_ns": 163569301,
+            "p95_ns": 163569301,
+            "timing_samples": [],
+            "metrics": {}
+          },
+          {
+            "semantic_path": [
+              "e2e"
+            ],
+            "kind": "turn",
+            "name": "action-4",
+            "model": null,
+            "calls": 1,
+            "runs": 1,
+            "errors": 0,
+            "inclusive_ns": 152661733,
+            "self_ns": 109035,
+            "p50_ns": 152661733,
+            "p95_ns": 152661733,
+            "timing_samples": [],
+            "metrics": {}
+          },
+          {
+            "semantic_path": [
+              "e2e"
+            ],
+            "kind": "turn",
+            "name": "action-5",
+            "model": null,
+            "calls": 1,
+            "runs": 1,
+            "errors": 0,
+            "inclusive_ns": 165655888,
+            "self_ns": 128784,
+            "p50_ns": 165655888,
+            "p95_ns": 165655888,
+            "timing_samples": [],
+            "metrics": {}
+          },
+          {
+            "semantic_path": [
+              "e2e"
+            ],
+            "kind": "turn",
+            "name": "action-6",
+            "model": null,
+            "calls": 1,
+            "runs": 1,
+            "errors": 0,
+            "inclusive_ns": 179219077,
+            "self_ns": 146389,
+            "p50_ns": 179219077,
+            "p95_ns": 179219077,
+            "timing_samples": [],
+            "metrics": {}
+          },
+          {
+            "semantic_path": [
+              "e2e"
+            ],
+            "kind": "turn",
+            "name": "action-7",
+            "model": null,
+            "calls": 1,
+            "runs": 1,
+            "errors": 0,
+            "inclusive_ns": 143691045,
+            "self_ns": 168907,
+            "p50_ns": 143691045,
+            "p95_ns": 143691045,
+            "timing_samples": [],
+            "metrics": {}
+          },
+          {
+            "semantic_path": [
+              "e2e"
+            ],
+            "kind": "turn",
+            "name": "action-8",
+            "model": null,
+            "calls": 1,
+            "runs": 1,
+            "errors": 0,
+            "inclusive_ns": 198575746,
+            "self_ns": 226464,
+            "p50_ns": 198575746,
+            "p95_ns": 198575746,
+            "timing_samples": [],
+            "metrics": {}
+          },
+          {
+            "semantic_path": [
+              "e2e"
+            ],
+            "kind": "turn",
+            "name": "action-9",
+            "model": null,
+            "calls": 1,
+            "runs": 1,
+            "errors": 0,
+            "inclusive_ns": 196889582,
+            "self_ns": 180347,
+            "p50_ns": 196889582,
+            "p95_ns": 196889582,
+            "timing_samples": [],
+            "metrics": {}
+          },
+          {
+            "semantic_path": [
+              "e2e"
+            ],
+            "kind": "turn",
+            "name": "agent-turn",
+            "model": null,
+            "calls": 1,
+            "runs": 1,
+            "errors": 0,
+            "inclusive_ns": 4837032666,
+            "self_ns": 2076405250,
+            "p50_ns": 4837032666,
+            "p95_ns": 4837032666,
+            "timing_samples": [],
+            "metrics": {}
+          }
+        ],
+        "completeness_scope": "received spans only; reconcile producer health separately",
+        "time_semantics": "inclusive sums are work, not elapsed wall time; self subtracts child union",
+        "unobserved": [
+          "transport unless instrumented",
+          "server timings unless provider reports"
+        ]
+      },
+      "evidence_health": {
+        "effects": {
+          "schema_version": 1,
+          "run_id": "57792014dbe248bdaacf9a7ce004644d",
+          "run_epoch": 1,
+          "cgroup_id": 894,
+          "profile": "balanced",
+          "object_resolution_mode": "KERNEL_OBJECT_EXPANDED_PARTIAL",
+          "transport_status": "COMPLETE",
+          "coverage_status": "PARTIAL",
+          "object_resolution_status": "PARTIAL",
+          "operation_attempted": 281,
+          "operation_completed": 281,
+          "event_attempted": 562,
+          "event_published": 562,
+          "event_dropped": 0,
+          "events_persisted": 562,
+          "pending_insert_failed": 0,
+          "pending_missing": 0,
+          "pending_remaining": 0,
+          "userspace_failures": 0,
+          "fatal_kernel_flags": 0,
+          "capture_read_failures": 0,
+          "capture_truncations": 0,
+          "capture_invalid_lengths": 50,
+          "object_resolution_attempted": 157,
+          "object_resolution_resolved": 142,
+          "object_resolution_unresolved": 15,
+          "object_resolution_failed_syscalls": 3,
+          "object_join_missing": 0,
+          "object_join_ambiguous": 0,
+          "object_read_failed": 0,
+          "object_delete_failed": 0,
+          "object_path_unavailable": 0,
+          "object_pending_remaining": 0,
+          "task_read_failed": 0,
+          "object_unsupported": 12,
+          "socket_state": {
+            "schema_version": 2,
+            "run_id": "57792014dbe248bdaacf9a7ce004644d",
+            "boot_id": "9ada39c1-b74a-432a-bb7e-96fc4884c4e9",
+            "run_epoch": 1,
+            "cgroup_id": 894,
+            "cgroup_match_mode": "ANCESTOR_ROOT",
+            "status": "COMPLETE",
+            "event_attempted": 72,
+            "event_published": 72,
+            "event_dropped": 0,
+            "events_persisted": 72,
+            "final_event_seq": 72,
+            "destroy_events_persisted": 12,
+            "owner_insert_failed": 0,
+            "owner_conflict": 0,
+            "owner_delete_failed": 0,
+            "owner_remaining": 0,
+            "owners_retired_at_barrier": 0,
+            "state_read_failed": 0,
+            "unsupported_sockets": 62,
+            "userspace_failures": 0,
+            "async_producer_seal": {
+              "complete": true,
+              "links_expected": 2,
+              "links_detached": 2
+            },
+            "producer_barrier_complete": true,
+            "drain_completed": true,
+            "wal_durable": true,
+            "callback_queue_high_water": 6,
+            "callback_queue_capacity": 4096,
+            "reasons": [],
+            "coverage_gaps": [
+              "state ownership covers directly observed AF_INET/AF_INET6 TCP bind/connect/accept operations only",
+              "accepted sockets receive a post-do_accept snapshot; TCP transitions before ownership publication are not claimed",
+              "owners still present after the producer barrier are retired from attribution; retirement is counted separately and is never projected as an observed TCP DESTROY event",
+              "UDP, Unix-domain, raw, packet, inherited, SCM_RIGHTS, io_uring, and delegated sockets are explicitly outside this partial state contract"
+            ]
+          },
+          "producer_barrier_complete": true,
+          "drain_completed": true,
+          "wal_durable": true,
+          "poll_calls": 586,
+          "maximum_events_per_poll": 28,
+          "callback_queue_high_water": 24,
+          "callback_queue_capacity": 4096,
+          "reasons": [],
+          "coverage_gaps": [
+            "native syscall ABI only; compat/x32 calls are not reliably classified",
+            "successful operation results are not proof that durable state differs",
+            "MAP_SHARED memory writes are not observed after the mapping is established",
+            "io_uring requests and completions are not decoded or causally joined",
+            "namespace creation through clone/clone3 is not recorded by this syscall-pair sensor",
+            "kernel-worker, writeback, softirq, and delayed async effects are not causally attributed",
+            "exact cgroup attribution identifies an unclassified run-execution-domain caller; it does not identify Agent code or observe delegated effects",
+            "netlink and generic ioctl payload semantics are not decoded",
+            "cooperative controlled workloads only; a privileged adversarial workload can evade the exact cgroup or tamper with enumerable BPF maps",
+            "KERNEL_OBJECT_EXPANDED resolves successful selected ordinary opens to the final user-visible file through file_post_open after filesystem callbacks complete (including stackable-filesystem opens), create parent directories, hard-link source inodes in the destination mount, unlink/rmdir targets, chmod/chown targets (including fchmodat2), mountless xattr inodes with bounded attribute-name capture, rename sources, eligible file-backed MAP_SHARED+PROT_WRITE mmap targets, and single shared file-backed VMA mprotect(PROT_WRITE) requests; it also resolves bind/connect requested socket endpoints, successful accept/accept4 accepted-socket peers, and a separately verified AF_INET/AF_INET6 TCP accept/transition/destroy stream. O_PATH/O_TMPFILE, missing or duplicate post-open joins, hard-link destination children, rename destinations, other created children, actual dirty-page writes after mmap/mprotect, multi-VMA or anonymous/private mprotect targets, non-INET/TCP socket state, io_uring, SCM_RIGHTS provenance, and delegated effects remain explicitly outside this partial contract",
+            "process-lifecycle schema v2 has no authoritative S0 task/thread enrollment ledger and no cgroup migration or CLONE_INTO_CGROUP enrollment hook; EXEC/EXIT may introduce identities during replay, so whole-tree lifecycle association is PARTIAL",
+            "FD object identity remains unresolved for truncate, setattr, allocation, range-transfer, sync, mmap, ioctl, and other non-write FD operations",
+            "balanced profile omits mmap/mprotect, fsync, ioctl, prctl, and setsockopt events"
+          ]
+        },
+        "lifecycle": {
+          "schema_version": 2,
+          "run_id": "57792014dbe248bdaacf9a7ce004644d",
+          "run_epoch": 1,
+          "cgroup_id": 894,
+          "status": "PARTIAL",
+          "event_attempted": 63,
+          "event_published": 63,
+          "event_dropped": 0,
+          "events_persisted": 63,
+          "task_read_failed": 0,
+          "exec_path_read_failed": 0,
+          "exec_path_truncated": 0,
+          "userspace_failures": 0,
+          "producer_barrier_complete": true,
+          "drain_completed": true,
+          "wal_durable": true,
+          "poll_calls": 586,
+          "maximum_events_per_poll": 2,
+          "callback_queue_high_water": 2,
+          "callback_queue_capacity": 4096,
+          "lineage": {
+            "event_count": 63,
+            "task_identities": 23,
+            "exited_task_identities": 23,
+            "group_dead_exits": 22,
+            "enrollment": {
+              "initial_task_ledger_present": false,
+              "initial_tasks_enrolled": 0,
+              "migration_hook_present": false,
+              "clone_into_cgroup_covered": false,
+              "migration_enrolled_task_identities": 0,
+              "fork_enrolled_task_identities": 20,
+              "exec_introduced_task_identities": 0,
+              "exit_introduced_task_identities": 3,
+              "forks_with_unenrolled_parent": 7,
+              "complete": false
+            },
+            "correlation": "PARTIAL_FORK_EXEC_EXIT_BY_BOOT_ID_PID_START_BOOTTIME_AND_EXEC_OLD_PID"
+          },
+          "reasons": [],
+          "limitations": [
+            "process-lifecycle schema v2 has no authoritative S0 task/thread enrollment ledger and no cgroup migration or CLONE_INTO_CGROUP enrollment hook; EXEC/EXIT may introduce identities during replay, so whole-tree lifecycle association is PARTIAL",
+            "EXEC filename is a bounded kernel-copied description, not executable FILE_OBJECT identity",
+            "direct exact-cgroup lifecycle attribution does not establish delegated causality",
+            "lossless terminal WAL replay applies only to lifecycle events admitted by the three scheduler hooks"
+          ]
+        },
+        "overall_status": "INCOMPLETE"
+      },
+      "coverage_gaps": [
+        "process-lifecycle schema v2 has no authoritative S0 task/thread enrollment ledger and no cgroup migration or CLONE_INTO_CGROUP enrollment hook; EXEC/EXIT may introduce identities during replay, so whole-tree lifecycle association is PARTIAL",
+        "EXEC filename is a bounded kernel-copied description, not executable FILE_OBJECT identity",
+        "direct exact-cgroup lifecycle attribution does not establish delegated causality",
+        "lossless terminal WAL replay applies only to lifecycle events admitted by the three scheduler hooks",
+        "read syscall is absent from the current side-effect policy; file-open/SDK timing is not read coverage"
+      ],
+      "correlation": {
+        "system-effects.jsonl": {
+          "schema": "allox.trace-correlation/v1",
+          "agent_id": "agent-a",
+          "session_id": "s2",
+          "run_id": "57792014dbe248bdaacf9a7ce004644d",
+          "trace_id": "fea953709ee54a50b9aa33412e5bc0cb",
+          "process_span_id": "process-57792014dbe248bdaacf9a7ce004644d",
+          "parent_span_id": "d9a95b727ca64a31a68f1ce2e2ab1eaf",
+          "span_refs": [
+            {
+              "span_id": "076fefa95be547d98b5bb903af6e6910",
+              "kind": "turn"
+            },
+            {
+              "span_id": "13aab03cb4fd45a7b408850225ee87d7",
+              "kind": "tool"
+            },
+            {
+              "span_id": "15a51798c4824a6db6051eeb3814d282",
+              "kind": "tool"
+            },
+            {
+              "span_id": "19e2bb8a62e74d219e2c91b0c3f947c8",
+              "kind": "phase"
+            },
+            {
+              "span_id": "1ae80239eaf6460b9348356a968d24fb",
+              "kind": "turn"
+            },
+            {
+              "span_id": "1fdc067fe259491bb80ef6d2fa0a0e22",
+              "kind": "phase"
+            },
+            {
+              "span_id": "233ced442a3b4a5da88209f0b9ecf454",
+              "kind": "tool"
+            },
+            {
+              "span_id": "2f7197c1f2774251bdb94b5ac1f92504",
+              "kind": "turn"
+            },
+            {
+              "span_id": "376890f4cbc342ffa5a1a6c6aa1dd09a",
+              "kind": "tool"
+            },
+            {
+              "span_id": "4d8f373047214c5cb4a0082ffe9898c1",
+              "kind": "phase"
+            },
+            {
+              "span_id": "4efb3caaa15540bbacc33415da88fed6",
+              "kind": "tool"
+            },
+            {
+              "span_id": "5272808ce2f945d1afc2ee42cbd2491b",
+              "kind": "phase"
+            },
+            {
+              "span_id": "5fb1b323c1574acdbeab60006342bfc3",
+              "kind": "phase"
+            },
+            {
+              "span_id": "611977b3ee954d8bb46ab3171a8eabe7",
+              "kind": "tool"
+            },
+            {
+              "span_id": "64ea93b2cb564d6d9f23bf146264f647",
+              "kind": "turn"
+            },
+            {
+              "span_id": "712f630e9a6a4bfc9ea7d27c7568f1ca",
+              "kind": "phase"
+            },
+            {
+              "span_id": "7251a7c6b4344f22bf87293386244200",
+              "kind": "phase"
+            },
+            {
+              "span_id": "7916ca446b7041dcad2f8918e81b7aa3",
+              "kind": "tool"
+            },
+            {
+              "span_id": "7ded15a8938e471b9b3a3f94744f3b04",
+              "kind": "phase"
+            },
+            {
+              "span_id": "820324277bf34cbe9c0bc10a2b83f8c1",
+              "kind": "tool"
+            },
+            {
+              "span_id": "88e2771469ce46e7af1ab88c4d59fb18",
+              "kind": "turn"
+            },
+            {
+              "span_id": "9311a5fc58ac4b1d9350b20292933776",
+              "kind": "turn"
+            },
+            {
+              "span_id": "9a95a5d8e1904dbcab9a86ad504bf66f",
+              "kind": "phase"
+            },
+            {
+              "span_id": "a1d2db77abf54ae58841cca3909cf35a",
+              "kind": "tool"
+            },
+            {
+              "span_id": "a5d0e9728bb1458f98e6045a047f2a6d",
+              "kind": "turn"
+            },
+            {
+              "span_id": "ab1df18410034999b706796eaf077dc1",
+              "kind": "turn"
+            },
+            {
+              "span_id": "ade2bb58682e431ebbe5cb057778a476",
+              "kind": "turn"
+            },
+            {
+              "span_id": "b33d1e089eef4505971f22a283b3133a",
+              "kind": "phase"
+            },
+            {
+              "span_id": "d7bbb2be09444f27b88cf143ce37a300",
+              "kind": "phase"
+            },
+            {
+              "span_id": "d971a832b1334378b3c12557adced38f",
+              "kind": "tool"
+            },
+            {
+              "span_id": "da20f63bdfa649c69a9e2896aa861dac",
+              "kind": "tool"
+            },
+            {
+              "span_id": "de354f9a45e143038221e1a063500bab",
+              "kind": "turn"
+            },
+            {
+              "span_id": "e9d8388e91d24d2d80ab8198daad242d",
+              "kind": "turn"
+            },
+            {
+              "span_id": "f4ed78c443ea4becad8c6cee5bb45d48",
+              "kind": "turn"
+            },
+            {
+              "span_id": "fdfc8aede5a342e98dbd466dee4d6d9b",
+              "kind": "phase"
+            },
+            {
+              "span_id": "fe672d0fa6564aea9c9d1436ee6a2bae",
+              "kind": "tool"
+            },
+            {
+              "span_id": "process-57792014dbe248bdaacf9a7ce004644d",
+              "kind": "process"
+            }
+          ],
+          "turn": {
+            "status": "declared_parent_turn",
+            "turn_id": "agent-turn-1",
+            "candidates": [
+              "agent-turn-1"
+            ],
+            "basis": "recorded context, not kernel semantic proof"
+          },
+          "status": "correlated",
+          "recorded_verification": "VERIFIED",
+          "integrity": "matched_recorded_sha256",
+          "observer_evidence_status": "INCOMPLETE",
+          "recovery_verdict": null,
+          "stream": "system-effects.jsonl",
+          "event_count": 562,
+          "next_offset": null,
+          "provenance": {
+            "receipt": "57792014dbe248bdaacf9a7ce004644d/system-effects-receipt.json",
+            "manifest": "57792014dbe248bdaacf9a7ce004644d/system-effects/artifact-manifest.json",
+            "stream": "57792014dbe248bdaacf9a7ce004644d/system-effects/system-effects.jsonl",
+            "stream_sha256": "94f0cca127e6c13bba8b6a75780761dfcd3d3e401b23d03d4dde6dd9c9e2f41e"
+          },
+          "warning": "Recorded hashes are not signatures; independent verifier is not rerun. Run attribution does not prove delegated effects or a precise tool span.",
+          "syscalls": {
+            "openat": 28,
+            "write": 54,
+            "rename": 24,
+            "chmod": 26,
+            "socket": 124,
+            "connect": 100,
+            "sendto": 100,
+            "bind": 24,
+            "listen": 24,
+            "accept4": 24,
+            "unlink": 24,
+            "unlinkat": 4,
+            "mkdir": 4,
+            "renameat2": 2
+          },
+          "domains": {
+            "FILESYSTEM": 112,
+            "IO": 54,
+            "NETWORK": 396
+          },
+          "kinds": {
+            "OPERATION_ATTEMPT": 281,
+            "OPERATION_RESULT": 281
+          },
+          "read_syscalls_covered": false
+        },
+        "process-lifecycle.jsonl": {
+          "schema": "allox.trace-correlation/v1",
+          "agent_id": "agent-a",
+          "session_id": "s2",
+          "run_id": "57792014dbe248bdaacf9a7ce004644d",
+          "trace_id": "fea953709ee54a50b9aa33412e5bc0cb",
+          "process_span_id": "process-57792014dbe248bdaacf9a7ce004644d",
+          "parent_span_id": "d9a95b727ca64a31a68f1ce2e2ab1eaf",
+          "span_refs": [
+            {
+              "span_id": "076fefa95be547d98b5bb903af6e6910",
+              "kind": "turn"
+            },
+            {
+              "span_id": "13aab03cb4fd45a7b408850225ee87d7",
+              "kind": "tool"
+            },
+            {
+              "span_id": "15a51798c4824a6db6051eeb3814d282",
+              "kind": "tool"
+            },
+            {
+              "span_id": "19e2bb8a62e74d219e2c91b0c3f947c8",
+              "kind": "phase"
+            },
+            {
+              "span_id": "1ae80239eaf6460b9348356a968d24fb",
+              "kind": "turn"
+            },
+            {
+              "span_id": "1fdc067fe259491bb80ef6d2fa0a0e22",
+              "kind": "phase"
+            },
+            {
+              "span_id": "233ced442a3b4a5da88209f0b9ecf454",
+              "kind": "tool"
+            },
+            {
+              "span_id": "2f7197c1f2774251bdb94b5ac1f92504",
+              "kind": "turn"
+            },
+            {
+              "span_id": "376890f4cbc342ffa5a1a6c6aa1dd09a",
+              "kind": "tool"
+            },
+            {
+              "span_id": "4d8f373047214c5cb4a0082ffe9898c1",
+              "kind": "phase"
+            },
+            {
+              "span_id": "4efb3caaa15540bbacc33415da88fed6",
+              "kind": "tool"
+            },
+            {
+              "span_id": "5272808ce2f945d1afc2ee42cbd2491b",
+              "kind": "phase"
+            },
+            {
+              "span_id": "5fb1b323c1574acdbeab60006342bfc3",
+              "kind": "phase"
+            },
+            {
+              "span_id": "611977b3ee954d8bb46ab3171a8eabe7",
+              "kind": "tool"
+            },
+            {
+              "span_id": "64ea93b2cb564d6d9f23bf146264f647",
+              "kind": "turn"
+            },
+            {
+              "span_id": "712f630e9a6a4bfc9ea7d27c7568f1ca",
+              "kind": "phase"
+            },
+            {
+              "span_id": "7251a7c6b4344f22bf87293386244200",
+              "kind": "phase"
+            },
+            {
+              "span_id": "7916ca446b7041dcad2f8918e81b7aa3",
+              "kind": "tool"
+            },
+            {
+              "span_id": "7ded15a8938e471b9b3a3f94744f3b04",
+              "kind": "phase"
+            },
+            {
+              "span_id": "820324277bf34cbe9c0bc10a2b83f8c1",
+              "kind": "tool"
+            },
+            {
+              "span_id": "88e2771469ce46e7af1ab88c4d59fb18",
+              "kind": "turn"
+            },
+            {
+              "span_id": "9311a5fc58ac4b1d9350b20292933776",
+              "kind": "turn"
+            },
+            {
+              "span_id": "9a95a5d8e1904dbcab9a86ad504bf66f",
+              "kind": "phase"
+            },
+            {
+              "span_id": "a1d2db77abf54ae58841cca3909cf35a",
+              "kind": "tool"
+            },
+            {
+              "span_id": "a5d0e9728bb1458f98e6045a047f2a6d",
+              "kind": "turn"
+            },
+            {
+              "span_id": "ab1df18410034999b706796eaf077dc1",
+              "kind": "turn"
+            },
+            {
+              "span_id": "ade2bb58682e431ebbe5cb057778a476",
+              "kind": "turn"
+            },
+            {
+              "span_id": "b33d1e089eef4505971f22a283b3133a",
+              "kind": "phase"
+            },
+            {
+              "span_id": "d7bbb2be09444f27b88cf143ce37a300",
+              "kind": "phase"
+            },
+            {
+              "span_id": "d971a832b1334378b3c12557adced38f",
+              "kind": "tool"
+            },
+            {
+              "span_id": "da20f63bdfa649c69a9e2896aa861dac",
+              "kind": "tool"
+            },
+            {
+              "span_id": "de354f9a45e143038221e1a063500bab",
+              "kind": "turn"
+            },
+            {
+              "span_id": "e9d8388e91d24d2d80ab8198daad242d",
+              "kind": "turn"
+            },
+            {
+              "span_id": "f4ed78c443ea4becad8c6cee5bb45d48",
+              "kind": "turn"
+            },
+            {
+              "span_id": "fdfc8aede5a342e98dbd466dee4d6d9b",
+              "kind": "phase"
+            },
+            {
+              "span_id": "fe672d0fa6564aea9c9d1436ee6a2bae",
+              "kind": "tool"
+            },
+            {
+              "span_id": "process-57792014dbe248bdaacf9a7ce004644d",
+              "kind": "process"
+            }
+          ],
+          "turn": {
+            "status": "declared_parent_turn",
+            "turn_id": "agent-turn-1",
+            "candidates": [
+              "agent-turn-1"
+            ],
+            "basis": "recorded context, not kernel semantic proof"
+          },
+          "status": "correlated",
+          "recorded_verification": "VERIFIED",
+          "integrity": "matched_recorded_sha256",
+          "observer_evidence_status": "INCOMPLETE",
+          "recovery_verdict": null,
+          "stream": "process-lifecycle.jsonl",
+          "event_count": 63,
+          "next_offset": null,
+          "provenance": {
+            "receipt": "57792014dbe248bdaacf9a7ce004644d/system-effects-receipt.json",
+            "manifest": "57792014dbe248bdaacf9a7ce004644d/system-effects/artifact-manifest.json",
+            "stream": "57792014dbe248bdaacf9a7ce004644d/system-effects/process-lifecycle.jsonl",
+            "stream_sha256": "2ac801e9fd70a91b34eb7724c96503f1dee912527426f43c604308188b751896"
+          },
+          "warning": "Recorded hashes are not signatures; independent verifier is not rerun. Run attribution does not prove delegated effects or a precise tool span.",
+          "kinds": {
+            "FORK": 20,
+            "EXEC": 20,
+            "EXIT": 23
+          }
+        }
+      },
+      "collector": {
+        "accepted_events_this_process": 78,
+        "rejected_events_this_process": 0,
+        "collector_ns_this_process": 901675224,
+        "storage_bytes": 382976,
+        "delivery": "explicit-queued-or-synchronous; only flush confirms queued durability",
+        "event_loss_rate": null,
+        "committed_transactions_this_process": 19,
+        "event_loss_note": "no claim about events never submitted by a producer",
+        "write_queue": {
+          "collector_id": "ecbc57c8aa04439697b585007bb6e453",
+          "pending_events": 0,
+          "pending_bytes": 0,
+          "failed_channels": 0,
+          "complete": true,
+          "group_commits": 13,
+          "channels": 1,
+          "crash_durable": "only flush-confirmed sequences; memory queue is not durable"
+        }
+      },
+      "passed": true
+    }
+  ],
+  "checks": {
+    "same_worker": true,
+    "same_kernel_objects": true,
+    "old_committed_files_unchanged": true,
+    "distinct_run_ids": true,
+    "same_session_epoch_advances": true,
+    "same_session_new_run_binding": true,
+    "same_session_same_worker_and_objects": true,
+    "stale_nonce_failed_and_fenced": true,
+    "worker_poisoned_and_exited": true,
+    "no_success_receipt": true,
+    "fault_processes_cleared": true,
+    "new_run_refused_until_explicit_reset": true,
+    "refused_command_not_executed": true,
+    "previous_evidence_still_unchanged_after_fault": true,
+    "same_session_evidence_unchanged_after_fault": true
+  },
+  "scope": "real kernel; no LLM; deliberate stale nonce fault",
+  "consecutive_same_session": [
+    {
+      "worker_pid": 34,
+      "artifact_manifest_sha256": "b91fcec6b887dab29533e235f0adcf9bf9e43ebc5534c2337e9588eed1e48e1b",
+      "epoch": 1,
+      "finish_nonce": "ece0cc280be1f7af7faabd5e9ea87817f16001eaad0af22cc060d2e8464f44ca",
+      "kernel_objects_reused": true,
+      "report_sha256": "378cdab1a899a517887090054bf543b476f5ce9681ecdd7cc78b844d58b394f3",
+      "resident_objects": [
+        {
+          "link_ids": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20
+          ],
+          "map_ids": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14
+          ],
+          "program_ids": [
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28
+          ]
+        },
+        {
+          "link_ids": [
+            23,
+            24,
+            25
+          ],
+          "map_ids": [
+            15,
+            16,
+            17,
+            18,
+            19
+          ],
+          "program_ids": [
+            31,
+            32,
+            33
+          ]
+        }
+      ],
+      "resident_protocol": 1,
+      "resident_resources": 2,
+      "run_id": "886acd292505497a829f45462882f9e9",
+      "sequence": 4,
+      "status": "IDLE"
+    },
+    {
+      "worker_pid": 34,
+      "artifact_manifest_sha256": "e1c5d0b240130d78908cfd29a2ed8bfa2feb6b781e6370d89136ae4ab8043fed",
+      "epoch": 2,
+      "finish_nonce": "d119fb03bd1ec29f489c3cd096049f7a6246363f6fb0f8e68cb66674d9a21f75",
+      "kernel_objects_reused": true,
+      "report_sha256": "91629b210e0a73cad905934bb16ea083d1e451da280a1b0d5f0555173ee5dd72",
+      "resident_objects": [
+        {
+          "link_ids": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20
+          ],
+          "map_ids": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14
+          ],
+          "program_ids": [
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28
+          ]
+        },
+        {
+          "link_ids": [
+            23,
+            24,
+            25
+          ],
+          "map_ids": [
+            15,
+            16,
+            17,
+            18,
+            19
+          ],
+          "program_ids": [
+            31,
+            32,
+            33
+          ]
+        }
+      ],
+      "resident_protocol": 1,
+      "resident_resources": 2,
+      "run_id": "f8f7fd5742c74109b6b6fb17906005b4",
+      "sequence": 5,
+      "status": "IDLE"
+    }
+  ],
+  "expected_failure": {
+    "run_id": "6959489beb5a47e8a0a8d2c7f7dc8d64",
+    "run_epoch": 3,
+    "agent_id": "fault-agent",
+    "session_id": "s",
+    "backend": "disabled",
+    "isolation": "bubblewrap",
+    "boot_id": "9ada39c1-b74a-432a-bb7e-96fc4884c4e9",
+    "state": "failed",
+    "created_ns": 1794684176771706987,
+    "event_count": 0,
+    "processes": {},
+    "audit_directory": "/results/fault-audit/6959489beb5a47e8a0a8d2c7f7dc8d64",
+    "trace_complete": false,
+    "cookie": 95217472982349165,
+    "feature_runs": {
+      "system-effects": {
+        "protocol_version": 2,
+        "status": "failed",
+        "run_id": "6959489beb5a47e8a0a8d2c7f7dc8d64",
+        "run_epoch": 3,
+        "cgroup_id": 1048,
+        "observer_pid": 34,
+        "evidence_directory": "/results/fault-audit/6959489beb5a47e8a0a8d2c7f7dc8d64/system-effects",
+        "config_sha256": "0a83a12a8b1e1a9b7b45970664ae939d75fa95defe52ab48f165fbf73a4f6f4a",
+        "profile": "balanced",
+        "object_resolution_mode": "KERNEL_OBJECT_EXPANDED_PARTIAL",
+        "scopes_enabled": [],
+        "offline_verified": false,
+        "failure": null,
+        "deployment_scope_sha256": "2de509b31a61db7a7eef8b80d175cca45c4d41534a0ea16ccff49b4d0d8d6ec9",
+        "registration_cgroup_ids": [
+          1048
+        ],
+        "error": "deployment-observe exited unexpectedly"
+      }
+    },
+    "agent_monitor": true,
+    "root_pid": 298,
+    "launcher_pid": 296,
+    "cgroup": "/sys/fs/cgroup/allox-resident-fault/agents/fault-agent/sessions/s",
+    "monitor_trace_id": "6959489beb5a47e8a0a8d2c7f7dc8d64",
+    "monitor_span_id": "process-6959489beb5a47e8a0a8d2c7f7dc8d64",
+    "session_fenced": true,
+    "feature_error": "deployment-observe exited unexpectedly",
+    "stop_reason": "feature_failure",
+    "root_exit_code": -9,
+    "error": "WorkspaceError",
+    "lifecycle_complete": false,
+    "finished_ns": 1794684179710655486
+  },
+  "fault_shutdown": {
+    "worker_pid": 34,
+    "runs": 5,
+    "shutdown_ns": 60385,
+    "poisoned": "resident protocol failure: WorkspaceError",
+    "exit_code": 1
+  }
+}

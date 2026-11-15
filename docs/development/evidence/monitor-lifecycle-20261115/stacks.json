@@ -1,0 +1,92 @@
+{
+  "attempt": "/data/hy/Allox/monitor-e2e-20261114/attempt-052074c894",
+  "passed": true,
+  "rows": [
+    {
+      "label": "pair-0-batch",
+      "finish_ms": 2410.04134,
+      "samples": {
+        "do_epoll_wait > __x64_sys_epoll_wait > do_syscall_64 > entry_SYSCALL_64_after_hwframe": 8,
+        "p9_virtio_zc_request > p9_client_zc_rpc.constprop.0 > p9_client_write > v9fs_issue_write > netfs_advance_write > netfs_write_folio.isra.0 > netfs_writepages > do_writepages > filemap_fdatawrite_wbc > __filemap_fdatawrite_range > file_write_and_wait_range > v9fs_file_fsync_dotl > do_fsync > __x64_sys_fsync > do_syscall_64 > entry_SYSCALL_64_after_hwframe": 8,
+        "p9_client_rpc > p9_client_fsync > v9fs_file_fsync_dotl > do_fsync > __x64_sys_fsync > do_syscall_64 > entry_SYSCALL_64_after_hwframe": 73,
+        "p9_client_rpc > p9_client_walk > v9fs_vfs_lookup.part.0 > v9fs_vfs_atomic_open_dotl > path_openat > do_filp_open > do_sys_openat2 > __x64_sys_openat > do_syscall_64 > entry_SYSCALL_64_after_hwframe": 1,
+        "p9_virtio_zc_request > p9_client_zc_rpc.constprop.0 > p9_client_read_once > p9_client_read > v9fs_issue_read > netfs_read_to_pagecache > netfs_readahead > read_pages > page_cache_ra_unbounded > filemap_fault > __do_fault > __handle_mm_fault > handle_mm_fault > do_user_addr_fault > exc_page_fault > asm_exc_page_fault": 1,
+        "p9_client_rpc > p9_client_create_dotl > v9fs_vfs_atomic_open_dotl > path_openat > do_filp_open > do_sys_openat2 > __x64_sys_openat > do_syscall_64 > entry_SYSCALL_64_after_hwframe": 9,
+        "p9_client_rpc > p9_client_clunk > v9fs_dir_release > __fput > __x64_sys_close > do_syscall_64 > entry_SYSCALL_64_after_hwframe": 1,
+        "p9_virtio_zc_request > p9_client_zc_rpc.constprop.0 > p9_client_read_once > p9_client_read > v9fs_issue_read > netfs_read_to_pagecache > netfs_readahead > read_pages > page_cache_ra_unbounded > filemap_get_pages > filemap_read > netfs_buffered_read_iter > vfs_read > ksys_read > do_syscall_64 > entry_SYSCALL_64_after_hwframe": 1,
+        "p9_client_rpc > p9_client_getattr_dotl > v9fs_inode_from_fid_dotl > v9fs_vfs_lookup.part.0 > v9fs_vfs_atomic_open_dotl > path_openat > do_filp_open > do_sys_openat2 > __x64_sys_openat > do_syscall_64 > entry_SYSCALL_64_after_hwframe": 2,
+        "": 12,
+        "p9_client_rpc > p9_client_getattr_dotl > v9fs_vfs_getattr_dotl > vfs_statx_path > do_statx_fd > __x64_sys_statx > do_syscall_64 > entry_SYSCALL_64_after_hwframe": 1,
+        "p9_client_rpc > p9_client_write > v9fs_issue_write > netfs_advance_write > netfs_write_folio.isra.0 > netfs_writepages > do_writepages > filemap_fdatawrite_wbc > __filemap_fdatawrite_range > file_write_and_wait_range > v9fs_file_fsync_dotl > do_fsync > __x64_sys_fsync > do_syscall_64 > entry_SYSCALL_64_after_hwframe": 1,
+        "__wait_rcu_gp > synchronize_rcu_tasks_rude > ftrace_shutdown.part.0 > unregister_ftrace_function > unregister_ftrace_direct > bpf_trampoline_update > bpf_trampoline_unlink_prog > bpf_tracing_link_release > bpf_link_free > bpf_link_release > __fput > __x64_sys_close > do_syscall_64 > entry_SYSCALL_64_after_hwframe": 318,
+        "__wait_rcu_gp > synchronize_rcu_tasks_trace > perf_event_detach_bpf_prog > bpf_perf_link_release > bpf_link_free > bpf_link_release > __fput > __x64_sys_close > do_syscall_64 > entry_SYSCALL_64_after_hwframe": 8,
+        "__synchronize_srcu.part.0 > perf_trace_event_unreg.isra.0 > perf_trace_destroy > __free_event > perf_event_release_kernel > perf_release > __fput > task_work_run > syscall_exit_to_user_mode > do_syscall_64 > entry_SYSCALL_64_after_hwframe": 3
+      }
+    },
+    {
+      "label": "pair-1-batch",
+      "finish_ms": 2293.702618,
+      "samples": {
+        "do_epoll_wait > __x64_sys_epoll_wait > do_syscall_64 > entry_SYSCALL_64_after_hwframe": 9,
+        "": 14,
+        "p9_client_rpc > p9_client_fsync > v9fs_file_fsync_dotl > do_fsync > __x64_sys_fsync > do_syscall_64 > entry_SYSCALL_64_after_hwframe": 61,
+        "p9_virtio_zc_request > p9_client_zc_rpc.constprop.0 > p9_client_write > v9fs_issue_write > netfs_advance_write > netfs_write_folio.isra.0 > netfs_writepages > do_writepages > filemap_fdatawrite_wbc > __filemap_fdatawrite_range > file_write_and_wait_range > v9fs_file_fsync_dotl > do_fsync > __x64_sys_fsync > do_syscall_64 > entry_SYSCALL_64_after_hwframe": 4,
+        "p9_virtio_zc_request > p9_client_zc_rpc.constprop.0 > p9_client_read_once > p9_client_read > v9fs_issue_read > netfs_read_to_pagecache > netfs_readahead > read_pages > page_cache_ra_unbounded > filemap_fault > __do_fault > __handle_mm_fault > handle_mm_fault > do_user_addr_fault > exc_page_fault > asm_exc_page_fault": 1,
+        "p9_client_rpc > p9_client_create_dotl > v9fs_vfs_atomic_open_dotl > path_openat > do_filp_open > do_sys_openat2 > __x64_sys_openat > do_syscall_64 > entry_SYSCALL_64_after_hwframe": 2,
+        "p9_client_rpc > p9_client_walk > v9fs_vfs_lookup.part.0 > v9fs_vfs_atomic_open_dotl > path_openat > do_filp_open > do_sys_openat2 > __x64_sys_openat > do_syscall_64 > entry_SYSCALL_64_after_hwframe": 1,
+        "p9_client_rpc > p9_client_clunk > v9fs_dir_release > __fput > __x64_sys_close > do_syscall_64 > entry_SYSCALL_64_after_hwframe": 2,
+        "p9_client_rpc > p9_client_getattr_dotl > v9fs_vfs_getattr_dotl > vfs_statx_path > do_statx_fd > __x64_sys_statx > do_syscall_64 > entry_SYSCALL_64_after_hwframe": 1,
+        "__wait_rcu_gp > synchronize_rcu_tasks_rude > ftrace_shutdown.part.0 > unregister_ftrace_function > unregister_ftrace_direct > bpf_trampoline_update > bpf_trampoline_unlink_prog > bpf_tracing_link_release > bpf_link_free > bpf_link_release > __fput > __x64_sys_close > do_syscall_64 > entry_SYSCALL_64_after_hwframe": 321,
+        "__wait_rcu_gp > synchronize_rcu_tasks_trace > perf_event_detach_bpf_prog > bpf_perf_link_release > bpf_link_free > bpf_link_release > __fput > __x64_sys_close > do_syscall_64 > entry_SYSCALL_64_after_hwframe": 8,
+        "__synchronize_srcu.part.0 > perf_trace_event_unreg.isra.0 > perf_trace_destroy > __free_event > perf_event_release_kernel > perf_release > __fput > task_work_run > syscall_exit_to_user_mode > do_syscall_64 > entry_SYSCALL_64_after_hwframe": 3
+      }
+    },
+    {
+      "label": "pair-2-batch",
+      "finish_ms": 2517.94421,
+      "samples": {
+        "p9_virtio_zc_request > p9_client_zc_rpc.constprop.0 > p9_client_read_once > p9_client_read > v9fs_issue_read > netfs_read_to_pagecache > netfs_readahead > read_pages > page_cache_ra_unbounded > filemap_fault > __do_fault > __handle_mm_fault > handle_mm_fault > do_user_addr_fault > exc_page_fault > asm_exc_page_fault": 3,
+        "do_epoll_wait > __x64_sys_epoll_wait > do_syscall_64 > entry_SYSCALL_64_after_hwframe": 8,
+        "p9_virtio_zc_request > p9_client_zc_rpc.constprop.0 > p9_client_write > v9fs_issue_write > netfs_advance_write > netfs_write_folio.isra.0 > netfs_writepages > do_writepages > filemap_fdatawrite_wbc > __filemap_fdatawrite_range > file_write_and_wait_range > v9fs_file_fsync_dotl > do_fsync > __x64_sys_fsync > do_syscall_64 > entry_SYSCALL_64_after_hwframe": 7,
+        "p9_client_rpc > p9_client_fsync > v9fs_file_fsync_dotl > do_fsync > __x64_sys_fsync > do_syscall_64 > entry_SYSCALL_64_after_hwframe": 90,
+        "": 16,
+        "p9_client_rpc > p9_client_clunk > v9fs_dir_release > __fput > __x64_sys_close > do_syscall_64 > entry_SYSCALL_64_after_hwframe": 1,
+        "p9_client_rpc > p9_client_create_dotl > v9fs_vfs_atomic_open_dotl > path_openat > do_filp_open > do_sys_openat2 > __x64_sys_openat > do_syscall_64 > entry_SYSCALL_64_after_hwframe": 5,
+        "p9_client_rpc > p9_client_xattrwalk > v9fs_fid_xattr_get > v9fs_xattr_handler_get > __vfs_getxattr > cap_inode_need_killpriv > security_inode_need_killpriv > file_remove_privs_flags > netfs_buffered_write_iter_locked > netfs_file_write_iter > vfs_write > ksys_write > do_syscall_64 > entry_SYSCALL_64_after_hwframe": 1,
+        "p9_client_rpc > p9_client_clunk > v9fs_dentry_release > __dentry_kill": 1,
+        "p9_client_rpc > p9_client_clunk > v9fs_dentry_release > __dentry_kill > dput > __fput > __x64_sys_close > do_syscall_64 > entry_SYSCALL_64_after_hwframe": 2,
+        "p9_client_rpc > p9_client_getattr_dotl > v9fs_vfs_getattr_dotl > vfs_statx_path > do_statx_fd > __x64_sys_statx > do_syscall_64 > entry_SYSCALL_64_after_hwframe": 2,
+        "p9_client_rpc > p9_client_open > v9fs_file_open > do_dentry_open > vfs_open > path_openat > do_filp_open > do_sys_openat2 > __x64_sys_openat > do_syscall_64 > entry_SYSCALL_64_after_hwframe": 2,
+        "p9_client_rpc > p9_client_walk > v9fs_file_open > do_dentry_open > vfs_open > path_openat > do_filp_open > do_sys_openat2 > __x64_sys_openat > do_syscall_64 > entry_SYSCALL_64_after_hwframe": 1,
+        "__wait_rcu_gp > synchronize_rcu_tasks_rude > ftrace_shutdown.part.0 > unregister_ftrace_function > unregister_ftrace_direct > bpf_trampoline_update > bpf_trampoline_unlink_prog > bpf_tracing_link_release > bpf_link_free > bpf_link_release > __fput > __x64_sys_close > do_syscall_64 > entry_SYSCALL_64_after_hwframe": 316,
+        "synchronize_rcu_expedited > ftrace_shutdown.part.0 > unregister_ftrace_function > unregister_ftrace_direct > bpf_trampoline_update > bpf_trampoline_unlink_prog > bpf_tracing_link_release > bpf_link_free > bpf_link_release > __fput > __x64_sys_close > do_syscall_64 > entry_SYSCALL_64_after_hwframe": 1,
+        "__wait_rcu_gp > synchronize_rcu_tasks_trace > perf_event_detach_bpf_prog > bpf_perf_link_release > bpf_link_free > bpf_link_release > __fput > __x64_sys_close > do_syscall_64 > entry_SYSCALL_64_after_hwframe": 10,
+        "__synchronize_srcu.part.0 > perf_trace_event_unreg.isra.0 > perf_trace_destroy > __free_event > perf_event_release_kernel > perf_release > __fput > task_work_run > syscall_exit_to_user_mode > do_syscall_64 > entry_SYSCALL_64_after_hwframe": 3
+      }
+    }
+  ],
+  "combined_samples": {
+    "do_epoll_wait > __x64_sys_epoll_wait > do_syscall_64 > entry_SYSCALL_64_after_hwframe": 25,
+    "p9_virtio_zc_request > p9_client_zc_rpc.constprop.0 > p9_client_write > v9fs_issue_write > netfs_advance_write > netfs_write_folio.isra.0 > netfs_writepages > do_writepages > filemap_fdatawrite_wbc > __filemap_fdatawrite_range > file_write_and_wait_range > v9fs_file_fsync_dotl > do_fsync > __x64_sys_fsync > do_syscall_64 > entry_SYSCALL_64_after_hwframe": 19,
+    "p9_client_rpc > p9_client_fsync > v9fs_file_fsync_dotl > do_fsync > __x64_sys_fsync > do_syscall_64 > entry_SYSCALL_64_after_hwframe": 224,
+    "p9_client_rpc > p9_client_walk > v9fs_vfs_lookup.part.0 > v9fs_vfs_atomic_open_dotl > path_openat > do_filp_open > do_sys_openat2 > __x64_sys_openat > do_syscall_64 > entry_SYSCALL_64_after_hwframe": 2,
+    "p9_virtio_zc_request > p9_client_zc_rpc.constprop.0 > p9_client_read_once > p9_client_read > v9fs_issue_read > netfs_read_to_pagecache > netfs_readahead > read_pages > page_cache_ra_unbounded > filemap_fault > __do_fault > __handle_mm_fault > handle_mm_fault > do_user_addr_fault > exc_page_fault > asm_exc_page_fault": 5,
+    "p9_client_rpc > p9_client_create_dotl > v9fs_vfs_atomic_open_dotl > path_openat > do_filp_open > do_sys_openat2 > __x64_sys_openat > do_syscall_64 > entry_SYSCALL_64_after_hwframe": 16,
+    "p9_client_rpc > p9_client_clunk > v9fs_dir_release > __fput > __x64_sys_close > do_syscall_64 > entry_SYSCALL_64_after_hwframe": 4,
+    "p9_virtio_zc_request > p9_client_zc_rpc.constprop.0 > p9_client_read_once > p9_client_read > v9fs_issue_read > netfs_read_to_pagecache > netfs_readahead > read_pages > page_cache_ra_unbounded > filemap_get_pages > filemap_read > netfs_buffered_read_iter > vfs_read > ksys_read > do_syscall_64 > entry_SYSCALL_64_after_hwframe": 1,
+    "p9_client_rpc > p9_client_getattr_dotl > v9fs_inode_from_fid_dotl > v9fs_vfs_lookup.part.0 > v9fs_vfs_atomic_open_dotl > path_openat > do_filp_open > do_sys_openat2 > __x64_sys_openat > do_syscall_64 > entry_SYSCALL_64_after_hwframe": 2,
+    "": 42,
+    "p9_client_rpc > p9_client_getattr_dotl > v9fs_vfs_getattr_dotl > vfs_statx_path > do_statx_fd > __x64_sys_statx > do_syscall_64 > entry_SYSCALL_64_after_hwframe": 4,
+    "p9_client_rpc > p9_client_write > v9fs_issue_write > netfs_advance_write > netfs_write_folio.isra.0 > netfs_writepages > do_writepages > filemap_fdatawrite_wbc > __filemap_fdatawrite_range > file_write_and_wait_range > v9fs_file_fsync_dotl > do_fsync > __x64_sys_fsync > do_syscall_64 > entry_SYSCALL_64_after_hwframe": 1,
+    "__wait_rcu_gp > synchronize_rcu_tasks_rude > ftrace_shutdown.part.0 > unregister_ftrace_function > unregister_ftrace_direct > bpf_trampoline_update > bpf_trampoline_unlink_prog > bpf_tracing_link_release > bpf_link_free > bpf_link_release > __fput > __x64_sys_close > do_syscall_64 > entry_SYSCALL_64_after_hwframe": 955,
+    "__wait_rcu_gp > synchronize_rcu_tasks_trace > perf_event_detach_bpf_prog > bpf_perf_link_release > bpf_link_free > bpf_link_release > __fput > __x64_sys_close > do_syscall_64 > entry_SYSCALL_64_after_hwframe": 26,
+    "__synchronize_srcu.part.0 > perf_trace_event_unreg.isra.0 > perf_trace_destroy > __free_event > perf_event_release_kernel > perf_release > __fput > task_work_run > syscall_exit_to_user_mode > do_syscall_64 > entry_SYSCALL_64_after_hwframe": 9,
+    "p9_client_rpc > p9_client_xattrwalk > v9fs_fid_xattr_get > v9fs_xattr_handler_get > __vfs_getxattr > cap_inode_need_killpriv > security_inode_need_killpriv > file_remove_privs_flags > netfs_buffered_write_iter_locked > netfs_file_write_iter > vfs_write > ksys_write > do_syscall_64 > entry_SYSCALL_64_after_hwframe": 1,
+    "p9_client_rpc > p9_client_clunk > v9fs_dentry_release > __dentry_kill": 1,
+    "p9_client_rpc > p9_client_clunk > v9fs_dentry_release > __dentry_kill > dput > __fput > __x64_sys_close > do_syscall_64 > entry_SYSCALL_64_after_hwframe": 2,
+    "p9_client_rpc > p9_client_open > v9fs_file_open > do_dentry_open > vfs_open > path_openat > do_filp_open > do_sys_openat2 > __x64_sys_openat > do_syscall_64 > entry_SYSCALL_64_after_hwframe": 2,
+    "p9_client_rpc > p9_client_walk > v9fs_file_open > do_dentry_open > vfs_open > path_openat > do_filp_open > do_sys_openat2 > __x64_sys_openat > do_syscall_64 > entry_SYSCALL_64_after_hwframe": 1,
+    "synchronize_rcu_expedited > ftrace_shutdown.part.0 > unregister_ftrace_function > unregister_ftrace_direct > bpf_trampoline_update > bpf_trampoline_unlink_prog > bpf_tracing_link_release > bpf_link_free > bpf_link_release > __fput > __x64_sys_close > do_syscall_64 > entry_SYSCALL_64_after_hwframe": 1
+  },
+  "note": "5ms nominal sampling interval; sample frequencies are not exact wall/CPU proportions"
+}

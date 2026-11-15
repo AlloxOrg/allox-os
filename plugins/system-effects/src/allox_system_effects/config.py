@@ -44,6 +44,7 @@ _CONFIG_KEYS = frozenset(
         "ready_timeout",
         "finalize_timeout",
         "host_lock_path",
+        "resident_observer",
         "recovery_verifier_path",
         "recovery_helper_path",
         "recovery_helper_sha256",
@@ -230,6 +231,7 @@ class SystemEffectsConfig:
     recovery_helper_sha256: str | None
     recovery_timeout_ms: int
     recovery_max_output_bytes: int
+    resident_observer: bool = False
 
     @classmethod
     def from_mapping(cls, raw: dict[str, Any]) -> SystemEffectsConfig:
@@ -269,6 +271,14 @@ class SystemEffectsConfig:
         object_mode = raw.get("object_resolution_mode", "KERNEL_OBJECT_EXPANDED_PARTIAL")
         if object_mode not in _OBJECT_MODES:
             raise WorkspaceError("unsupported system-effects object_resolution_mode")
+        resident = raw.get("resident_observer", False)
+        if type(resident) is not bool:
+            raise WorkspaceError("system-effects resident_observer must be boolean")
+        if resident and (profile != "balanced" or object_mode != "KERNEL_OBJECT_EXPANDED_PARTIAL"
+            or any(raw.get(key) is not None for key in ("bpf_state_scope_file",
+                "filesystem_state_scope_file", "linux_state_scope_file", "recovery_helper_path",
+                "recovery_helper_sha256", "recovery_verifier_path"))):
+            raise WorkspaceError("resident observer requires balanced expanded observation-only v2")
         recovery_helper_raw = raw.get("recovery_helper_path")
         recovery_helper_sha = raw.get("recovery_helper_sha256")
         recovery_verifier_raw = raw.get("recovery_verifier_path")
@@ -316,6 +326,7 @@ class SystemEffectsConfig:
             lifecycle_object_sha256=lifecycle_sha,
             profile=profile,
             object_resolution_mode=object_mode,
+            resident_observer=resident,
             bpf_state_scope=_scope(raw, "bpf_state_scope_file"),
             filesystem_state_scope=_scope(raw, "filesystem_state_scope_file"),
             linux_state_scope=_scope(raw, "linux_state_scope_file"),

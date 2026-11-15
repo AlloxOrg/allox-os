@@ -18,6 +18,7 @@ from allox_system_effects.recovery_runner import (
     RECOVERY_PROTOCOL_VERSION,
     RecoverySystemEffectsRun,
 )
+from allox_system_effects.resident import resident_worker
 from allox_system_effects.runner import PROTOCOL_VERSION, SystemEffectsRun
 
 
@@ -106,7 +107,7 @@ class _HostRunLock:
 
 
 class SystemEffectsFeature:
-    """Activate one fail-closed ``deployment-observe`` child per execution."""
+    """Bind each execution to a fail-closed Observer (optionally resident)."""
 
     name = "system-effects"
     abi = 1
@@ -172,7 +173,11 @@ class SystemEffectsFeature:
         try:
             recovery = getattr(context, "recovery", None)
             if recovery is None:
-                handle = SystemEffectsRun(self._config, context, retire)
+                if self._config.resident_observer:
+                    handle = SystemEffectsRun(self._config, context, retire,
+                                              resident=resident_worker(self._config))
+                else:
+                    handle = SystemEffectsRun(self._config, context, retire)
             else:
                 if not self._config.recovery_enabled:
                     raise WorkspaceError(
@@ -226,6 +231,7 @@ class SystemEffectsFeature:
             "host_lock_path": str(self._config.host_lock_path),
             "observation_slot_busy": slot_busy,
             "offline_verifier_required": True,
+            "observer_lifetime": "daemon-resident" if self._config.resident_observer else "one-shot",
         }
 
     def dispatch(self, action: str, params: dict[str, Any]) -> Any:

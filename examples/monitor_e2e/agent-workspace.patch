@@ -1,0 +1,6 @@
+--- a/src/agent/Cargo.toml
++++ b/src/agent/Cargo.toml
+@@ -100,0 +101,3 @@
++
++[patch.crates-io]
++ttrpc = { path = "../../e2e-ttrpc" }

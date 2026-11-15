@@ -1,0 +1,40 @@
+--- a/bpf/system_effects.bpf.c
++++ b/bpf/system_effects.bpf.c
+@@ -235,3 +235,13 @@
+ } effect_socket_state_runs SEC(".maps");
+ 
++/* Non-sleeping TCP state/accept hooks only. No helper below re-enters the
++ * network stack; use per-CPU scratch instead of adding a full state event
++ * to the nested accept hook's limited BPF stack. Reset by fill_socket_state. */
++struct {
++	__uint(type, BPF_MAP_TYPE_PERCPU_ARRAY);
++	__uint(max_entries, 1);
++	__type(key, __u32);
++	__type(value, struct effect_socket_state_event);
++} effect_socket_state_scratch SEC(".maps");
++
+ struct {
+@@ -1681,4 +1692,5 @@
+-	struct effect_socket_state_event prepared;
++	struct effect_socket_state_event *prepared;
+ 	struct effect_socket_state_event *event;
+ 	__u64 sequence;
++	__u32 scratch_key = 0;
+ 
+@@ -1689,3 +1701,8 @@
+ 		return 0;
+-	if (fill_socket_state(&prepared, sk, owner, socket_cookie, spec) != 0) {
++	prepared = bpf_map_lookup_elem(&effect_socket_state_scratch, &scratch_key);
++	if (!prepared) {
++		__sync_fetch_and_add(&state->state_read_failed, 1);
++		return 0;
++	}
++	if (fill_socket_state(prepared, sk, owner, socket_cookie, spec) != 0) {
+ 		__sync_fetch_and_add(&state->state_read_failed, 1);
+@@ -1695,2 +1713,2 @@
+-	prepared.event_seq = sequence;
++	prepared->event_seq = sequence;
+ 	__sync_fetch_and_add(&state->event_attempted, 1);
+@@ -1703 +1721 @@
+-	*event = prepared;
++	*event = *prepared;

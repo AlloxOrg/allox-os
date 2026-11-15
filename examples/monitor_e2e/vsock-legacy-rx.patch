@@ -1,0 +1,7 @@
+--- a/include/linux/virtio_vsock.h
++++ b/include/linux/virtio_vsock.h
+@@ -138 +138,3 @@
+-#define VIRTIO_VSOCK_DEFAULT_RX_BUF_SIZE	SKB_WITH_OVERHEAD(1024 * 4)
++/* Owned 117 fixture: legacy vhost sends a 4 KiB payload plus its header
++ * without splitting it to fit a smaller Guest RX descriptor. */
++#define VIRTIO_VSOCK_DEFAULT_RX_BUF_SIZE	SKB_WITH_OVERHEAD(1024 * 8)

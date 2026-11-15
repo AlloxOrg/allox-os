@@ -1,0 +1,8 @@
+deployment-observe exited unexpectedly: libbpf: prog 'trace_effect_do_accept_exit': BPF program load failed: Permission denied
+libbpf: prog 'trace_effect_do_accept_exit': -- BEGIN PROG LOAD LOG --
+combined stack size of 4 calls is 560. Too large
+processed 1017 insns (limit 1000000) max_states_per_insn 2 total_states 67 peak_states 67 mark_read 16
+-- END PROG LOAD LOG --
+libbpf: prog 'trace_effect_do_accept_exit': failed to load: -13
+libbpf: failed to load object '7f02366b1010-39748'
+deployment-observe: load system-effect BPF object: Permission denied (os error 13)

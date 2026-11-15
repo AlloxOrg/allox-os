@@ -1,0 +1,8 @@
+--- a/bpf/system_effects.bpf.c
++++ b/bpf/system_effects.bpf.c
+@@ -1589 +1589 @@
+-static __attribute__((noinline)) long fill_socket_state(
++static __always_inline long fill_socket_state(
+@@ -1676 +1676 @@
+-static __attribute__((noinline)) int publish_socket_state(
++static __always_inline int publish_socket_state(

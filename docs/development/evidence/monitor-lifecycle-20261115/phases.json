@@ -1,0 +1,2703 @@
+{
+  "attempt": "/data/hy/Allox/monitor-e2e-20261114/attempt-2b5bc68f22",
+  "passed": true,
+  "strace": false,
+  "rows": [
+    {
+      "label": "pair-0-off",
+      "mode": "off",
+      "metrics": {
+        "wall_ms": 3046.989289,
+        "task_ms": 1827.666616,
+        "pre_start_ms": 0.569591,
+        "launch_ms": 657.994846,
+        "execution_until_root_exit_ms": 2320.766738,
+        "post_exit_ms": 67.658114
+      },
+      "methods": {
+        "core.start": {
+          "calls": 1,
+          "wall_ms": 657.994846,
+          "thread_cpu_ms": 10.499339
+        },
+        "core._save": {
+          "calls": 2,
+          "wall_ms": 7.461676,
+          "thread_cpu_ms": 1.58704
+        },
+        "core._wait_stopped": {
+          "calls": 1,
+          "wall_ms": 639.270968,
+          "thread_cpu_ms": 2.935441
+        },
+        "cgroup.attach": {
+          "calls": 1,
+          "wall_ms": 2.508677,
+          "thread_cpu_ms": 2.100425
+        },
+        "cgroup.wait_empty": {
+          "calls": 2,
+          "wall_ms": 0.877444,
+          "thread_cpu_ms": 0.821867
+        },
+        "cgroup.quiesce_empty": {
+          "calls": 1,
+          "wall_ms": 1.833723,
+          "thread_cpu_ms": 1.832077
+        },
+        "cgroup.freeze": {
+          "calls": 1,
+          "wall_ms": 1.411586,
+          "thread_cpu_ms": 1.411596
+        },
+        "core._save_durable": {
+          "calls": 2,
+          "wall_ms": 62.535695,
+          "thread_cpu_ms": 2.048308
+        },
+        "python.fsync": {
+          "calls": 4,
+          "wall_ms": 53.618602,
+          "thread_cpu_ms": 0.252067
+        },
+        "cgroup.remove": {
+          "calls": 1,
+          "wall_ms": 1.813049,
+          "thread_cpu_ms": 1.634302
+        },
+        "framework.close": {
+          "calls": 1,
+          "wall_ms": 0.02024,
+          "thread_cpu_ms": 0.015844
+        }
+      },
+      "syscalls": {}
+    },
+    {
+      "label": "pair-0-batch",
+      "mode": "batch",
+      "metrics": {
+        "wall_ms": 7353.210215,
+        "task_ms": 2290.944088,
+        "pre_start_ms": 66.795435,
+        "launch_ms": 1395.197118,
+        "execution_until_root_exit_ms": 2860.003473,
+        "post_exit_ms": 3031.214189
+      },
+      "methods": {
+        "collector.ingest": {
+          "calls": 6,
+          "wall_ms": 202.688993,
+          "thread_cpu_ms": 5.45801
+        },
+        "core.start": {
+          "calls": 1,
+          "wall_ms": 1395.197118,
+          "thread_cpu_ms": 26.229759
+        },
+        "core._save": {
+          "calls": 1,
+          "wall_ms": 4.758015,
+          "thread_cpu_ms": 0.688916
+        },
+        "core._wait_stopped": {
+          "calls": 1,
+          "wall_ms": 639.535052,
+          "thread_cpu_ms": 3.124786
+        },
+        "cgroup.attach": {
+          "calls": 1,
+          "wall_ms": 2.004974,
+          "thread_cpu_ms": 1.750707
+        },
+        "core._wait_inner_gate": {
+          "calls": 1,
+          "wall_ms": 53.330044,
+          "thread_cpu_ms": 2.864248
+        },
+        "cgroup.freeze": {
+          "calls": 2,
+          "wall_ms": 2.37348,
+          "thread_cpu_ms": 2.371966
+        },
+        "core._target_identity": {
+          "calls": 2,
+          "wall_ms": 1.842216,
+          "thread_cpu_ms": 1.840229
+        },
+        "features.start_execution": {
+          "calls": 1,
+          "wall_ms": 592.399012,
+          "thread_cpu_ms": 3.699509
+        },
+        "observer.__init__": {
+          "calls": 1,
+          "wall_ms": 575.112855,
+          "thread_cpu_ms": 3.223728
+        },
+        "observer.write_file": {
+          "calls": 4,
+          "wall_ms": 113.534869,
+          "thread_cpu_ms": 2.265594
+        },
+        "python.fsync": {
+          "calls": 14,
+          "wall_ms": 226.541142,
+          "thread_cpu_ms": 0.931647
+        },
+        "observer._receive.READY": {
+          "calls": 1,
+          "wall_ms": 540.237535,
+          "thread_cpu_ms": 0.083073
+        },
+        "observer._validate_ready": {
+          "calls": 1,
+          "wall_ms": 3.421332,
+          "thread_cpu_ms": 0.997176
+        },
+        "features.execution_started": {
+          "calls": 1,
+          "wall_ms": 36.149112,
+          "thread_cpu_ms": 1.721659
+        },
+        "core._save_durable": {
+          "calls": 3,
+          "wall_ms": 139.295498,
+          "thread_cpu_ms": 2.875921
+        },
+        "cgroup.thaw": {
+          "calls": 1,
+          "wall_ms": 1.149446,
+          "thread_cpu_ms": 1.148462
+        },
+        "collector.ingest_group": {
+          "calls": 13,
+          "wall_ms": 494.105012,
+          "thread_cpu_ms": 23.049496
+        },
+        "cgroup.wait_empty": {
+          "calls": 2,
+          "wall_ms": 0.736643,
+          "thread_cpu_ms": 0.691022
+        },
+        "cgroup.quiesce_empty": {
+          "calls": 1,
+          "wall_ms": 1.490152,
+          "thread_cpu_ms": 1.489116
+        },
+        "features.execution_finished": {
+          "calls": 1,
+          "wall_ms": 27.276634,
+          "thread_cpu_ms": 1.337759
+        },
+        "observer.finish": {
+          "calls": 1,
+          "wall_ms": 2826.900302,
+          "thread_cpu_ms": 8.242418
+        },
+        "observer._validate_quiescence": {
+          "calls": 1,
+          "wall_ms": 0.271792,
+          "thread_cpu_ms": 0.272371
+        },
+        "observer._send": {
+          "calls": 1,
+          "wall_ms": 0.125888,
+          "thread_cpu_ms": 0.125073
+        },
+        "observer._receive.FINISHED": {
+          "calls": 1,
+          "wall_ms": 2502.983973,
+          "thread_cpu_ms": 0.111289
+        },
+        "observer._require_observer_exit": {
+          "calls": 1,
+          "wall_ms": 3.431102,
+          "thread_cpu_ms": 0.251579
+        },
+        "observer._validate_terminal_artifacts": {
+          "calls": 1,
+          "wall_ms": 9.101118,
+          "thread_cpu_ms": 2.477904
+        },
+        "observer._run_verifier": {
+          "calls": 1,
+          "wall_ms": 221.828607,
+          "thread_cpu_ms": 1.995568
+        },
+        "observer._validate_offline_verification": {
+          "calls": 1,
+          "wall_ms": 0.088434,
+          "thread_cpu_ms": 0.085832
+        },
+        "observer._shutdown": {
+          "calls": 1,
+          "wall_ms": 0.49316,
+          "thread_cpu_ms": 0.211288
+        },
+        "cgroup.remove": {
+          "calls": 1,
+          "wall_ms": 1.125302,
+          "thread_cpu_ms": 1.1245
+        },
+        "framework.close": {
+          "calls": 1,
+          "wall_ms": 0.040785,
+          "thread_cpu_ms": 0.036584
+        }
+      },
+      "syscalls": {}
+    },
+    {
+      "label": "pair-1-batch",
+      "mode": "batch",
+      "metrics": {
+        "wall_ms": 7397.338943,
+        "task_ms": 2262.978526,
+        "pre_start_ms": 52.643216,
+        "launch_ms": 1420.370669,
+        "execution_until_root_exit_ms": 2854.521094,
+        "post_exit_ms": 3069.803964
+      },
+      "methods": {
+        "collector.ingest": {
+          "calls": 6,
+          "wall_ms": 136.271629,
+          "thread_cpu_ms": 4.826436
+        },
+        "core.start": {
+          "calls": 1,
+          "wall_ms": 1420.370669,
+          "thread_cpu_ms": 19.720817
+        },
+        "core._save": {
+          "calls": 1,
+          "wall_ms": 3.051744,
+          "thread_cpu_ms": 0.440386
+        },
+        "core._wait_stopped": {
+          "calls": 1,
+          "wall_ms": 699.579751,
+          "thread_cpu_ms": 2.676428
+        },
+        "cgroup.attach": {
+          "calls": 1,
+          "wall_ms": 1.610676,
+          "thread_cpu_ms": 1.373943
+        },
+        "core._wait_inner_gate": {
+          "calls": 1,
+          "wall_ms": 41.784548,
+          "thread_cpu_ms": 1.409536
+        },
+        "cgroup.freeze": {
+          "calls": 2,
+          "wall_ms": 11.630623,
+          "thread_cpu_ms": 1.537028
+        },
+        "core._target_identity": {
+          "calls": 2,
+          "wall_ms": 1.529604,
+          "thread_cpu_ms": 1.527545
+        },
+        "features.start_execution": {
+          "calls": 1,
+          "wall_ms": 587.128957,
+          "thread_cpu_ms": 3.078861
+        },
+        "observer.__init__": {
+          "calls": 1,
+          "wall_ms": 585.553909,
+          "thread_cpu_ms": 2.800544
+        },
+        "observer.write_file": {
+          "calls": 4,
+          "wall_ms": 194.745579,
+          "thread_cpu_ms": 2.336539
+        },
+        "python.fsync": {
+          "calls": 14,
+          "wall_ms": 311.883868,
+          "thread_cpu_ms": 1.012892
+        },
+        "observer._receive.READY": {
+          "calls": 1,
+          "wall_ms": 513.109367,
+          "thread_cpu_ms": 0.081616
+        },
+        "observer._validate_ready": {
+          "calls": 1,
+          "wall_ms": 3.686237,
+          "thread_cpu_ms": 0.991502
+        },
+        "features.execution_started": {
+          "calls": 1,
+          "wall_ms": 19.050859,
+          "thread_cpu_ms": 1.686503
+        },
+        "core._save_durable": {
+          "calls": 3,
+          "wall_ms": 146.916686,
+          "thread_cpu_ms": 3.182116
+        },
+        "cgroup.thaw": {
+          "calls": 1,
+          "wall_ms": 1.292753,
+          "thread_cpu_ms": 1.291548
+        },
+        "collector.ingest_group": {
+          "calls": 12,
+          "wall_ms": 611.770525,
+          "thread_cpu_ms": 19.600637
+        },
+        "cgroup.wait_empty": {
+          "calls": 2,
+          "wall_ms": 0.473089,
+          "thread_cpu_ms": 0.391175
+        },
+        "cgroup.quiesce_empty": {
+          "calls": 1,
+          "wall_ms": 0.931805,
+          "thread_cpu_ms": 0.931008
+        },
+        "features.execution_finished": {
+          "calls": 1,
+          "wall_ms": 17.028761,
+          "thread_cpu_ms": 0.89996
+        },
+        "observer.finish": {
+          "calls": 1,
+          "wall_ms": 2893.833837,
+          "thread_cpu_ms": 6.418558
+        },
+        "observer._validate_quiescence": {
+          "calls": 1,
+          "wall_ms": 0.018612,
+          "thread_cpu_ms": 0.018157
+        },
+        "observer._send": {
+          "calls": 1,
+          "wall_ms": 0.054457,
+          "thread_cpu_ms": 0.054145
+        },
+        "observer._receive.FINISHED": {
+          "calls": 1,
+          "wall_ms": 2528.205259,
+          "thread_cpu_ms": 0.071784
+        },
+        "observer._require_observer_exit": {
+          "calls": 1,
+          "wall_ms": 3.357634,
+          "thread_cpu_ms": 0.160987
+        },
+        "observer._validate_terminal_artifacts": {
+          "calls": 1,
+          "wall_ms": 7.575072,
+          "thread_cpu_ms": 1.893946
+        },
+        "observer._run_verifier": {
+          "calls": 1,
+          "wall_ms": 219.964535,
+          "thread_cpu_ms": 1.24129
+        },
+        "observer._validate_offline_verification": {
+          "calls": 1,
+          "wall_ms": 0.036617,
+          "thread_cpu_ms": 0.034057
+        },
+        "observer._shutdown": {
+          "calls": 1,
+          "wall_ms": 0.597362,
+          "thread_cpu_ms": 0.193423
+        },
+        "cgroup.remove": {
+          "calls": 1,
+          "wall_ms": 1.430203,
+          "thread_cpu_ms": 1.429399
+        },
+        "framework.close": {
+          "calls": 1,
+          "wall_ms": 0.0123,
+          "thread_cpu_ms": 0.009723
+        }
+      },
+      "syscalls": {}
+    },
+    {
+      "label": "pair-1-off",
+      "mode": "off",
+      "metrics": {
+        "wall_ms": 3486.054229,
+        "task_ms": 2224.984218,
+        "pre_start_ms": 0.077015,
+        "launch_ms": 644.509332,
+        "execution_until_root_exit_ms": 2780.884412,
+        "post_exit_ms": 60.58347
+      },
+      "methods": {
+        "core.start": {
+          "calls": 1,
+          "wall_ms": 644.509332,
+          "thread_cpu_ms": 7.256163
+        },
+        "core._save": {
+          "calls": 2,
+          "wall_ms": 7.047773,
+          "thread_cpu_ms": 1.233636
+        },
+        "core._wait_stopped": {
+          "calls": 1,
+          "wall_ms": 628.369166,
+          "thread_cpu_ms": 2.196582
+        },
+        "cgroup.attach": {
+          "calls": 1,
+          "wall_ms": 1.241898,
+          "thread_cpu_ms": 1.058535
+        },
+        "cgroup.wait_empty": {
+          "calls": 2,
+          "wall_ms": 2.08906,
+          "thread_cpu_ms": 1.991496
+        },
+        "cgroup.quiesce_empty": {
+          "calls": 1,
+          "wall_ms": 1.754423,
+          "thread_cpu_ms": 1.748411
+        },
+        "cgroup.freeze": {
+          "calls": 1,
+          "wall_ms": 1.286946,
+          "thread_cpu_ms": 1.287845
+        },
+        "core._save_durable": {
+          "calls": 2,
+          "wall_ms": 54.570843,
+          "thread_cpu_ms": 2.584479
+        },
+        "python.fsync": {
+          "calls": 4,
+          "wall_ms": 43.355895,
+          "thread_cpu_ms": 0.447671
+        },
+        "cgroup.remove": {
+          "calls": 1,
+          "wall_ms": 1.249268,
+          "thread_cpu_ms": 1.236476
+        },
+        "framework.close": {
+          "calls": 1,
+          "wall_ms": 0.045493,
+          "thread_cpu_ms": 0.040023
+        }
+      },
+      "syscalls": {}
+    },
+    {
+      "label": "pair-2-off",
+      "mode": "off",
+      "metrics": {
+        "wall_ms": 3440.346584,
+        "task_ms": 2043.27172,
+        "pre_start_ms": 0.118635,
+        "launch_ms": 727.142437,
+        "execution_until_root_exit_ms": 2620.580648,
+        "post_exit_ms": 92.504864
+      },
+      "methods": {
+        "core.start": {
+          "calls": 1,
+          "wall_ms": 727.142437,
+          "thread_cpu_ms": 7.717665
+        },
+        "core._save": {
+          "calls": 2,
+          "wall_ms": 7.586775,
+          "thread_cpu_ms": 1.051712
+        },
+        "core._wait_stopped": {
+          "calls": 1,
+          "wall_ms": 709.792383,
+          "thread_cpu_ms": 2.649328
+        },
+        "cgroup.attach": {
+          "calls": 1,
+          "wall_ms": 1.304184,
+          "thread_cpu_ms": 1.120961
+        },
+        "cgroup.wait_empty": {
+          "calls": 2,
+          "wall_ms": 21.330619,
+          "thread_cpu_ms": 1.182492
+        },
+        "cgroup.quiesce_empty": {
+          "calls": 1,
+          "wall_ms": 1.822455,
+          "thread_cpu_ms": 1.820717
+        },
+        "cgroup.freeze": {
+          "calls": 1,
+          "wall_ms": 1.405053,
+          "thread_cpu_ms": 1.40501
+        },
+        "core._save_durable": {
+          "calls": 2,
+          "wall_ms": 67.882749,
+          "thread_cpu_ms": 2.098702
+        },
+        "python.fsync": {
+          "calls": 4,
+          "wall_ms": 56.775076,
+          "thread_cpu_ms": 0.338086
+        },
+        "cgroup.remove": {
+          "calls": 1,
+          "wall_ms": 1.215114,
+          "thread_cpu_ms": 1.187641
+        },
+        "framework.close": {
+          "calls": 1,
+          "wall_ms": 0.017189,
+          "thread_cpu_ms": 0.013137
+        }
+      },
+      "syscalls": {}
+    },
+    {
+      "label": "pair-2-batch",
+      "mode": "batch",
+      "metrics": {
+        "wall_ms": 6680.488102,
+        "task_ms": 2233.762251,
+        "pre_start_ms": 78.525972,
+        "launch_ms": 1144.82786,
+        "execution_until_root_exit_ms": 2745.367606,
+        "post_exit_ms": 2711.766664
+      },
+      "methods": {
+        "collector.ingest": {
+          "calls": 6,
+          "wall_ms": 196.248839,
+          "thread_cpu_ms": 5.419638
+        },
+        "core.start": {
+          "calls": 1,
+          "wall_ms": 1144.82786,
+          "thread_cpu_ms": 24.777418
+        },
+        "core._save": {
+          "calls": 1,
+          "wall_ms": 4.821811,
+          "thread_cpu_ms": 0.700659
+        },
+        "core._wait_stopped": {
+          "calls": 1,
+          "wall_ms": 669.664741,
+          "thread_cpu_ms": 2.587875
+        },
+        "cgroup.attach": {
+          "calls": 1,
+          "wall_ms": 1.566299,
+          "thread_cpu_ms": 1.297346
+        },
+        "core._wait_inner_gate": {
+          "calls": 1,
+          "wall_ms": 42.677604,
+          "thread_cpu_ms": 2.267538
+        },
+        "cgroup.freeze": {
+          "calls": 2,
+          "wall_ms": 2.647683,
+          "thread_cpu_ms": 2.646804
+        },
+        "core._target_identity": {
+          "calls": 2,
+          "wall_ms": 1.63632,
+          "thread_cpu_ms": 1.634784
+        },
+        "features.start_execution": {
+          "calls": 1,
+          "wall_ms": 340.592454,
+          "thread_cpu_ms": 4.315303
+        },
+        "observer.__init__": {
+          "calls": 1,
+          "wall_ms": 338.840036,
+          "thread_cpu_ms": 3.785985
+        },
+        "observer.write_file": {
+          "calls": 4,
+          "wall_ms": 126.879391,
+          "thread_cpu_ms": 2.345335
+        },
+        "python.fsync": {
+          "calls": 14,
+          "wall_ms": 210.772945,
+          "thread_cpu_ms": 0.954794
+        },
+        "observer._receive.READY": {
+          "calls": 1,
+          "wall_ms": 296.122509,
+          "thread_cpu_ms": 0.08274
+        },
+        "observer._validate_ready": {
+          "calls": 1,
+          "wall_ms": 3.165114,
+          "thread_cpu_ms": 1.030336
+        },
+        "features.execution_started": {
+          "calls": 1,
+          "wall_ms": 28.841867,
+          "thread_cpu_ms": 1.909646
+        },
+        "core._save_durable": {
+          "calls": 3,
+          "wall_ms": 113.821546,
+          "thread_cpu_ms": 2.89354
+        },
+        "cgroup.thaw": {
+          "calls": 1,
+          "wall_ms": 1.086701,
+          "thread_cpu_ms": 1.085733
+        },
+        "collector.ingest_group": {
+          "calls": 13,
+          "wall_ms": 467.493963,
+          "thread_cpu_ms": 20.38909
+        },
+        "cgroup.wait_empty": {
+          "calls": 2,
+          "wall_ms": 0.602826,
+          "thread_cpu_ms": 0.51652
+        },
+        "cgroup.quiesce_empty": {
+          "calls": 1,
+          "wall_ms": 1.866139,
+          "thread_cpu_ms": 1.866638
+        },
+        "features.execution_finished": {
+          "calls": 1,
+          "wall_ms": 24.977323,
+          "thread_cpu_ms": 1.401788
+        },
+        "observer.finish": {
+          "calls": 1,
+          "wall_ms": 2535.294994,
+          "thread_cpu_ms": 6.358619
+        },
+        "observer._validate_quiescence": {
+          "calls": 1,
+          "wall_ms": 0.035064,
+          "thread_cpu_ms": 0.034643
+        },
+        "observer._send": {
+          "calls": 1,
+          "wall_ms": 0.132326,
+          "thread_cpu_ms": 0.131833
+        },
+        "observer._receive.FINISHED": {
+          "calls": 1,
+          "wall_ms": 2206.204885,
+          "thread_cpu_ms": 0.078543
+        },
+        "observer._require_observer_exit": {
+          "calls": 1,
+          "wall_ms": 3.285939,
+          "thread_cpu_ms": 0.133606
+        },
+        "observer._validate_terminal_artifacts": {
+          "calls": 1,
+          "wall_ms": 9.0853,
+          "thread_cpu_ms": 2.001275
+        },
+        "observer._run_verifier": {
+          "calls": 1,
+          "wall_ms": 220.501768,
+          "thread_cpu_ms": 1.250961
+        },
+        "observer._validate_offline_verification": {
+          "calls": 1,
+          "wall_ms": 0.041763,
+          "thread_cpu_ms": 0.039545
+        },
+        "observer._shutdown": {
+          "calls": 1,
+          "wall_ms": 0.580476,
+          "thread_cpu_ms": 0.176478
+        },
+        "cgroup.remove": {
+          "calls": 1,
+          "wall_ms": 1.062687,
+          "thread_cpu_ms": 1.062084
+        },
+        "framework.close": {
+          "calls": 1,
+          "wall_ms": 0.01076,
+          "thread_cpu_ms": 0.008613
+        }
+      },
+      "syscalls": {}
+    },
+    {
+      "label": "pair-3-batch",
+      "mode": "batch",
+      "metrics": {
+        "wall_ms": 7947.91439,
+        "task_ms": 2515.553425,
+        "pre_start_ms": 84.129243,
+        "launch_ms": 1419.362474,
+        "execution_until_root_exit_ms": 3148.750992,
+        "post_exit_ms": 3295.671681
+      },
+      "methods": {
+        "collector.ingest": {
+          "calls": 6,
+          "wall_ms": 231.002918,
+          "thread_cpu_ms": 5.666518
+        },
+        "core.start": {
+          "calls": 1,
+          "wall_ms": 1419.362474,
+          "thread_cpu_ms": 26.810002
+        },
+        "core._save": {
+          "calls": 1,
+          "wall_ms": 5.127851,
+          "thread_cpu_ms": 0.557336
+        },
+        "core._wait_stopped": {
+          "calls": 1,
+          "wall_ms": 874.963226,
+          "thread_cpu_ms": 6.704136
+        },
+        "cgroup.attach": {
+          "calls": 1,
+          "wall_ms": 1.582898,
+          "thread_cpu_ms": 1.400512
+        },
+        "core._wait_inner_gate": {
+          "calls": 1,
+          "wall_ms": 53.692137,
+          "thread_cpu_ms": 3.253359
+        },
+        "cgroup.freeze": {
+          "calls": 2,
+          "wall_ms": 12.766212,
+          "thread_cpu_ms": 2.669058
+        },
+        "core._target_identity": {
+          "calls": 2,
+          "wall_ms": 1.260085,
+          "thread_cpu_ms": 1.256537
+        },
+        "features.start_execution": {
+          "calls": 1,
+          "wall_ms": 338.919801,
+          "thread_cpu_ms": 3.718131
+        },
+        "observer.__init__": {
+          "calls": 1,
+          "wall_ms": 336.476137,
+          "thread_cpu_ms": 3.335538
+        },
+        "observer.write_file": {
+          "calls": 4,
+          "wall_ms": 119.981034,
+          "thread_cpu_ms": 2.49609
+        },
+        "python.fsync": {
+          "calls": 14,
+          "wall_ms": 236.570632,
+          "thread_cpu_ms": 1.171178
+        },
+        "observer._receive.READY": {
+          "calls": 1,
+          "wall_ms": 296.197246,
+          "thread_cpu_ms": 0.076734
+        },
+        "observer._validate_ready": {
+          "calls": 1,
+          "wall_ms": 3.448581,
+          "thread_cpu_ms": 0.812961
+        },
+        "features.execution_started": {
+          "calls": 1,
+          "wall_ms": 45.440219,
+          "thread_cpu_ms": 1.563966
+        },
+        "core._save_durable": {
+          "calls": 3,
+          "wall_ms": 147.325316,
+          "thread_cpu_ms": 3.06615
+        },
+        "cgroup.thaw": {
+          "calls": 1,
+          "wall_ms": 0.778514,
+          "thread_cpu_ms": 0.778275
+        },
+        "collector.ingest_group": {
+          "calls": 13,
+          "wall_ms": 863.868597,
+          "thread_cpu_ms": 25.871336
+        },
+        "cgroup.wait_empty": {
+          "calls": 2,
+          "wall_ms": 21.129517,
+          "thread_cpu_ms": 0.981631
+        },
+        "cgroup.quiesce_empty": {
+          "calls": 1,
+          "wall_ms": 1.721833,
+          "thread_cpu_ms": 1.720523
+        },
+        "features.execution_finished": {
+          "calls": 1,
+          "wall_ms": 46.15414,
+          "thread_cpu_ms": 1.431386
+        },
+        "observer.finish": {
+          "calls": 1,
+          "wall_ms": 3085.489492,
+          "thread_cpu_ms": 7.849341
+        },
+        "observer._validate_quiescence": {
+          "calls": 1,
+          "wall_ms": 0.089099,
+          "thread_cpu_ms": 0.088054
+        },
+        "observer._send": {
+          "calls": 1,
+          "wall_ms": 0.19652,
+          "thread_cpu_ms": 0.196264
+        },
+        "observer._receive.FINISHED": {
+          "calls": 1,
+          "wall_ms": 2760.248504,
+          "thread_cpu_ms": 0.129549
+        },
+        "observer._require_observer_exit": {
+          "calls": 1,
+          "wall_ms": 3.416425,
+          "thread_cpu_ms": 0.210168
+        },
+        "observer._validate_terminal_artifacts": {
+          "calls": 1,
+          "wall_ms": 9.971,
+          "thread_cpu_ms": 2.420999
+        },
+        "observer._run_verifier": {
+          "calls": 1,
+          "wall_ms": 220.066644,
+          "thread_cpu_ms": 1.840642
+        },
+        "observer._validate_offline_verification": {
+          "calls": 1,
+          "wall_ms": 0.042758,
+          "thread_cpu_ms": 0.04108
+        },
+        "observer._shutdown": {
+          "calls": 1,
+          "wall_ms": 0.567371,
+          "thread_cpu_ms": 0.196007
+        },
+        "cgroup.remove": {
+          "calls": 1,
+          "wall_ms": 1.105551,
+          "thread_cpu_ms": 1.105058
+        },
+        "framework.close": {
+          "calls": 1,
+          "wall_ms": 0.023384,
+          "thread_cpu_ms": 0.021328
+        }
+      },
+      "syscalls": {}
+    },
+    {
+      "label": "pair-3-off",
+      "mode": "off",
+      "metrics": {
+        "wall_ms": 3056.63483,
+        "task_ms": 1786.926856,
+        "pre_start_ms": 0.083116,
+        "launch_ms": 656.047217,
+        "execution_until_root_exit_ms": 2319.797309,
+        "post_exit_ms": 80.707188
+      },
+      "methods": {
+        "core.start": {
+          "calls": 1,
+          "wall_ms": 656.047217,
+          "thread_cpu_ms": 8.921764
+        },
+        "core._save": {
+          "calls": 2,
+          "wall_ms": 6.930889,
+          "thread_cpu_ms": 1.408291
+        },
+        "core._wait_stopped": {
+          "calls": 1,
+          "wall_ms": 638.859362,
+          "thread_cpu_ms": 2.381617
+        },
+        "cgroup.attach": {
+          "calls": 1,
+          "wall_ms": 2.198275,
+          "thread_cpu_ms": 1.877126
+        },
+        "cgroup.wait_empty": {
+          "calls": 2,
+          "wall_ms": 0.711019,
+          "thread_cpu_ms": 0.627267
+        },
+        "cgroup.quiesce_empty": {
+          "calls": 1,
+          "wall_ms": 1.979843,
+          "thread_cpu_ms": 1.979841
+        },
+        "cgroup.freeze": {
+          "calls": 1,
+          "wall_ms": 1.456059,
+          "thread_cpu_ms": 1.456092
+        },
+        "core._save_durable": {
+          "calls": 2,
+          "wall_ms": 76.68169,
+          "thread_cpu_ms": 1.916199
+        },
+        "python.fsync": {
+          "calls": 4,
+          "wall_ms": 64.919703,
+          "thread_cpu_ms": 0.265176
+        },
+        "cgroup.remove": {
+          "calls": 1,
+          "wall_ms": 1.232508,
+          "thread_cpu_ms": 1.231653
+        },
+        "framework.close": {
+          "calls": 1,
+          "wall_ms": 0.01876,
+          "thread_cpu_ms": 0.014424
+        }
+      },
+      "syscalls": {}
+    },
+    {
+      "label": "pair-4-off",
+      "mode": "off",
+      "metrics": {
+        "wall_ms": 3470.911182,
+        "task_ms": 2005.503603,
+        "pre_start_ms": 0.065905,
+        "launch_ms": 848.994807,
+        "execution_until_root_exit_ms": 2533.816559,
+        "post_exit_ms": 88.033911
+      },
+      "methods": {
+        "core.start": {
+          "calls": 1,
+          "wall_ms": 848.994807,
+          "thread_cpu_ms": 8.16799
+        },
+        "core._save": {
+          "calls": 2,
+          "wall_ms": 8.158384,
+          "thread_cpu_ms": 1.086683
+        },
+        "core._wait_stopped": {
+          "calls": 1,
+          "wall_ms": 831.360894,
+          "thread_cpu_ms": 2.992885
+        },
+        "cgroup.attach": {
+          "calls": 1,
+          "wall_ms": 1.363887,
+          "thread_cpu_ms": 1.141647
+        },
+        "cgroup.wait_empty": {
+          "calls": 2,
+          "wall_ms": 20.855774,
+          "thread_cpu_ms": 0.741443
+        },
+        "cgroup.quiesce_empty": {
+          "calls": 1,
+          "wall_ms": 1.373641,
+          "thread_cpu_ms": 1.372104
+        },
+        "cgroup.freeze": {
+          "calls": 1,
+          "wall_ms": 1.053095,
+          "thread_cpu_ms": 1.05278
+        },
+        "core._save_durable": {
+          "calls": 2,
+          "wall_ms": 64.506204,
+          "thread_cpu_ms": 1.664974
+        },
+        "python.fsync": {
+          "calls": 4,
+          "wall_ms": 55.345212,
+          "thread_cpu_ms": 0.252773
+        },
+        "cgroup.remove": {
+          "calls": 1,
+          "wall_ms": 1.134018,
+          "thread_cpu_ms": 1.121556
+        },
+        "framework.close": {
+          "calls": 1,
+          "wall_ms": 0.009757,
+          "thread_cpu_ms": 0.007527
+        }
+      },
+      "syscalls": {}
+    },
+    {
+      "label": "pair-4-batch",
+      "mode": "batch",
+      "metrics": {
+        "wall_ms": 7123.165452,
+        "task_ms": 2227.330635,
+        "pre_start_ms": 120.138575,
+        "launch_ms": 1336.090924,
+        "execution_until_root_exit_ms": 2833.173795,
+        "post_exit_ms": 2833.762158
+      },
+      "methods": {
+        "collector.ingest": {
+          "calls": 6,
+          "wall_ms": 259.351197,
+          "thread_cpu_ms": 5.31637
+        },
+        "core.start": {
+          "calls": 1,
+          "wall_ms": 1336.090924,
+          "thread_cpu_ms": 20.750955
+        },
+        "core._save": {
+          "calls": 1,
+          "wall_ms": 5.549541,
+          "thread_cpu_ms": 0.754971
+        },
+        "core._wait_stopped": {
+          "calls": 1,
+          "wall_ms": 820.942711,
+          "thread_cpu_ms": 2.840294
+        },
+        "cgroup.attach": {
+          "calls": 1,
+          "wall_ms": 1.477498,
+          "thread_cpu_ms": 1.285951
+        },
+        "core._wait_inner_gate": {
+          "calls": 1,
+          "wall_ms": 62.622073,
+          "thread_cpu_ms": 2.05383
+        },
+        "cgroup.freeze": {
+          "calls": 2,
+          "wall_ms": 2.022361,
+          "thread_cpu_ms": 2.022211
+        },
+        "core._target_identity": {
+          "calls": 2,
+          "wall_ms": 1.22133,
+          "thread_cpu_ms": 1.219841
+        },
+        "features.start_execution": {
+          "calls": 1,
+          "wall_ms": 343.340655,
+          "thread_cpu_ms": 2.550175
+        },
+        "observer.__init__": {
+          "calls": 1,
+          "wall_ms": 340.937791,
+          "thread_cpu_ms": 2.2562
+        },
+        "observer.write_file": {
+          "calls": 4,
+          "wall_ms": 120.374478,
+          "thread_cpu_ms": 2.274731
+        },
+        "python.fsync": {
+          "calls": 14,
+          "wall_ms": 204.482052,
+          "thread_cpu_ms": 1.162736
+        },
+        "observer._receive.READY": {
+          "calls": 1,
+          "wall_ms": 306.454207,
+          "thread_cpu_ms": 0.060121
+        },
+        "observer._validate_ready": {
+          "calls": 1,
+          "wall_ms": 2.992146,
+          "thread_cpu_ms": 0.697492
+        },
+        "features.execution_started": {
+          "calls": 1,
+          "wall_ms": 45.311158,
+          "thread_cpu_ms": 1.239897
+        },
+        "core._save_durable": {
+          "calls": 3,
+          "wall_ms": 113.827802,
+          "thread_cpu_ms": 2.83742
+        },
+        "cgroup.thaw": {
+          "calls": 1,
+          "wall_ms": 1.068379,
+          "thread_cpu_ms": 1.043055
+        },
+        "collector.ingest_group": {
+          "calls": 13,
+          "wall_ms": 514.952091,
+          "thread_cpu_ms": 24.17592
+        },
+        "cgroup.wait_empty": {
+          "calls": 2,
+          "wall_ms": 0.69899,
+          "thread_cpu_ms": 0.695545
+        },
+        "cgroup.quiesce_empty": {
+          "calls": 1,
+          "wall_ms": 1.656992,
+          "thread_cpu_ms": 1.6557
+        },
+        "features.execution_finished": {
+          "calls": 1,
+          "wall_ms": 29.758035,
+          "thread_cpu_ms": 1.289979
+        },
+        "observer.finish": {
+          "calls": 1,
+          "wall_ms": 2653.04472,
+          "thread_cpu_ms": 7.028323
+        },
+        "observer._validate_quiescence": {
+          "calls": 1,
+          "wall_ms": 0.022536,
+          "thread_cpu_ms": 0.021655
+        },
+        "observer._send": {
+          "calls": 1,
+          "wall_ms": 0.078687,
+          "thread_cpu_ms": 0.077882
+        },
+        "observer._receive.FINISHED": {
+          "calls": 1,
+          "wall_ms": 2271.727569,
+          "thread_cpu_ms": 0.072149
+        },
+        "observer._require_observer_exit": {
+          "calls": 1,
+          "wall_ms": 3.324783,
+          "thread_cpu_ms": 0.153297
+        },
+        "observer._validate_terminal_artifacts": {
+          "calls": 1,
+          "wall_ms": 10.464227,
+          "thread_cpu_ms": 2.105124
+        },
+        "observer._run_verifier": {
+          "calls": 1,
+          "wall_ms": 271.214676,
+          "thread_cpu_ms": 1.68326
+        },
+        "observer._validate_offline_verification": {
+          "calls": 1,
+          "wall_ms": 0.031342,
+          "thread_cpu_ms": 0.028081
+        },
+        "observer._shutdown": {
+          "calls": 1,
+          "wall_ms": 0.911694,
+          "thread_cpu_ms": 0.179297
+        },
+        "cgroup.remove": {
+          "calls": 1,
+          "wall_ms": 1.045789,
+          "thread_cpu_ms": 1.044085
+        },
+        "framework.close": {
+          "calls": 1,
+          "wall_ms": 0.012657,
+          "thread_cpu_ms": 0.010082
+        }
+      },
+      "syscalls": {}
+    },
+    {
+      "label": "pair-5-batch",
+      "mode": "batch",
+      "metrics": {
+        "wall_ms": 7436.988309,
+        "task_ms": 2142.642598,
+        "pre_start_ms": 76.333884,
+        "launch_ms": 1770.312977,
+        "execution_until_root_exit_ms": 2724.85113,
+        "post_exit_ms": 2865.490318
+      },
+      "methods": {
+        "collector.ingest": {
+          "calls": 6,
+          "wall_ms": 712.086524,
+          "thread_cpu_ms": 5.155681
+        },
+        "core.start": {
+          "calls": 1,
+          "wall_ms": 1770.312977,
+          "thread_cpu_ms": 21.965589
+        },
+        "core._save": {
+          "calls": 1,
+          "wall_ms": 5.420479,
+          "thread_cpu_ms": 0.756362
+        },
+        "core._wait_stopped": {
+          "calls": 1,
+          "wall_ms": 699.378081,
+          "thread_cpu_ms": 2.704361
+        },
+        "cgroup.attach": {
+          "calls": 1,
+          "wall_ms": 1.488221,
+          "thread_cpu_ms": 1.249462
+        },
+        "core._wait_inner_gate": {
+          "calls": 1,
+          "wall_ms": 52.423023,
+          "thread_cpu_ms": 2.013311
+        },
+        "cgroup.freeze": {
+          "calls": 2,
+          "wall_ms": 1.842198,
+          "thread_cpu_ms": 1.841936
+        },
+        "core._target_identity": {
+          "calls": 2,
+          "wall_ms": 1.520208,
+          "thread_cpu_ms": 1.519012
+        },
+        "features.start_execution": {
+          "calls": 1,
+          "wall_ms": 393.132997,
+          "thread_cpu_ms": 3.125461
+        },
+        "observer.__init__": {
+          "calls": 1,
+          "wall_ms": 391.532843,
+          "thread_cpu_ms": 2.817842
+        },
+        "observer.write_file": {
+          "calls": 4,
+          "wall_ms": 139.301084,
+          "thread_cpu_ms": 2.37984
+        },
+        "python.fsync": {
+          "calls": 14,
+          "wall_ms": 231.319735,
+          "thread_cpu_ms": 0.954783
+        },
+        "observer._receive.READY": {
+          "calls": 1,
+          "wall_ms": 329.345039,
+          "thread_cpu_ms": 0.079592
+        },
+        "observer._validate_ready": {
+          "calls": 1,
+          "wall_ms": 2.966034,
+          "thread_cpu_ms": 0.865122
+        },
+        "features.execution_started": {
+          "calls": 1,
+          "wall_ms": 537.472784,
+          "thread_cpu_ms": 1.748749
+        },
+        "core._save_durable": {
+          "calls": 3,
+          "wall_ms": 122.116236,
+          "thread_cpu_ms": 2.943556
+        },
+        "cgroup.thaw": {
+          "calls": 1,
+          "wall_ms": 1.264485,
+          "thread_cpu_ms": 1.264247
+        },
+        "collector.ingest_group": {
+          "calls": 13,
+          "wall_ms": 402.047688,
+          "thread_cpu_ms": 15.520585
+        },
+        "cgroup.wait_empty": {
+          "calls": 2,
+          "wall_ms": 20.880884,
+          "thread_cpu_ms": 0.686038
+        },
+        "cgroup.quiesce_empty": {
+          "calls": 1,
+          "wall_ms": 1.259487,
+          "thread_cpu_ms": 1.258477
+        },
+        "features.execution_finished": {
+          "calls": 1,
+          "wall_ms": 25.426143,
+          "thread_cpu_ms": 0.954267
+        },
+        "observer.finish": {
+          "calls": 1,
+          "wall_ms": 2676.940508,
+          "thread_cpu_ms": 6.482353
+        },
+        "observer._validate_quiescence": {
+          "calls": 1,
+          "wall_ms": 0.02206,
+          "thread_cpu_ms": 0.02128
+        },
+        "observer._send": {
+          "calls": 1,
+          "wall_ms": 0.127648,
+          "thread_cpu_ms": 0.127157
+        },
+        "observer._receive.FINISHED": {
+          "calls": 1,
+          "wall_ms": 2356.05638,
+          "thread_cpu_ms": 0.071039
+        },
+        "observer._require_observer_exit": {
+          "calls": 1,
+          "wall_ms": 3.35191,
+          "thread_cpu_ms": 0.149605
+        },
+        "observer._validate_terminal_artifacts": {
+          "calls": 1,
+          "wall_ms": 8.801915,
+          "thread_cpu_ms": 1.974085
+        },
+        "observer._run_verifier": {
+          "calls": 1,
+          "wall_ms": 220.12027,
+          "thread_cpu_ms": 1.31856
+        },
+        "observer._validate_offline_verification": {
+          "calls": 1,
+          "wall_ms": 0.033767,
+          "thread_cpu_ms": 0.030773
+        },
+        "observer._shutdown": {
+          "calls": 1,
+          "wall_ms": 0.545993,
+          "thread_cpu_ms": 0.168236
+        },
+        "cgroup.remove": {
+          "calls": 1,
+          "wall_ms": 1.162403,
+          "thread_cpu_ms": 1.161668
+        },
+        "framework.close": {
+          "calls": 1,
+          "wall_ms": 0.01268,
+          "thread_cpu_ms": 0.010155
+        }
+      },
+      "syscalls": {}
+    },
+    {
+      "label": "pair-5-off",
+      "mode": "off",
+      "metrics": {
+        "wall_ms": 3618.671232,
+        "task_ms": 2079.364783,
+        "pre_start_ms": 0.065014,
+        "launch_ms": 757.712675,
+        "execution_until_root_exit_ms": 2672.532549,
+        "post_exit_ms": 188.360994
+      },
+      "methods": {
+        "core.start": {
+          "calls": 1,
+          "wall_ms": 757.712675,
+          "thread_cpu_ms": 12.23445
+        },
+        "core._save": {
+          "calls": 2,
+          "wall_ms": 14.233037,
+          "thread_cpu_ms": 1.405417
+        },
+        "core._wait_stopped": {
+          "calls": 1,
+          "wall_ms": 734.105205,
+          "thread_cpu_ms": 6.365901
+        },
+        "cgroup.attach": {
+          "calls": 1,
+          "wall_ms": 1.887494,
+          "thread_cpu_ms": 1.558831
+        },
+        "cgroup.wait_empty": {
+          "calls": 2,
+          "wall_ms": 0.697712,
+          "thread_cpu_ms": 0.610333
+        },
+        "cgroup.quiesce_empty": {
+          "calls": 1,
+          "wall_ms": 1.618044,
+          "thread_cpu_ms": 1.616774
+        },
+        "cgroup.freeze": {
+          "calls": 1,
+          "wall_ms": 1.190942,
+          "thread_cpu_ms": 1.190899
+        },
+        "core._save_durable": {
+          "calls": 2,
+          "wall_ms": 184.514282,
+          "thread_cpu_ms": 1.929384
+        },
+        "python.fsync": {
+          "calls": 4,
+          "wall_ms": 160.665233,
+          "thread_cpu_ms": 0.290469
+        },
+        "cgroup.remove": {
+          "calls": 1,
+          "wall_ms": 1.22821,
+          "thread_cpu_ms": 1.227016
+        },
+        "framework.close": {
+          "calls": 1,
+          "wall_ms": 0.025298,
+          "thread_cpu_ms": 0.018179
+        }
+      },
+      "syscalls": {}
+    },
+    {
+      "label": "pair-6-off",
+      "mode": "off",
+      "metrics": {
+        "wall_ms": 3509.639753,
+        "task_ms": 2062.981221,
+        "pre_start_ms": 0.067223,
+        "launch_ms": 768.870582,
+        "execution_until_root_exit_ms": 2654.802839,
+        "post_exit_ms": 85.899109
+      },
+      "methods": {
+        "core.start": {
+          "calls": 1,
+          "wall_ms": 768.870582,
+          "thread_cpu_ms": 8.24821
+        },
+        "core._save": {
+          "calls": 2,
+          "wall_ms": 8.646089,
+          "thread_cpu_ms": 1.332733
+        },
+        "core._wait_stopped": {
+          "calls": 1,
+          "wall_ms": 750.740057,
+          "thread_cpu_ms": 2.916443
+        },
+        "cgroup.attach": {
+          "calls": 1,
+          "wall_ms": 1.549174,
+          "thread_cpu_ms": 1.202973
+        },
+        "cgroup.wait_empty": {
+          "calls": 2,
+          "wall_ms": 0.825408,
+          "thread_cpu_ms": 0.729965
+        },
+        "cgroup.quiesce_empty": {
+          "calls": 1,
+          "wall_ms": 1.878606,
+          "thread_cpu_ms": 1.877403
+        },
+        "cgroup.freeze": {
+          "calls": 1,
+          "wall_ms": 1.349174,
+          "thread_cpu_ms": 1.349058
+        },
+        "core._save_durable": {
+          "calls": 2,
+          "wall_ms": 81.762015,
+          "thread_cpu_ms": 1.826503
+        },
+        "python.fsync": {
+          "calls": 4,
+          "wall_ms": 71.067069,
+          "thread_cpu_ms": 0.245661
+        },
+        "cgroup.remove": {
+          "calls": 1,
+          "wall_ms": 1.069924,
+          "thread_cpu_ms": 1.069321
+        },
+        "framework.close": {
+          "calls": 1,
+          "wall_ms": 0.029722,
+          "thread_cpu_ms": 0.02078
+        }
+      },
+      "syscalls": {}
+    },
+    {
+      "label": "pair-6-batch",
+      "mode": "batch",
+      "metrics": {
+        "wall_ms": 7242.520202,
+        "task_ms": 2347.821175,
+        "pre_start_ms": 73.688322,
+        "launch_ms": 1278.104076,
+        "execution_until_root_exit_ms": 3046.319811,
+        "post_exit_ms": 2844.407993
+      },
+      "methods": {
+        "collector.ingest": {
+          "calls": 6,
+          "wall_ms": 207.984588,
+          "thread_cpu_ms": 5.860112
+        },
+        "core.start": {
+          "calls": 1,
+          "wall_ms": 1278.104076,
+          "thread_cpu_ms": 27.560761
+        },
+        "core._save": {
+          "calls": 1,
+          "wall_ms": 4.90354,
+          "thread_cpu_ms": 0.667498
+        },
+        "core._wait_stopped": {
+          "calls": 1,
+          "wall_ms": 712.441408,
+          "thread_cpu_ms": 5.473417
+        },
+        "cgroup.attach": {
+          "calls": 1,
+          "wall_ms": 1.585258,
+          "thread_cpu_ms": 1.400634
+        },
+        "core._wait_inner_gate": {
+          "calls": 1,
+          "wall_ms": 53.794358,
+          "thread_cpu_ms": 3.315885
+        },
+        "cgroup.freeze": {
+          "calls": 2,
+          "wall_ms": 2.617991,
+          "thread_cpu_ms": 2.615347
+        },
+        "core._target_identity": {
+          "calls": 2,
+          "wall_ms": 1.904479,
+          "thread_cpu_ms": 1.9021
+        },
+        "features.start_execution": {
+          "calls": 1,
+          "wall_ms": 411.326692,
+          "thread_cpu_ms": 3.967637
+        },
+        "observer.__init__": {
+          "calls": 1,
+          "wall_ms": 409.567805,
+          "thread_cpu_ms": 3.513537
+        },
+        "observer.write_file": {
+          "calls": 4,
+          "wall_ms": 129.354155,
+          "thread_cpu_ms": 2.393379
+        },
+        "python.fsync": {
+          "calls": 14,
+          "wall_ms": 194.990318,
+          "thread_cpu_ms": 1.030836
+        },
+        "observer._receive.READY": {
+          "calls": 1,
+          "wall_ms": 370.906857,
+          "thread_cpu_ms": 0.081769
+        },
+        "observer._validate_ready": {
+          "calls": 1,
+          "wall_ms": 2.813302,
+          "thread_cpu_ms": 0.889303
+        },
+        "features.execution_started": {
+          "calls": 1,
+          "wall_ms": 37.742545,
+          "thread_cpu_ms": 1.798576
+        },
+        "core._save_durable": {
+          "calls": 3,
+          "wall_ms": 97.197783,
+          "thread_cpu_ms": 3.093481
+        },
+        "cgroup.thaw": {
+          "calls": 1,
+          "wall_ms": 1.16236,
+          "thread_cpu_ms": 1.116355
+        },
+        "collector.ingest_group": {
+          "calls": 9,
+          "wall_ms": 1056.463443,
+          "thread_cpu_ms": 19.097335
+        },
+        "cgroup.wait_empty": {
+          "calls": 2,
+          "wall_ms": 0.799524,
+          "thread_cpu_ms": 0.755486
+        },
+        "cgroup.quiesce_empty": {
+          "calls": 1,
+          "wall_ms": 1.446718,
+          "thread_cpu_ms": 1.44552
+        },
+        "features.execution_finished": {
+          "calls": 1,
+          "wall_ms": 24.447334,
+          "thread_cpu_ms": 1.303446
+        },
+        "observer.finish": {
+          "calls": 1,
+          "wall_ms": 2676.67997,
+          "thread_cpu_ms": 7.049261
+        },
+        "observer._validate_quiescence": {
+          "calls": 1,
+          "wall_ms": 0.092633,
+          "thread_cpu_ms": 0.092318
+        },
+        "observer._send": {
+          "calls": 1,
+          "wall_ms": 0.147873,
+          "thread_cpu_ms": 0.147123
+        },
+        "observer._receive.FINISHED": {
+          "calls": 1,
+          "wall_ms": 2340.274873,
+          "thread_cpu_ms": 0.114159
+        },
+        "observer._require_observer_exit": {
+          "calls": 1,
+          "wall_ms": 3.28466,
+          "thread_cpu_ms": 0.158626
+        },
+        "observer._validate_terminal_artifacts": {
+          "calls": 1,
+          "wall_ms": 9.860032,
+          "thread_cpu_ms": 2.137244
+        },
+        "observer._run_verifier": {
+          "calls": 1,
+          "wall_ms": 221.034521,
+          "thread_cpu_ms": 1.676847
+        },
+        "observer._validate_offline_verification": {
+          "calls": 1,
+          "wall_ms": 0.054635,
+          "thread_cpu_ms": 0.052568
+        },
+        "observer._shutdown": {
+          "calls": 1,
+          "wall_ms": 0.557612,
+          "thread_cpu_ms": 0.165948
+        },
+        "cgroup.remove": {
+          "calls": 1,
+          "wall_ms": 1.254994,
+          "thread_cpu_ms": 1.25439
+        },
+        "framework.close": {
+          "calls": 1,
+          "wall_ms": 0.015643,
+          "thread_cpu_ms": 0.011975
+        }
+      },
+      "syscalls": {}
+    },
+    {
+      "label": "pair-7-batch",
+      "mode": "batch",
+      "metrics": {
+        "wall_ms": 7136.687658,
+        "task_ms": 2238.001246,
+        "pre_start_ms": 67.694224,
+        "launch_ms": 1427.928667,
+        "execution_until_root_exit_ms": 2794.271501,
+        "post_exit_ms": 2846.793266
+      },
+      "methods": {
+        "collector.ingest": {
+          "calls": 6,
+          "wall_ms": 162.081984,
+          "thread_cpu_ms": 5.211942
+        },
+        "core.start": {
+          "calls": 1,
+          "wall_ms": 1427.928667,
+          "thread_cpu_ms": 21.472125
+        },
+        "core._save": {
+          "calls": 1,
+          "wall_ms": 5.194704,
+          "thread_cpu_ms": 0.482806
+        },
+        "core._wait_stopped": {
+          "calls": 1,
+          "wall_ms": 841.588675,
+          "thread_cpu_ms": 3.076989
+        },
+        "cgroup.attach": {
+          "calls": 1,
+          "wall_ms": 1.498787,
+          "thread_cpu_ms": 1.300355
+        },
+        "core._wait_inner_gate": {
+          "calls": 1,
+          "wall_ms": 73.380886,
+          "thread_cpu_ms": 2.672905
+        },
+        "cgroup.freeze": {
+          "calls": 2,
+          "wall_ms": 2.0137,
+          "thread_cpu_ms": 2.012977
+        },
+        "core._target_identity": {
+          "calls": 2,
+          "wall_ms": 1.378074,
+          "thread_cpu_ms": 1.376887
+        },
+        "features.start_execution": {
+          "calls": 1,
+          "wall_ms": 393.817199,
+          "thread_cpu_ms": 3.570684
+        },
+        "observer.__init__": {
+          "calls": 1,
+          "wall_ms": 391.369051,
+          "thread_cpu_ms": 3.17371
+        },
+        "observer.write_file": {
+          "calls": 4,
+          "wall_ms": 101.850622,
+          "thread_cpu_ms": 2.312315
+        },
+        "python.fsync": {
+          "calls": 14,
+          "wall_ms": 160.183221,
+          "thread_cpu_ms": 0.947161
+        },
+        "observer._receive.READY": {
+          "calls": 1,
+          "wall_ms": 347.731306,
+          "thread_cpu_ms": 0.095619
+        },
+        "observer._validate_ready": {
+          "calls": 1,
+          "wall_ms": 3.260453,
+          "thread_cpu_ms": 1.032817
+        },
+        "features.execution_started": {
+          "calls": 1,
+          "wall_ms": 28.122068,
+          "thread_cpu_ms": 1.813782
+        },
+        "core._save_durable": {
+          "calls": 3,
+          "wall_ms": 113.868098,
+          "thread_cpu_ms": 2.946711
+        },
+        "cgroup.thaw": {
+          "calls": 1,
+          "wall_ms": 1.019316,
+          "thread_cpu_ms": 1.006997
+        },
+        "collector.ingest_group": {
+          "calls": 12,
+          "wall_ms": 554.889138,
+          "thread_cpu_ms": 24.398572
+        },
+        "cgroup.wait_empty": {
+          "calls": 2,
+          "wall_ms": 0.610533,
+          "thread_cpu_ms": 0.563288
+        },
+        "cgroup.quiesce_empty": {
+          "calls": 1,
+          "wall_ms": 1.46949,
+          "thread_cpu_ms": 1.468349
+        },
+        "features.execution_finished": {
+          "calls": 1,
+          "wall_ms": 18.550207,
+          "thread_cpu_ms": 1.052619
+        },
+        "observer.finish": {
+          "calls": 1,
+          "wall_ms": 2710.548514,
+          "thread_cpu_ms": 6.703
+        },
+        "observer._validate_quiescence": {
+          "calls": 1,
+          "wall_ms": 0.019576,
+          "thread_cpu_ms": 0.019004
+        },
+        "observer._send": {
+          "calls": 1,
+          "wall_ms": 0.080457,
+          "thread_cpu_ms": 0.080158
+        },
+        "observer._receive.FINISHED": {
+          "calls": 1,
+          "wall_ms": 2408.281783,
+          "thread_cpu_ms": 0.077564
+        },
+        "observer._require_observer_exit": {
+          "calls": 1,
+          "wall_ms": 3.34162,
+          "thread_cpu_ms": 0.15165
+        },
+        "observer._validate_terminal_artifacts": {
+          "calls": 1,
+          "wall_ms": 10.04252,
+          "thread_cpu_ms": 2.1731
+        },
+        "observer._run_verifier": {
+          "calls": 1,
+          "wall_ms": 219.932584,
+          "thread_cpu_ms": 1.50342
+        },
+        "observer._validate_offline_verification": {
+          "calls": 1,
+          "wall_ms": 0.031357,
+          "thread_cpu_ms": 0.028603
+        },
+        "observer._shutdown": {
+          "calls": 1,
+          "wall_ms": 0.506553,
+          "thread_cpu_ms": 0.137032
+        },
+        "cgroup.remove": {
+          "calls": 1,
+          "wall_ms": 1.103347,
+          "thread_cpu_ms": 1.10213
+        },
+        "framework.close": {
+          "calls": 1,
+          "wall_ms": 0.010676,
+          "thread_cpu_ms": 0.008309
+        }
+      },
+      "syscalls": {}
+    },
+    {
+      "label": "pair-7-off",
+      "mode": "off",
+      "metrics": {
+        "wall_ms": 3124.197453,
+        "task_ms": 1735.122328,
+        "pre_start_ms": 0.100622,
+        "launch_ms": 773.568445,
+        "execution_until_root_exit_ms": 2286.073374,
+        "post_exit_ms": 64.455012
+      },
+      "methods": {
+        "core.start": {
+          "calls": 1,
+          "wall_ms": 773.568445,
+          "thread_cpu_ms": 12.846227
+        },
+        "core._save": {
+          "calls": 2,
+          "wall_ms": 9.050349,
+          "thread_cpu_ms": 1.695993
+        },
+        "core._wait_stopped": {
+          "calls": 1,
+          "wall_ms": 753.883655,
+          "thread_cpu_ms": 6.008241
+        },
+        "cgroup.attach": {
+          "calls": 1,
+          "wall_ms": 1.847702,
+          "thread_cpu_ms": 1.65629
+        },
+        "cgroup.wait_empty": {
+          "calls": 2,
+          "wall_ms": 0.767781,
+          "thread_cpu_ms": 0.654968
+        },
+        "cgroup.quiesce_empty": {
+          "calls": 1,
+          "wall_ms": 1.54941,
+          "thread_cpu_ms": 1.547922
+        },
+        "cgroup.freeze": {
+          "calls": 1,
+          "wall_ms": 1.20178,
+          "thread_cpu_ms": 1.201997
+        },
+        "core._save_durable": {
+          "calls": 2,
+          "wall_ms": 60.614699,
+          "thread_cpu_ms": 1.53296
+        },
+        "python.fsync": {
+          "calls": 4,
+          "wall_ms": 53.074249,
+          "thread_cpu_ms": 0.214794
+        },
+        "cgroup.remove": {
+          "calls": 1,
+          "wall_ms": 1.058294,
+          "thread_cpu_ms": 1.057679
+        },
+        "framework.close": {
+          "calls": 1,
+          "wall_ms": 0.027486,
+          "thread_cpu_ms": 0.019703
+        }
+      },
+      "syscalls": {}
+    },
+    {
+      "label": "pair-8-off",
+      "mode": "off",
+      "metrics": {
+        "wall_ms": 3154.89781,
+        "task_ms": 1839.648931,
+        "pre_start_ms": 0.070458,
+        "launch_ms": 606.693729,
+        "execution_until_root_exit_ms": 2448.686191,
+        "post_exit_ms": 99.447432
+      },
+      "methods": {
+        "core.start": {
+          "calls": 1,
+          "wall_ms": 606.693729,
+          "thread_cpu_ms": 10.618741
+        },
+        "core._save": {
+          "calls": 2,
+          "wall_ms": 7.437727,
+          "thread_cpu_ms": 1.603381
+        },
+        "core._wait_stopped": {
+          "calls": 1,
+          "wall_ms": 591.081422,
+          "thread_cpu_ms": 4.663887
+        },
+        "cgroup.attach": {
+          "calls": 1,
+          "wall_ms": 1.593844,
+          "thread_cpu_ms": 1.279876
+        },
+        "cgroup.wait_empty": {
+          "calls": 2,
+          "wall_ms": 21.071789,
+          "thread_cpu_ms": 0.920127
+        },
+        "cgroup.quiesce_empty": {
+          "calls": 1,
+          "wall_ms": 1.599262,
+          "thread_cpu_ms": 1.59782
+        },
+        "cgroup.freeze": {
+          "calls": 1,
+          "wall_ms": 1.184137,
+          "thread_cpu_ms": 1.184245
+        },
+        "core._save_durable": {
+          "calls": 2,
+          "wall_ms": 75.193793,
+          "thread_cpu_ms": 1.745729
+        },
+        "python.fsync": {
+          "calls": 4,
+          "wall_ms": 65.023346,
+          "thread_cpu_ms": 0.24829
+        },
+        "cgroup.remove": {
+          "calls": 1,
+          "wall_ms": 1.250148,
+          "thread_cpu_ms": 1.237264
+        },
+        "framework.close": {
+          "calls": 1,
+          "wall_ms": 0.027755,
+          "thread_cpu_ms": 0.019388
+        }
+      },
+      "syscalls": {}
+    },
+    {
+      "label": "pair-8-batch",
+      "mode": "batch",
+      "metrics": {
+        "wall_ms": 7289.230378,
+        "task_ms": 2224.283915,
+        "pre_start_ms": 257.081392,
+        "launch_ms": 1381.256365,
+        "execution_until_root_exit_ms": 2843.622599,
+        "post_exit_ms": 2807.270022
+      },
+      "methods": {
+        "collector.ingest": {
+          "calls": 6,
+          "wall_ms": 368.685752,
+          "thread_cpu_ms": 5.55977
+        },
+        "core.start": {
+          "calls": 1,
+          "wall_ms": 1381.256365,
+          "thread_cpu_ms": 27.009597
+        },
+        "core._save": {
+          "calls": 1,
+          "wall_ms": 5.848121,
+          "thread_cpu_ms": 0.810275
+        },
+        "core._wait_stopped": {
+          "calls": 1,
+          "wall_ms": 703.896217,
+          "thread_cpu_ms": 5.799102
+        },
+        "cgroup.attach": {
+          "calls": 1,
+          "wall_ms": 1.574545,
+          "thread_cpu_ms": 1.343477
+        },
+        "core._wait_inner_gate": {
+          "calls": 1,
+          "wall_ms": 53.106356,
+          "thread_cpu_ms": 2.611421
+        },
+        "cgroup.freeze": {
+          "calls": 2,
+          "wall_ms": 12.127078,
+          "thread_cpu_ms": 2.012482
+        },
+        "core._target_identity": {
+          "calls": 2,
+          "wall_ms": 1.58755,
+          "thread_cpu_ms": 1.584801
+        },
+        "features.start_execution": {
+          "calls": 1,
+          "wall_ms": 496.578284,
+          "thread_cpu_ms": 3.384733
+        },
+        "observer.__init__": {
+          "calls": 1,
+          "wall_ms": 493.911696,
+          "thread_cpu_ms": 3.003739
+        },
+        "observer.write_file": {
+          "calls": 4,
+          "wall_ms": 142.337812,
+          "thread_cpu_ms": 2.269285
+        },
+        "python.fsync": {
+          "calls": 14,
+          "wall_ms": 225.140977,
+          "thread_cpu_ms": 0.989093
+        },
+        "observer._receive.READY": {
+          "calls": 1,
+          "wall_ms": 438.436194,
+          "thread_cpu_ms": 0.078747
+        },
+        "observer._validate_ready": {
+          "calls": 1,
+          "wall_ms": 3.443888,
+          "thread_cpu_ms": 0.961589
+        },
+        "features.execution_started": {
+          "calls": 1,
+          "wall_ms": 27.587239,
+          "thread_cpu_ms": 1.735573
+        },
+        "core._save_durable": {
+          "calls": 3,
+          "wall_ms": 122.319581,
+          "thread_cpu_ms": 2.958955
+        },
+        "cgroup.thaw": {
+          "calls": 1,
+          "wall_ms": 1.211642,
+          "thread_cpu_ms": 1.197052
+        },
+        "collector.ingest_group": {
+          "calls": 13,
+          "wall_ms": 555.039445,
+          "thread_cpu_ms": 21.081757
+        },
+        "cgroup.wait_empty": {
+          "calls": 2,
+          "wall_ms": 0.469459,
+          "thread_cpu_ms": 0.408451
+        },
+        "cgroup.quiesce_empty": {
+          "calls": 1,
+          "wall_ms": 1.103059,
+          "thread_cpu_ms": 1.102334
+        },
+        "features.execution_finished": {
+          "calls": 1,
+          "wall_ms": 36.498762,
+          "thread_cpu_ms": 1.100128
+        },
+        "observer.finish": {
+          "calls": 1,
+          "wall_ms": 2653.272183,
+          "thread_cpu_ms": 6.186889
+        },
+        "observer._validate_quiescence": {
+          "calls": 1,
+          "wall_ms": 0.019962,
+          "thread_cpu_ms": 0.019397
+        },
+        "observer._send": {
+          "calls": 1,
+          "wall_ms": 0.070493,
+          "thread_cpu_ms": 0.070074
+        },
+        "observer._receive.FINISHED": {
+          "calls": 1,
+          "wall_ms": 2320.551326,
+          "thread_cpu_ms": 0.063433
+        },
+        "observer._require_observer_exit": {
+          "calls": 1,
+          "wall_ms": 3.323666,
+          "thread_cpu_ms": 0.146832
+        },
+        "observer._validate_terminal_artifacts": {
+          "calls": 1,
+          "wall_ms": 9.066883,
+          "thread_cpu_ms": 1.872285
+        },
+        "observer._run_verifier": {
+          "calls": 1,
+          "wall_ms": 220.625853,
+          "thread_cpu_ms": 1.3572
+        },
+        "observer._validate_offline_verification": {
+          "calls": 1,
+          "wall_ms": 0.032757,
+          "thread_cpu_ms": 0.030168
+        },
+        "observer._shutdown": {
+          "calls": 1,
+          "wall_ms": 0.52303,
+          "thread_cpu_ms": 0.166805
+        },
+        "cgroup.remove": {
+          "calls": 1,
+          "wall_ms": 1.326467,
+          "thread_cpu_ms": 1.325562
+        },
+        "framework.close": {
+          "calls": 1,
+          "wall_ms": 0.018862,
+          "thread_cpu_ms": 0.01482
+        }
+      },
+      "syscalls": {}
+    },
+    {
+      "label": "pair-9-batch",
+      "mode": "batch",
+      "metrics": {
+        "wall_ms": 7116.423729,
+        "task_ms": 2237.626855,
+        "pre_start_ms": 94.489142,
+        "launch_ms": 1239.31335,
+        "execution_until_root_exit_ms": 2802.40728,
+        "post_exit_ms": 2980.213957
+      },
+      "methods": {
+        "collector.ingest": {
+          "calls": 6,
+          "wall_ms": 264.602713,
+          "thread_cpu_ms": 5.699575
+        },
+        "core.start": {
+          "calls": 1,
+          "wall_ms": 1239.31335,
+          "thread_cpu_ms": 21.664451
+        },
+        "core._save": {
+          "calls": 1,
+          "wall_ms": 15.681363,
+          "thread_cpu_ms": 0.676036
+        },
+        "core._wait_stopped": {
+          "calls": 1,
+          "wall_ms": 649.092419,
+          "thread_cpu_ms": 2.499676
+        },
+        "cgroup.attach": {
+          "calls": 1,
+          "wall_ms": 1.911548,
+          "thread_cpu_ms": 1.635168
+        },
+        "core._wait_inner_gate": {
+          "calls": 1,
+          "wall_ms": 62.962667,
+          "thread_cpu_ms": 2.336464
+        },
+        "cgroup.freeze": {
+          "calls": 2,
+          "wall_ms": 1.973905,
+          "thread_cpu_ms": 1.973508
+        },
+        "core._target_identity": {
+          "calls": 2,
+          "wall_ms": 1.507654,
+          "thread_cpu_ms": 1.506231
+        },
+        "features.start_execution": {
+          "calls": 1,
+          "wall_ms": 370.99565,
+          "thread_cpu_ms": 2.530009
+        },
+        "observer.__init__": {
+          "calls": 1,
+          "wall_ms": 369.613849,
+          "thread_cpu_ms": 2.270014
+        },
+        "observer.write_file": {
+          "calls": 4,
+          "wall_ms": 151.02054,
+          "thread_cpu_ms": 2.276853
+        },
+        "python.fsync": {
+          "calls": 14,
+          "wall_ms": 328.482561,
+          "thread_cpu_ms": 0.968776
+        },
+        "observer._receive.READY": {
+          "calls": 1,
+          "wall_ms": 323.816648,
+          "thread_cpu_ms": 0.068558
+        },
+        "observer._validate_ready": {
+          "calls": 1,
+          "wall_ms": 2.578005,
+          "thread_cpu_ms": 0.826073
+        },
+        "features.execution_started": {
+          "calls": 1,
+          "wall_ms": 37.759865,
+          "thread_cpu_ms": 1.577584
+        },
+        "core._save_durable": {
+          "calls": 3,
+          "wall_ms": 280.546131,
+          "thread_cpu_ms": 3.270347
+        },
+        "cgroup.thaw": {
+          "calls": 1,
+          "wall_ms": 1.326633,
+          "thread_cpu_ms": 1.325508
+        },
+        "collector.ingest_group": {
+          "calls": 8,
+          "wall_ms": 1233.897127,
+          "thread_cpu_ms": 14.774182
+        },
+        "cgroup.wait_empty": {
+          "calls": 2,
+          "wall_ms": 0.754016,
+          "thread_cpu_ms": 0.711825
+        },
+        "cgroup.quiesce_empty": {
+          "calls": 1,
+          "wall_ms": 1.745385,
+          "thread_cpu_ms": 1.744078
+        },
+        "features.execution_finished": {
+          "calls": 1,
+          "wall_ms": 43.017175,
+          "thread_cpu_ms": 1.508375
+        },
+        "observer.finish": {
+          "calls": 1,
+          "wall_ms": 2627.357124,
+          "thread_cpu_ms": 6.237915
+        },
+        "observer._validate_quiescence": {
+          "calls": 1,
+          "wall_ms": 0.030104,
+          "thread_cpu_ms": 0.029552
+        },
+        "observer._send": {
+          "calls": 1,
+          "wall_ms": 0.07422,
+          "thread_cpu_ms": 0.073478
+        },
+        "observer._receive.FINISHED": {
+          "calls": 1,
+          "wall_ms": 2281.422117,
+          "thread_cpu_ms": 0.07072
+        },
+        "observer._require_observer_exit": {
+          "calls": 1,
+          "wall_ms": 3.377099,
+          "thread_cpu_ms": 0.155747
+        },
+        "observer._validate_terminal_artifacts": {
+          "calls": 1,
+          "wall_ms": 9.504912,
+          "thread_cpu_ms": 1.919955
+        },
+        "observer._run_verifier": {
+          "calls": 1,
+          "wall_ms": 219.516284,
+          "thread_cpu_ms": 1.166203
+        },
+        "observer._validate_offline_verification": {
+          "calls": 1,
+          "wall_ms": 0.030939,
+          "thread_cpu_ms": 0.028133
+        },
+        "observer._shutdown": {
+          "calls": 1,
+          "wall_ms": 0.628279,
+          "thread_cpu_ms": 0.178947
+        },
+        "cgroup.remove": {
+          "calls": 1,
+          "wall_ms": 1.294567,
+          "thread_cpu_ms": 1.293672
+        },
+        "framework.close": {
+          "calls": 1,
+          "wall_ms": 0.011503,
+          "thread_cpu_ms": 0.00913
+        }
+      },
+      "syscalls": {}
+    },
+    {
+      "label": "pair-9-off",
+      "mode": "off",
+      "metrics": {
+        "wall_ms": 3436.893121,
+        "task_ms": 1963.341728,
+        "pre_start_ms": 0.052806,
+        "launch_ms": 727.247138,
+        "execution_until_root_exit_ms": 2603.893863,
+        "post_exit_ms": 105.699314
+      },
+      "methods": {
+        "core.start": {
+          "calls": 1,
+          "wall_ms": 727.247138,
+          "thread_cpu_ms": 7.77061
+        },
+        "core._save": {
+          "calls": 2,
+          "wall_ms": 8.586091,
+          "thread_cpu_ms": 1.294312
+        },
+        "core._wait_stopped": {
+          "calls": 1,
+          "wall_ms": 709.784494,
+          "thread_cpu_ms": 2.621649
+        },
+        "cgroup.attach": {
+          "calls": 1,
+          "wall_ms": 1.592814,
+          "thread_cpu_ms": 1.326111
+        },
+        "cgroup.wait_empty": {
+          "calls": 2,
+          "wall_ms": 21.051063,
+          "thread_cpu_ms": 0.865148
+        },
+        "cgroup.quiesce_empty": {
+          "calls": 1,
+          "wall_ms": 1.460269,
+          "thread_cpu_ms": 1.458684
+        },
+        "cgroup.freeze": {
+          "calls": 1,
+          "wall_ms": 1.125794,
+          "thread_cpu_ms": 1.125768
+        },
+        "core._save_durable": {
+          "calls": 2,
+          "wall_ms": 81.853924,
+          "thread_cpu_ms": 1.738803
+        },
+        "python.fsync": {
+          "calls": 4,
+          "wall_ms": 69.659881,
+          "thread_cpu_ms": 0.244882
+        },
+        "cgroup.remove": {
+          "calls": 1,
+          "wall_ms": 1.103564,
+          "thread_cpu_ms": 1.092017
+        },
+        "framework.close": {
+          "calls": 1,
+          "wall_ms": 0.01843,
+          "thread_cpu_ms": 0.01413
+        }
+      },
+      "syscalls": {}
+    }
+  ],
+  "notes": [
+    "method timers are inclusive/nested, NOT additive",
+    "thread_cpu_ms covers only the Python calling thread, not Observer CPU",
+    "strace syscall durations may overlap across threads and add tracing overhead"
+  ],
+  "medians": {
+    "off": {
+      "metrics": {
+        "wall_ms": 3438.6198525,
+        "task_ms": 1984.4226655000002,
+        "pre_start_ms": 0.07373650000000001,
+        "launch_ms": 727.1947875,
+        "execution_until_root_exit_ms": 2568.855211,
+        "post_exit_ms": 86.96651
+      },
+      "methods": {
+        "cgroup.attach": {
+          "calls": 1.0,
+          "wall_ms": 1.593329,
+          "thread_cpu_ms": 1.3029935
+        },
+        "cgroup.freeze": {
+          "calls": 1.0,
+          "wall_ms": 1.2443629999999999,
+          "thread_cpu_ms": 1.244921
+        },
+        "cgroup.quiesce_empty": {
+          "calls": 1.0,
+          "wall_ms": 1.6862335000000002,
+          "thread_cpu_ms": 1.6825925
+        },
+        "cgroup.remove": {
+          "calls": 1.0,
+          "wall_ms": 1.221662,
+          "thread_cpu_ms": 1.2073285
+        },
+        "cgroup.wait_empty": {
+          "calls": 2.0,
+          "wall_ms": 1.483252,
+          "thread_cpu_ms": 0.781655
+        },
+        "core._save": {
+          "calls": 2.0,
+          "wall_ms": 7.8725795000000005,
+          "thread_cpu_ms": 1.369075
+        },
+        "core._save_durable": {
+          "calls": 2.0,
+          "wall_ms": 71.53827100000001,
+          "thread_cpu_ms": 1.871351
+        },
+        "core._wait_stopped": {
+          "calls": 1.0,
+          "wall_ms": 709.7884385,
+          "thread_cpu_ms": 2.925942
+        },
+        "core.start": {
+          "calls": 1.0,
+          "wall_ms": 727.1947875,
+          "thread_cpu_ms": 8.584987
+        },
+        "framework.close": {
+          "calls": 1.0,
+          "wall_ms": 0.022769,
+          "thread_cpu_ms": 0.0170115
+        },
+        "python.fsync": {
+          "calls": 4.0,
+          "wall_ms": 60.8473895,
+          "thread_cpu_ms": 0.25242
+        }
+      }
+    },
+    "batch": {
+      "metrics": {
+        "wall_ms": 7265.87529,
+        "task_ms": 2237.8140505,
+        "pre_start_ms": 77.42992799999999,
+        "launch_ms": 1388.2267415000001,
+        "execution_until_root_exit_ms": 2838.398197,
+        "post_exit_ms": 2856.1417920000004
+      },
+      "methods": {
+        "cgroup.attach": {
+          "calls": 1.0,
+          "wall_ms": 1.5787214999999999,
+          "thread_cpu_ms": 1.3587099999999999
+        },
+        "cgroup.freeze": {
+          "calls": 2.0,
+          "wall_ms": 2.4957355,
+          "thread_cpu_ms": 2.017594
+        },
+        "cgroup.quiesce_empty": {
+          "calls": 1.0,
+          "wall_ms": 1.4798209999999998,
+          "thread_cpu_ms": 1.4787325
+        },
+        "cgroup.remove": {
+          "calls": 1.0,
+          "wall_ms": 1.1438525,
+          "thread_cpu_ms": 1.143084
+        },
+        "cgroup.thaw": {
+          "calls": 1.0,
+          "wall_ms": 1.155903,
+          "thread_cpu_ms": 1.1324085
+        },
+        "cgroup.wait_empty": {
+          "calls": 2.0,
+          "wall_ms": 0.7178165000000001,
+          "thread_cpu_ms": 0.6885300000000001
+        },
+        "collector.ingest": {
+          "calls": 6.0,
+          "wall_ms": 219.493753,
+          "thread_cpu_ms": 5.438824
+        },
+        "collector.ingest_group": {
+          "calls": 13.0,
+          "wall_ms": 554.9642915,
+          "thread_cpu_ms": 20.7354235
+        },
+        "core._save": {
+          "calls": 1.0,
+          "wall_ms": 5.1612775,
+          "thread_cpu_ms": 0.682476
+        },
+        "core._save_durable": {
+          "calls": 3.0,
+          "wall_ms": 122.2179085,
+          "thread_cpu_ms": 2.952833
+        },
+        "core._target_identity": {
+          "calls": 2.0,
+          "wall_ms": 1.524906,
+          "thread_cpu_ms": 1.5232785
+        },
+        "core._wait_inner_gate": {
+          "calls": 1.0,
+          "wall_ms": 53.5110905,
+          "thread_cpu_ms": 2.4739424999999997
+        },
+        "core._wait_stopped": {
+          "calls": 1.0,
+          "wall_ms": 701.737984,
+          "thread_cpu_ms": 2.9586415
+        },
+        "core.start": {
+          "calls": 1.0,
+          "wall_ms": 1388.2267415000001,
+          "thread_cpu_ms": 23.371503500000003
+        },
+        "features.execution_finished": {
+          "calls": 1.0,
+          "wall_ms": 26.3513885,
+          "thread_cpu_ms": 1.2967125
+        },
+        "features.execution_started": {
+          "calls": 1.0,
+          "wall_ms": 36.945828500000005,
+          "thread_cpu_ms": 1.7286160000000002
+        },
+        "features.start_execution": {
+          "calls": 1.0,
+          "wall_ms": 393.475098,
+          "thread_cpu_ms": 3.4777085000000003
+        },
+        "framework.close": {
+          "calls": 1.0,
+          "wall_ms": 0.0126685,
+          "thread_cpu_ms": 0.0101185
+        },
+        "observer.__init__": {
+          "calls": 1.0,
+          "wall_ms": 391.45094700000004,
+          "thread_cpu_ms": 3.0887244999999997
+        },
+        "observer._receive.FINISHED": {
+          "calls": 1.0,
+          "wall_ms": 2348.1656265,
+          "thread_cpu_ms": 0.07485649999999999
+        },
+        "observer._receive.READY": {
+          "calls": 1.0,
+          "wall_ms": 338.5381725,
+          "thread_cpu_ms": 0.080604
+        },
+        "observer._require_observer_exit": {
+          "calls": 1.0,
+          "wall_ms": 3.346765,
+          "thread_cpu_ms": 0.154522
+        },
+        "observer._run_verifier": {
+          "calls": 1.0,
+          "wall_ms": 220.311019,
+          "thread_cpu_ms": 1.43031
+        },
+        "observer._send": {
+          "calls": 1.0,
+          "wall_ms": 0.1031725,
+          "thread_cpu_ms": 0.1026155
+        },
+        "observer._shutdown": {
+          "calls": 1.0,
+          "wall_ms": 0.5624914999999999,
+          "thread_cpu_ms": 0.1777125
+        },
+        "observer._validate_offline_verification": {
+          "calls": 1.0,
+          "wall_ms": 0.035192,
+          "thread_cpu_ms": 0.032415
+        },
+        "observer._validate_quiescence": {
+          "calls": 1.0,
+          "wall_ms": 0.02632,
+          "thread_cpu_ms": 0.0256035
+        },
+        "observer._validate_ready": {
+          "calls": 1.0,
+          "wall_ms": 3.2127835,
+          "thread_cpu_ms": 0.925446
+        },
+        "observer._validate_terminal_artifacts": {
+          "calls": 1.0,
+          "wall_ms": 9.303014999999998,
+          "thread_cpu_ms": 2.0531995
+        },
+        "observer.finish": {
+          "calls": 1.0,
+          "wall_ms": 2676.8102390000004,
+          "thread_cpu_ms": 6.5926765
+        },
+        "observer.write_file": {
+          "calls": 4.0,
+          "wall_ms": 128.116773,
+          "thread_cpu_ms": 2.324427
+        },
+        "python.fsync": {
+          "calls": 14.0,
+          "wall_ms": 225.8410595,
+          "thread_cpu_ms": 0.9789345
+        }
+      }
+    }
+  }
+}

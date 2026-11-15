@@ -1,0 +1,31 @@
+--- a/include/trace/events/sched.h
++++ b/include/trace/events/sched.h
+@@ -333,3 +333,20 @@
+-DEFINE_EVENT(sched_process_template, sched_process_exit,
+-	     TP_PROTO(struct task_struct *p),
+-	     TP_ARGS(p));
++/* Backport the upstream 6.16 exit tracepoint ABI for the pinned Observer. */
++TRACE_EVENT(sched_process_exit,
++	TP_PROTO(struct task_struct *p, bool group_dead),
++	TP_ARGS(p, group_dead),
++	TP_STRUCT__entry(
++		__array(char, comm, TASK_COMM_LEN)
++		__field(pid_t, pid)
++		__field(int, prio)
++		__field(bool, group_dead)
++	),
++	TP_fast_assign(
++		memcpy(__entry->comm, p->comm, TASK_COMM_LEN);
++		__entry->pid = p->pid;
++		__entry->prio = p->prio;
++		__entry->group_dead = group_dead;
++	),
++	TP_printk("comm=%s pid=%d prio=%d group_dead=%s",
++		__entry->comm, __entry->pid, __entry->prio,
++		__entry->group_dead ? "true" : "false")
++);
+--- a/kernel/exit.c
++++ b/kernel/exit.c
+@@ -945 +945 @@
+-	trace_sched_process_exit(tsk);
++	trace_sched_process_exit(tsk, group_dead);

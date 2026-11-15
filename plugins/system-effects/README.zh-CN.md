@@ -2,6 +2,29 @@
 
 [English](README.md) | 简体中文
 
+## 可选常驻 Observer／探针（实验性）
+
+可信 feature 配置增加 `resident_observer: true`，并使用
+[配套 Rust Observer 补丁](observer/README.md) 编译的二进制。默认关闭，
+保留原来的单次启动方式。目前只接受 balanced、expanded partial、无可选状态
+scope／恢复 helper 的观测 v2；恢复 v3 仍用单次模式，不会静默删减观测范围。
+
+同一 daemon 进程内串行复用一个 Worker 和主探针，仍保留 host lock。
+每个 run 单独建立身份、nonce、回调、WAL、JSONL、证据目录及独立 verifier。
+只有排空、注销、状态 map 清空、持久化封存成功且收到绑定该 run 的 IDLE ACK
+后才允许复用。两条异步 TCP producer link 仍在每次封存时卸载、下次重建。
+`wait()` 表示收到封存 ACK，不再冒充 Observer OS 进程退出。
+
+feature／service 关闭只释放自己的 run；应用／VM 关闭时调用
+`allox_system_effects.resident.shutdown_resident_observers()` 统一卸载，另有
+`atexit` 兜底；原生 Worker 的 stdin EOF 也会使其退出。任何协议、清空或验证失败
+都会毒化并终止 Worker，维持 Session 的失败封禁，不自动重启。
+修复故障后需显式关闭并重建；变更配置、累计 4096 个 run 后也需显式重启。
+该注册表不支持 fork 后复用。这不改变现有 PARTIAL／INCOMPLETE 语义。
+
+117 实测及故障注入见
+[实验报告](../../docs/development/monitor-resident-20261115.md)。
+
 `allox-system-effects` 是 Allox Workspace Daemon 的系统效果观测插件。它在命令运行前后采集状态，并用 eBPF 记录命令进程树产生的 syscall、内核对象和进程生命周期证据。
 
 ## 它在 Allox 中怎样工作
@@ -43,7 +66,9 @@ scope 中可能看到 `.allox-tmp` 等执行层效果；这能证明效果来自
 
 - cgroup v2，并支持 `cgroup.freeze`；
 - BTF；
+- syscall tracepoints，以及已挂载的 tracefs（检查 `/sys/kernel/tracing/events/raw_syscalls/sys_enter/id`）；
 - BPF LSM；
+- 所选 Observer 的全部 hook ABI；当前对象解析使用 `file_post_open`，只有 BTF/LSM 开关仍不足以保证可加载；
 - Bubblewrap；
 - Btrfs；Allox workspace root 必须位于 Btrfs 上；
 - root 或具备等价特权的 daemon。
@@ -60,6 +85,10 @@ findmnt -T /var/lib/allox/workspaces -no FSTYPE
 ```
 
 最后一条必须输出 `btrfs`。推荐内核配置见 [kernel/allox-system-effects.config](kernel/allox-system-effects.config)。
+
+6.1 测试内核即使开启 BTF、BPF LSM，也缺少当前 Observer 使用的 `file_post_open` hook。
+Linux 6.12 的[上游 hook 定义](https://github.com/torvalds/linux/blob/v6.12/include/linux/lsm_hook_defs.h)
+包含该接口。应按固定 Observer 对象和实际内核做加载验证，不得静默跳过 hook 后仍宣称对象覆盖完整。
 
 ## 2. 构建 Observer
 

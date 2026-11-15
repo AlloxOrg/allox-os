@@ -1,0 +1,13 @@
+--- a/src/common.rs
++++ b/src/common.rs
+@@ -159,7 +159,9 @@
+ pub(crate) fn do_bind(sockaddr: &str) -> Result<(RawFd, Domain)> {
+     let (fd, domain, sockaddr) = make_socket((sockaddr, VMADDR_CID_ANY))?;
+ 
+-    setsockopt(fd, sockopt::ReusePort, &true)?;
++    // make_socket supports AF_UNIX and AF_VSOCK, neither is INET.
++    // Linux 6.12 rejects SO_REUSEPORT on non-INET sockets. It is not
++    // required for the agent's single-listener Unix/vsock endpoints.
+     bind(fd, sockaddr.as_ref()).map_err(err_to_others_err!(e, ""))?;
+ 
+     Ok((fd, domain))

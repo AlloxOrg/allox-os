@@ -1,1 +1,5 @@
 *.sh text eol=lf
+# Patch context prefixes are structural whitespace, not source lint errors.
+*.patch text eol=lf whitespace=-blank-at-eol,-space-before-tab
+# Preserve the original terminal progress/CR bytes in this captured build log.
+docs/development/evidence/monitor-resident-20261115/build.log -text -whitespace

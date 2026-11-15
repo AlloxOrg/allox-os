@@ -1,0 +1,1641 @@
+{
+  "attempt": "/data/hy/Allox/monitor-e2e-20261114/attempt-be59046548",
+  "passed": true,
+  "pairs_per_phase": 10,
+  "groups": {
+    "baseline/off": {
+      "wall_ms": {
+        "median": 3375.1705995,
+        "mean": 3393.5578566,
+        "min": 3150.626198,
+        "max": 3892.609738
+      },
+      "task_ms": {
+        "median": 1982.6817715,
+        "mean": 1997.9591415999998,
+        "min": 1815.420897,
+        "max": 2304.633206
+      }
+    },
+    "baseline/one-shot": {
+      "wall_ms": {
+        "median": 7456.6073455000005,
+        "mean": 7415.2714311,
+        "min": 6989.949513,
+        "max": 8113.797706
+      },
+      "task_ms": {
+        "median": 2228.110017,
+        "mean": 2301.2221965,
+        "min": 2073.779083,
+        "max": 2974.742592
+      }
+    },
+    "baseline/paired-added-ms": {
+      "median": 3956.7063614999997,
+      "mean": 4021.7135745,
+      "samples": [
+        3895.882847,
+        4072.4393950000003,
+        3953.465161,
+        3824.998446,
+        4057.474291,
+        3959.947562,
+        3632.92969,
+        3839.3233149999996,
+        4642.715484,
+        4337.959553999999
+      ]
+    },
+    "resident/off": {
+      "wall_ms": {
+        "median": 3388.51303,
+        "mean": 3393.9719723,
+        "min": 3047.585707,
+        "max": 3670.240162
+      },
+      "task_ms": {
+        "median": 1895.6505085,
+        "mean": 1913.9293808,
+        "min": 1742.708888,
+        "max": 2122.739931
+      }
+    },
+    "resident/resident": {
+      "wall_ms": {
+        "median": 5186.078889,
+        "mean": 5247.4207968,
+        "min": 4986.844393,
+        "max": 5743.260685
+      },
+      "task_ms": {
+        "median": 2191.604217,
+        "mean": 2217.551891,
+        "min": 2109.103901,
+        "max": 2447.96461
+      }
+    },
+    "resident/paired-added-ms": {
+      "median": 1812.1456020000003,
+      "mean": 1853.4488245,
+      "samples": [
+        1755.5912150000004,
+        2252.925715,
+        1548.2189180000005,
+        2135.0407560000003,
+        1885.7488990000002,
+        2054.39308,
+        1619.9085479999999,
+        1666.3761779999995,
+        1868.6999890000002,
+        1747.5849469999998
+      ]
+    }
+  },
+  "paired_added_latency_reduction_percent": 54.20065487717894,
+  "direct_on_median_reduction_percent": 30.449886272612236,
+  "cold_run_ms": 5425.831377,
+  "warm_run_median_ms": 5101.978787,
+  "shutdown": {
+    "worker_pid": 1193,
+    "runs": 10,
+    "shutdown_ns": 1850168470,
+    "poisoned": null,
+    "exit_code": 0
+  },
+  "resident_mean_including_shutdown_ms": 5432.4376438,
+  "rows": [
+    {
+      "label": "baseline-0-one-shot",
+      "phase": "baseline",
+      "lifetime": "one-shot",
+      "wall_ms": 7116.518188,
+      "task_ms": 2282.413809,
+      "sdk_events": 72,
+      "resident_before": {
+        "present": false
+      },
+      "resident": null
+    },
+    {
+      "label": "baseline-0-off",
+      "phase": "baseline",
+      "lifetime": "off",
+      "wall_ms": 3220.635341,
+      "task_ms": 1854.256974,
+      "sdk_events": 0,
+      "resident_before": {
+        "present": false
+      },
+      "resident": null
+    },
+    {
+      "label": "baseline-1-off",
+      "phase": "baseline",
+      "lifetime": "off",
+      "wall_ms": 3361.243154,
+      "task_ms": 1815.420897,
+      "sdk_events": 0,
+      "resident_before": {
+        "present": false
+      },
+      "resident": null
+    },
+    {
+      "label": "baseline-1-one-shot",
+      "phase": "baseline",
+      "lifetime": "one-shot",
+      "wall_ms": 7433.682549,
+      "task_ms": 2137.725564,
+      "sdk_events": 72,
+      "resident_before": {
+        "present": false
+      },
+      "resident": null
+    },
+    {
+      "label": "baseline-2-one-shot",
+      "phase": "baseline",
+      "lifetime": "one-shot",
+      "wall_ms": 7148.423678,
+      "task_ms": 2098.353222,
+      "sdk_events": 72,
+      "resident_before": {
+        "present": false
+      },
+      "resident": null
+    },
+    {
+      "label": "baseline-2-off",
+      "phase": "baseline",
+      "lifetime": "off",
+      "wall_ms": 3194.958517,
+      "task_ms": 1957.60784,
+      "sdk_events": 0,
+      "resident_before": {
+        "present": false
+      },
+      "resident": null
+    },
+    {
+      "label": "baseline-3-off",
+      "phase": "baseline",
+      "lifetime": "off",
+      "wall_ms": 3389.098045,
+      "task_ms": 2007.755703,
+      "sdk_events": 0,
+      "resident_before": {
+        "present": false
+      },
+      "resident": null
+    },
+    {
+      "label": "baseline-3-one-shot",
+      "phase": "baseline",
+      "lifetime": "one-shot",
+      "wall_ms": 7214.096491,
+      "task_ms": 2205.021492,
+      "sdk_events": 72,
+      "resident_before": {
+        "present": false
+      },
+      "resident": null
+    },
+    {
+      "label": "baseline-4-one-shot",
+      "phase": "baseline",
+      "lifetime": "one-shot",
+      "wall_ms": 7479.532142,
+      "task_ms": 2073.779083,
+      "sdk_events": 72,
+      "resident_before": {
+        "present": false
+      },
+      "resident": null
+    },
+    {
+      "label": "baseline-4-off",
+      "phase": "baseline",
+      "lifetime": "off",
+      "wall_ms": 3422.057851,
+      "task_ms": 2045.832815,
+      "sdk_events": 0,
+      "resident_before": {
+        "present": false
+      },
+      "resident": null
+    },
+    {
+      "label": "baseline-5-off",
+      "phase": "baseline",
+      "lifetime": "off",
+      "wall_ms": 3667.754681,
+      "task_ms": 2244.105297,
+      "sdk_events": 0,
+      "resident_before": {
+        "present": false
+      },
+      "resident": null
+    },
+    {
+      "label": "baseline-5-one-shot",
+      "phase": "baseline",
+      "lifetime": "one-shot",
+      "wall_ms": 7627.702243,
+      "task_ms": 2251.018149,
+      "sdk_events": 72,
+      "resident_before": {
+        "present": false
+      },
+      "resident": null
+    },
+    {
+      "label": "baseline-6-one-shot",
+      "phase": "baseline",
+      "lifetime": "one-shot",
+      "wall_ms": 7525.539428,
+      "task_ms": 2205.201885,
+      "sdk_events": 72,
+      "resident_before": {
+        "present": false
+      },
+      "resident": null
+    },
+    {
+      "label": "baseline-6-off",
+      "phase": "baseline",
+      "lifetime": "off",
+      "wall_ms": 3892.609738,
+      "task_ms": 2304.633206,
+      "sdk_events": 0,
+      "resident_before": {
+        "present": false
+      },
+      "resident": null
+    },
+    {
+      "label": "baseline-7-off",
+      "phase": "baseline",
+      "lifetime": "off",
+      "wall_ms": 3150.626198,
+      "task_ms": 1819.415595,
+      "sdk_events": 0,
+      "resident_before": {
+        "present": false
+      },
+      "resident": null
+    },
+    {
+      "label": "baseline-7-one-shot",
+      "phase": "baseline",
+      "lifetime": "one-shot",
+      "wall_ms": 6989.949513,
+      "task_ms": 2350.530308,
+      "sdk_events": 72,
+      "resident_before": {
+        "present": false
+      },
+      "resident": null
+    },
+    {
+      "label": "baseline-8-one-shot",
+      "phase": "baseline",
+      "lifetime": "one-shot",
+      "wall_ms": 8113.797706,
+      "task_ms": 2974.742592,
+      "sdk_events": 72,
+      "resident_before": {
+        "present": false
+      },
+      "resident": null
+    },
+    {
+      "label": "baseline-8-off",
+      "phase": "baseline",
+      "lifetime": "off",
+      "wall_ms": 3471.082222,
+      "task_ms": 2062.094366,
+      "sdk_events": 0,
+      "resident_before": {
+        "present": false
+      },
+      "resident": null
+    },
+    {
+      "label": "baseline-9-off",
+      "phase": "baseline",
+      "lifetime": "off",
+      "wall_ms": 3165.512819,
+      "task_ms": 1868.468723,
+      "sdk_events": 0,
+      "resident_before": {
+        "present": false
+      },
+      "resident": null
+    },
+    {
+      "label": "baseline-9-one-shot",
+      "phase": "baseline",
+      "lifetime": "one-shot",
+      "wall_ms": 7503.472373,
+      "task_ms": 2433.435861,
+      "sdk_events": 72,
+      "resident_before": {
+        "present": false
+      },
+      "resident": null
+    },
+    {
+      "label": "resident-0-resident",
+      "phase": "resident",
+      "lifetime": "resident",
+      "wall_ms": 5425.831377,
+      "task_ms": 2141.273827,
+      "sdk_events": 72,
+      "resident_before": {
+        "present": false
+      },
+      "resident": {
+        "worker_pid": 1193,
+        "artifact_manifest_sha256": "93eb4beaa136c2abef2bbc2f0a836f15352337411fe7c6a93ead8390c2e7c4b6",
+        "epoch": 1,
+        "finish_nonce": "2ad42e4c0301c8d39eb7859d2089b2725f9b2eb99879385a7fa30fd43546dbae",
+        "kernel_objects_reused": false,
+        "report_sha256": "0b7b805fda39828650d3cc84f4ab1d0ffba1945817c5b2586668715b46b47dc0",
+        "resident_objects": [
+          {
+            "link_ids": [
+              251,
+              252,
+              253,
+              254,
+              255,
+              256,
+              257,
+              258,
+              259,
+              260,
+              261,
+              262,
+              263,
+              264,
+              265,
+              266,
+              267,
+              268,
+              269,
+              270
+            ],
+            "map_ids": [
+              191,
+              192,
+              193,
+              194,
+              195,
+              196,
+              197,
+              198,
+              199,
+              200,
+              201,
+              202,
+              203,
+              204
+            ],
+            "program_ids": [
+              317,
+              318,
+              319,
+              320,
+              321,
+              322,
+              323,
+              324,
+              325,
+              326,
+              327,
+              328,
+              329,
+              330,
+              331,
+              332,
+              333,
+              334,
+              335,
+              336,
+              337,
+              338
+            ]
+          },
+          {
+            "link_ids": [
+              273,
+              274,
+              275
+            ],
+            "map_ids": [
+              205,
+              206,
+              207,
+              208,
+              209
+            ],
+            "program_ids": [
+              341,
+              342,
+              343
+            ]
+          }
+        ],
+        "resident_protocol": 1,
+        "resident_resources": 2,
+        "run_id": "e14f57e3910c4c37833dd9a7ba459094",
+        "sequence": 1,
+        "status": "IDLE"
+      }
+    },
+    {
+      "label": "resident-0-off",
+      "phase": "resident",
+      "lifetime": "off",
+      "wall_ms": 3670.240162,
+      "task_ms": 1821.170692,
+      "sdk_events": 0,
+      "resident_before": {
+        "present": true,
+        "worker_pid": 1193,
+        "runs": 1,
+        "poisoned": null,
+        "alive": true
+      },
+      "resident": null
+    },
+    {
+      "label": "resident-1-off",
+      "phase": "resident",
+      "lifetime": "off",
+      "wall_ms": 3297.853278,
+      "task_ms": 1959.539472,
+      "sdk_events": 0,
+      "resident_before": {
+        "present": true,
+        "worker_pid": 1193,
+        "runs": 1,
+        "poisoned": null,
+        "alive": true
+      },
+      "resident": null
+    },
+    {
+      "label": "resident-1-resident",
+      "phase": "resident",
+      "lifetime": "resident",
+      "wall_ms": 5550.778993,
+      "task_ms": 2447.96461,
+      "sdk_events": 72,
+      "resident_before": {
+        "present": true,
+        "worker_pid": 1193,
+        "runs": 1,
+        "poisoned": null,
+        "alive": true
+      },
+      "resident": {
+        "worker_pid": 1193,
+        "artifact_manifest_sha256": "c2599b33e03267161f5b202cec4f597f0094c2e9d31184dfe21fe34f96f76db2",
+        "epoch": 1,
+        "finish_nonce": "8b13492c0f434c2c25bc9235860b6b37ac1bc1ce8235d6d19946bd65b3303bbc",
+        "kernel_objects_reused": true,
+        "report_sha256": "a8d7c5ec9f16197313be37d65a96bf21b59a0c14b686e2e0d39112484b46b59c",
+        "resident_objects": [
+          {
+            "link_ids": [
+              251,
+              252,
+              253,
+              254,
+              255,
+              256,
+              257,
+              258,
+              259,
+              260,
+              261,
+              262,
+              263,
+              264,
+              265,
+              266,
+              267,
+              268,
+              269,
+              270
+            ],
+            "map_ids": [
+              191,
+              192,
+              193,
+              194,
+              195,
+              196,
+              197,
+              198,
+              199,
+              200,
+              201,
+              202,
+              203,
+              204
+            ],
+            "program_ids": [
+              317,
+              318,
+              319,
+              320,
+              321,
+              322,
+              323,
+              324,
+              325,
+              326,
+              327,
+              328,
+              329,
+              330,
+              331,
+              332,
+              333,
+              334,
+              335,
+              336,
+              337,
+              338
+            ]
+          },
+          {
+            "link_ids": [
+              273,
+              274,
+              275
+            ],
+            "map_ids": [
+              205,
+              206,
+              207,
+              208,
+              209
+            ],
+            "program_ids": [
+              341,
+              342,
+              343
+            ]
+          }
+        ],
+        "resident_protocol": 1,
+        "resident_resources": 2,
+        "run_id": "983ee051485949019d88a66655f03258",
+        "sequence": 2,
+        "status": "IDLE"
+      }
+    },
+    {
+      "label": "resident-2-resident",
+      "phase": "resident",
+      "lifetime": "resident",
+      "wall_ms": 5069.924227,
+      "task_ms": 2243.815971,
+      "sdk_events": 72,
+      "resident_before": {
+        "present": true,
+        "worker_pid": 1193,
+        "runs": 2,
+        "poisoned": null,
+        "alive": true
+      },
+      "resident": {
+        "worker_pid": 1193,
+        "artifact_manifest_sha256": "67bb979e2bc4a568db8290f166ef4b612cab833af0af6ab3e5267bd6dabad896",
+        "epoch": 1,
+        "finish_nonce": "714c41eefc177e94273cfa8a4b453342287fa12d7e9ca70d776058384a276569",
+        "kernel_objects_reused": true,
+        "report_sha256": "91eddb01f4b3dc221856e711d35e63b5a6ea9d1f39f00863c57e4cb56f526fd8",
+        "resident_objects": [
+          {
+            "link_ids": [
+              251,
+              252,
+              253,
+              254,
+              255,
+              256,
+              257,
+              258,
+              259,
+              260,
+              261,
+              262,
+              263,
+              264,
+              265,
+              266,
+              267,
+              268,
+              269,
+              270
+            ],
+            "map_ids": [
+              191,
+              192,
+              193,
+              194,
+              195,
+              196,
+              197,
+              198,
+              199,
+              200,
+              201,
+              202,
+              203,
+              204
+            ],
+            "program_ids": [
+              317,
+              318,
+              319,
+              320,
+              321,
+              322,
+              323,
+              324,
+              325,
+              326,
+              327,
+              328,
+              329,
+              330,
+              331,
+              332,
+              333,
+              334,
+              335,
+              336,
+              337,
+              338
+            ]
+          },
+          {
+            "link_ids": [
+              273,
+              274,
+              275
+            ],
+            "map_ids": [
+              205,
+              206,
+              207,
+              208,
+              209
+            ],
+            "program_ids": [
+              341,
+              342,
+              343
+            ]
+          }
+        ],
+        "resident_protocol": 1,
+        "resident_resources": 2,
+        "run_id": "28d39fd3beae4b3ab2cd035e01826894",
+        "sequence": 3,
+        "status": "IDLE"
+      }
+    },
+    {
+      "label": "resident-2-off",
+      "phase": "resident",
+      "lifetime": "off",
+      "wall_ms": 3521.705309,
+      "task_ms": 2122.739931,
+      "sdk_events": 0,
+      "resident_before": {
+        "present": true,
+        "worker_pid": 1193,
+        "runs": 3,
+        "poisoned": null,
+        "alive": true
+      },
+      "resident": null
+    },
+    {
+      "label": "resident-3-off",
+      "phase": "resident",
+      "lifetime": "off",
+      "wall_ms": 3608.219929,
+      "task_ms": 2023.063318,
+      "sdk_events": 0,
+      "resident_before": {
+        "present": true,
+        "worker_pid": 1193,
+        "runs": 3,
+        "poisoned": null,
+        "alive": true
+      },
+      "resident": null
+    },
+    {
+      "label": "resident-3-resident",
+      "phase": "resident",
+      "lifetime": "resident",
+      "wall_ms": 5743.260685,
+      "task_ms": 2322.27403,
+      "sdk_events": 72,
+      "resident_before": {
+        "present": true,
+        "worker_pid": 1193,
+        "runs": 3,
+        "poisoned": null,
+        "alive": true
+      },
+      "resident": {
+        "worker_pid": 1193,
+        "artifact_manifest_sha256": "453f8a11e1f97d7c644f9c9a7550c8d762f785b57eb77ae336a004ba8dc3a9e9",
+        "epoch": 1,
+        "finish_nonce": "194ee49a148ac61801797337e5c33e1aa433a52d57683023465d1d5c7576e869",
+        "kernel_objects_reused": true,
+        "report_sha256": "2340d2c35e0c523aa62d9d26c5abd120c842d079e09ee38022d5bf9b16e86226",
+        "resident_objects": [
+          {
+            "link_ids": [
+              251,
+              252,
+              253,
+              254,
+              255,
+              256,
+              257,
+              258,
+              259,
+              260,
+              261,
+              262,
+              263,
+              264,
+              265,
+              266,
+              267,
+              268,
+              269,
+              270
+            ],
+            "map_ids": [
+              191,
+              192,
+              193,
+              194,
+              195,
+              196,
+              197,
+              198,
+              199,
+              200,
+              201,
+              202,
+              203,
+              204
+            ],
+            "program_ids": [
+              317,
+              318,
+              319,
+              320,
+              321,
+              322,
+              323,
+              324,
+              325,
+              326,
+              327,
+              328,
+              329,
+              330,
+              331,
+              332,
+              333,
+              334,
+              335,
+              336,
+              337,
+              338
+            ]
+          },
+          {
+            "link_ids": [
+              273,
+              274,
+              275
+            ],
+            "map_ids": [
+              205,
+              206,
+              207,
+              208,
+              209
+            ],
+            "program_ids": [
+              341,
+              342,
+              343
+            ]
+          }
+        ],
+        "resident_protocol": 1,
+        "resident_resources": 2,
+        "run_id": "f8d440ed243c4b7e8acc7447c5c5c218",
+        "sequence": 4,
+        "status": "IDLE"
+      }
+    },
+    {
+      "label": "resident-4-resident",
+      "phase": "resident",
+      "lifetime": "resident",
+      "wall_ms": 5307.518559,
+      "task_ms": 2229.913181,
+      "sdk_events": 72,
+      "resident_before": {
+        "present": true,
+        "worker_pid": 1193,
+        "runs": 4,
+        "poisoned": null,
+        "alive": true
+      },
+      "resident": {
+        "worker_pid": 1193,
+        "artifact_manifest_sha256": "ebe703a434858b4cba24995337fdc569ff7141327953849fd4e32db5a9e78d1d",
+        "epoch": 1,
+        "finish_nonce": "8112502f12e6b64c69fdb0a431b415e98984c1e35c6a452b1782cd5ff147fc16",
+        "kernel_objects_reused": true,
+        "report_sha256": "f46cf3111c35833b7f2ed16bbb6ab143baeef57133c7ce2a6eeddbb12b84dc31",
+        "resident_objects": [
+          {
+            "link_ids": [
+              251,
+              252,
+              253,
+              254,
+              255,
+              256,
+              257,
+              258,
+              259,
+              260,
+              261,
+              262,
+              263,
+              264,
+              265,
+              266,
+              267,
+              268,
+              269,
+              270
+            ],
+            "map_ids": [
+              191,
+              192,
+              193,
+              194,
+              195,
+              196,
+              197,
+              198,
+              199,
+              200,
+              201,
+              202,
+              203,
+              204
+            ],
+            "program_ids": [
+              317,
+              318,
+              319,
+              320,
+              321,
+              322,
+              323,
+              324,
+              325,
+              326,
+              327,
+              328,
+              329,
+              330,
+              331,
+              332,
+              333,
+              334,
+              335,
+              336,
+              337,
+              338
+            ]
+          },
+          {
+            "link_ids": [
+              273,
+              274,
+              275
+            ],
+            "map_ids": [
+              205,
+              206,
+              207,
+              208,
+              209
+            ],
+            "program_ids": [
+              341,
+              342,
+              343
+            ]
+          }
+        ],
+        "resident_protocol": 1,
+        "resident_resources": 2,
+        "run_id": "57509a009e0444238bfdc2e4f4f931eb",
+        "sequence": 5,
+        "status": "IDLE"
+      }
+    },
+    {
+      "label": "resident-4-off",
+      "phase": "resident",
+      "lifetime": "off",
+      "wall_ms": 3421.76966,
+      "task_ms": 2052.892212,
+      "sdk_events": 0,
+      "resident_before": {
+        "present": true,
+        "worker_pid": 1193,
+        "runs": 5,
+        "poisoned": null,
+        "alive": true
+      },
+      "resident": null
+    },
+    {
+      "label": "resident-5-off",
+      "phase": "resident",
+      "lifetime": "off",
+      "wall_ms": 3047.585707,
+      "task_ms": 1822.493053,
+      "sdk_events": 0,
+      "resident_before": {
+        "present": true,
+        "worker_pid": 1193,
+        "runs": 5,
+        "poisoned": null,
+        "alive": true
+      },
+      "resident": null
+    },
+    {
+      "label": "resident-5-resident",
+      "phase": "resident",
+      "lifetime": "resident",
+      "wall_ms": 5101.978787,
+      "task_ms": 2282.434477,
+      "sdk_events": 72,
+      "resident_before": {
+        "present": true,
+        "worker_pid": 1193,
+        "runs": 5,
+        "poisoned": null,
+        "alive": true
+      },
+      "resident": {
+        "worker_pid": 1193,
+        "artifact_manifest_sha256": "9d0bc583706e96b7a694ad29668bfc48900c44eb770fa396e42e8169401d17be",
+        "epoch": 1,
+        "finish_nonce": "fcea1ee2d749d08e4157cc844bbed259e6f774ffe79aa4c0368beacfa1dfd030",
+        "kernel_objects_reused": true,
+        "report_sha256": "32cdf8ea8c0e0e99a56780b75a999279d041532af6e60bbf02006fe8a8ac10ac",
+        "resident_objects": [
+          {
+            "link_ids": [
+              251,
+              252,
+              253,
+              254,
+              255,
+              256,
+              257,
+              258,
+              259,
+              260,
+              261,
+              262,
+              263,
+              264,
+              265,
+              266,
+              267,
+              268,
+              269,
+              270
+            ],
+            "map_ids": [
+              191,
+              192,
+              193,
+              194,
+              195,
+              196,
+              197,
+              198,
+              199,
+              200,
+              201,
+              202,
+              203,
+              204
+            ],
+            "program_ids": [
+              317,
+              318,
+              319,
+              320,
+              321,
+              322,
+              323,
+              324,
+              325,
+              326,
+              327,
+              328,
+              329,
+              330,
+              331,
+              332,
+              333,
+              334,
+              335,
+              336,
+              337,
+              338
+            ]
+          },
+          {
+            "link_ids": [
+              273,
+              274,
+              275
+            ],
+            "map_ids": [
+              205,
+              206,
+              207,
+              208,
+              209
+            ],
+            "program_ids": [
+              341,
+              342,
+              343
+            ]
+          }
+        ],
+        "resident_protocol": 1,
+        "resident_resources": 2,
+        "run_id": "301f6c2f21e44d4faba74deaf741c3e5",
+        "sequence": 6,
+        "status": "IDLE"
+      }
+    },
+    {
+      "label": "resident-6-resident",
+      "phase": "resident",
+      "lifetime": "resident",
+      "wall_ms": 5270.178991,
+      "task_ms": 2153.295253,
+      "sdk_events": 72,
+      "resident_before": {
+        "present": true,
+        "worker_pid": 1193,
+        "runs": 6,
+        "poisoned": null,
+        "alive": true
+      },
+      "resident": {
+        "worker_pid": 1193,
+        "artifact_manifest_sha256": "1b55fd454ff10fea6cc639c37c4ce51ccb1fc02cf542f856c3aa17a2dd2a424f",
+        "epoch": 1,
+        "finish_nonce": "5a5816e32d7b05707dbdd7028daa42a90eee468cf5fcb95428d607cc23468d3d",
+        "kernel_objects_reused": true,
+        "report_sha256": "fb020afa34f7bbe5676aafd07d013df7ea813a0685a6345623780b50d950862e",
+        "resident_objects": [
+          {
+            "link_ids": [
+              251,
+              252,
+              253,
+              254,
+              255,
+              256,
+              257,
+              258,
+              259,
+              260,
+              261,
+              262,
+              263,
+              264,
+              265,
+              266,
+              267,
+              268,
+              269,
+              270
+            ],
+            "map_ids": [
+              191,
+              192,
+              193,
+              194,
+              195,
+              196,
+              197,
+              198,
+              199,
+              200,
+              201,
+              202,
+              203,
+              204
+            ],
+            "program_ids": [
+              317,
+              318,
+              319,
+              320,
+              321,
+              322,
+              323,
+              324,
+              325,
+              326,
+              327,
+              328,
+              329,
+              330,
+              331,
+              332,
+              333,
+              334,
+              335,
+              336,
+              337,
+              338
+            ]
+          },
+          {
+            "link_ids": [
+              273,
+              274,
+              275
+            ],
+            "map_ids": [
+              205,
+              206,
+              207,
+              208,
+              209
+            ],
+            "program_ids": [
+              341,
+              342,
+              343
+            ]
+          }
+        ],
+        "resident_protocol": 1,
+        "resident_resources": 2,
+        "run_id": "27b63265e89e43499fa9921a39eee756",
+        "sequence": 7,
+        "status": "IDLE"
+      }
+    },
+    {
+      "label": "resident-6-off",
+      "phase": "resident",
+      "lifetime": "off",
+      "wall_ms": 3650.270443,
+      "task_ms": 1742.708888,
+      "sdk_events": 0,
+      "resident_before": {
+        "present": true,
+        "worker_pid": 1193,
+        "runs": 7,
+        "poisoned": null,
+        "alive": true
+      },
+      "resident": null
+    },
+    {
+      "label": "resident-7-off",
+      "phase": "resident",
+      "lifetime": "off",
+      "wall_ms": 3355.2564,
+      "task_ms": 1969.039277,
+      "sdk_events": 0,
+      "resident_before": {
+        "present": true,
+        "worker_pid": 1193,
+        "runs": 7,
+        "poisoned": null,
+        "alive": true
+      },
+      "resident": null
+    },
+    {
+      "label": "resident-7-resident",
+      "phase": "resident",
+      "lifetime": "resident",
+      "wall_ms": 5021.632578,
+      "task_ms": 2121.60319,
+      "sdk_events": 72,
+      "resident_before": {
+        "present": true,
+        "worker_pid": 1193,
+        "runs": 7,
+        "poisoned": null,
+        "alive": true
+      },
+      "resident": {
+        "worker_pid": 1193,
+        "artifact_manifest_sha256": "4246005f8696f9ad69e9991cf799084382ab6618f58684fdbc343ef9d6968cc1",
+        "epoch": 1,
+        "finish_nonce": "057c9939c41b0011cba1251a0587908c92819409ddcec82d7c16bd81df8cac51",
+        "kernel_objects_reused": true,
+        "report_sha256": "8a7f2c675025e7032a8559ae6e96422d4b6d561b8f1986f767f3a7827605c595",
+        "resident_objects": [
+          {
+            "link_ids": [
+              251,
+              252,
+              253,
+              254,
+              255,
+              256,
+              257,
+              258,
+              259,
+              260,
+              261,
+              262,
+              263,
+              264,
+              265,
+              266,
+              267,
+              268,
+              269,
+              270
+            ],
+            "map_ids": [
+              191,
+              192,
+              193,
+              194,
+              195,
+              196,
+              197,
+              198,
+              199,
+              200,
+              201,
+              202,
+              203,
+              204
+            ],
+            "program_ids": [
+              317,
+              318,
+              319,
+              320,
+              321,
+              322,
+              323,
+              324,
+              325,
+              326,
+              327,
+              328,
+              329,
+              330,
+              331,
+              332,
+              333,
+              334,
+              335,
+              336,
+              337,
+              338
+            ]
+          },
+          {
+            "link_ids": [
+              273,
+              274,
+              275
+            ],
+            "map_ids": [
+              205,
+              206,
+              207,
+              208,
+              209
+            ],
+            "program_ids": [
+              341,
+              342,
+              343
+            ]
+          }
+        ],
+        "resident_protocol": 1,
+        "resident_resources": 2,
+        "run_id": "2e796564d3c74975ba1e28eb0a711fde",
+        "sequence": 8,
+        "status": "IDLE"
+      }
+    },
+    {
+      "label": "resident-8-resident",
+      "phase": "resident",
+      "lifetime": "resident",
+      "wall_ms": 4986.844393,
+      "task_ms": 2123.84047,
+      "sdk_events": 72,
+      "resident_before": {
+        "present": true,
+        "worker_pid": 1193,
+        "runs": 8,
+        "poisoned": null,
+        "alive": true
+      },
+      "resident": {
+        "worker_pid": 1193,
+        "artifact_manifest_sha256": "77e38d0bb063bfddc95166785ce39f2dfdd14077ceb3564338f42928ac7ba322",
+        "epoch": 1,
+        "finish_nonce": "6b70d7be8648311e003b9808cdc8e17a7046dbf888ce1ac12cdd1057cba51162",
+        "kernel_objects_reused": true,
+        "report_sha256": "f0450f09d326865b195ddcb7eb21d69712c39c6877a8dada7fa3da08d8f13a4d",
+        "resident_objects": [
+          {
+            "link_ids": [
+              251,
+              252,
+              253,
+              254,
+              255,
+              256,
+              257,
+              258,
+              259,
+              260,
+              261,
+              262,
+              263,
+              264,
+              265,
+              266,
+              267,
+              268,
+              269,
+              270
+            ],
+            "map_ids": [
+              191,
+              192,
+              193,
+              194,
+              195,
+              196,
+              197,
+              198,
+              199,
+              200,
+              201,
+              202,
+              203,
+              204
+            ],
+            "program_ids": [
+              317,
+              318,
+              319,
+              320,
+              321,
+              322,
+              323,
+              324,
+              325,
+              326,
+              327,
+              328,
+              329,
+              330,
+              331,
+              332,
+              333,
+              334,
+              335,
+              336,
+              337,
+              338
+            ]
+          },
+          {
+            "link_ids": [
+              273,
+              274,
+              275
+            ],
+            "map_ids": [
+              205,
+              206,
+              207,
+              208,
+              209
+            ],
+            "program_ids": [
+              341,
+              342,
+              343
+            ]
+          }
+        ],
+        "resident_protocol": 1,
+        "resident_resources": 2,
+        "run_id": "8eb1e4fa8d904a4eb253eb1b00985bb1",
+        "sequence": 9,
+        "status": "IDLE"
+      }
+    },
+    {
+      "label": "resident-8-off",
+      "phase": "resident",
+      "lifetime": "off",
+      "wall_ms": 3118.144404,
+      "task_ms": 1793.88542,
+      "sdk_events": 0,
+      "resident_before": {
+        "present": true,
+        "worker_pid": 1193,
+        "runs": 9,
+        "poisoned": null,
+        "alive": true
+      },
+      "resident": null
+    },
+    {
+      "label": "resident-9-off",
+      "phase": "resident",
+      "lifetime": "off",
+      "wall_ms": 3248.674431,
+      "task_ms": 1831.761545,
+      "sdk_events": 0,
+      "resident_before": {
+        "present": true,
+        "worker_pid": 1193,
+        "runs": 9,
+        "poisoned": null,
+        "alive": true
+      },
+      "resident": null
+    },
+    {
+      "label": "resident-9-resident",
+      "phase": "resident",
+      "lifetime": "resident",
+      "wall_ms": 4996.259378,
+      "task_ms": 2109.103901,
+      "sdk_events": 72,
+      "resident_before": {
+        "present": true,
+        "worker_pid": 1193,
+        "runs": 9,
+        "poisoned": null,
+        "alive": true
+      },
+      "resident": {
+        "worker_pid": 1193,
+        "artifact_manifest_sha256": "aab097f1ec9aefe4dda78f401c9f368d8568e3b698afe2803d94b4c6ec8f4d56",
+        "epoch": 1,
+        "finish_nonce": "1e5d6720c4382a42fb2281e6dc5040394164ab67f38ed99eadf6207ce098b061",
+        "kernel_objects_reused": true,
+        "report_sha256": "54ca31349643be03b701ccffcceb024345f313714915351c81882ba12c1b3e9a",
+        "resident_objects": [
+          {
+            "link_ids": [
+              251,
+              252,
+              253,
+              254,
+              255,
+              256,
+              257,
+              258,
+              259,
+              260,
+              261,
+              262,
+              263,
+              264,
+              265,
+              266,
+              267,
+              268,
+              269,
+              270
+            ],
+            "map_ids": [
+              191,
+              192,
+              193,
+              194,
+              195,
+              196,
+              197,
+              198,
+              199,
+              200,
+              201,
+              202,
+              203,
+              204
+            ],
+            "program_ids": [
+              317,
+              318,
+              319,
+              320,
+              321,
+              322,
+              323,
+              324,
+              325,
+              326,
+              327,
+              328,
+              329,
+              330,
+              331,
+              332,
+              333,
+              334,
+              335,
+              336,
+              337,
+              338
+            ]
+          },
+          {
+            "link_ids": [
+              273,
+              274,
+              275
+            ],
+            "map_ids": [
+              205,
+              206,
+              207,
+              208,
+              209
+            ],
+            "program_ids": [
+              341,
+              342,
+              343
+            ]
+          }
+        ],
+        "resident_protocol": 1,
+        "resident_resources": 2,
+        "run_id": "64a51956cebe4ae0b4119647eb78f40e",
+        "sequence": 10,
+        "status": "IDLE"
+      }
+    }
+  ],
+  "notes": [
+    "baseline is measured BEFORE loading any resident probes",
+    "resident off means SDK/collection disabled, resident hooks idle; not unloaded",
+    "first cold run is INCLUDED among ten resident on samples; final teardown separately amortized",
+    "host disk/cache/other workloads are not fully controlled; no tail-latency guarantee"
+  ]
+}

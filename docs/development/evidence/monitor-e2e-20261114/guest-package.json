@@ -1,0 +1,32 @@
+{
+  "agent_sha256": "9c748d4deb407752d6bedadbb1d33348889988795275c7d2838c17d966222cbc",
+  "image_sha256": "01681015befa2fcbe2d479c89ceb7007547203f2da99d6287ea3ad671e20f470",
+  "partition_offset": 3145728,
+  "host_cpus": [
+    24,
+    25,
+    26,
+    27,
+    28,
+    29,
+    30,
+    31,
+    32,
+    33,
+    34,
+    35,
+    36,
+    37,
+    38,
+    39,
+    40,
+    41,
+    42,
+    43,
+    44,
+    45,
+    46,
+    47
+  ],
+  "patch": "ttrpc 0.8.1 non-INET ReusePort compatibility; cached device fix retained"
+}

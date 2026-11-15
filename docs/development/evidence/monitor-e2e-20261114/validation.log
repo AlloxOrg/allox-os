@@ -1,0 +1,34 @@
+AFFINITY 24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47 COMMAND ['/data/hy/Allox/agent-monitoring-main-20261030-v2/.validation-venv/bin/ruff', 'check', '--select', 'E4,E7,E9,F,I', 'src', 'plugins/agent-monitor', 'plugins/recovery-checks', 'plugins/trace-correlation', 'tests/test_agent_monitor_queued.py', 'tests/test_agent_monitor_actions.py']
+All checks passed!
+AFFINITY 24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47 COMMAND ['docker', 'run', '--rm', '--network', 'none', '-v', '/data/hy/Allox/monitor-e2e-20261114/source:/work:ro', '-v', '/data/hy/Allox/agent-monitoring-main-20261030-v2/.validation-venv/lib/python3.10/site-packages/pyright:/checker:ro', '-w', '/work', 'node:22-alpine', 'node', '/checker/dist/dist/pyright.js', '--typeshedpath', '/checker/dist/dist/typeshed-fallback']
+0 errors, 0 warnings, 0 informations
+AFFINITY 24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47 COMMAND ['/data/hy/Allox/agent-monitoring-main-20261030-v2/.validation-venv/bin/python', '-m', 'pytest', '-q', '--maxfail=5', 'tests', 'plugins/system-effects/tests']
+........................................................................ [ 18%]
+................................................................ssssss.. [ 36%]
+..............s..s.......s.sssssssss.................................... [ 54%]
+...................s..............ss.................................... [ 72%]
+........................................................................ [ 91%]
+...................................                                      [100%]
+374 passed, 21 skipped in 48.39s
+AFFINITY 24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47 COMMAND ['/data/hy/Allox/agent-monitoring-main-20261030-v2/.validation-venv/bin/python', '-m', 'pip', 'wheel', '--no-deps', '--no-build-isolation', '--wheel-dir', '/data/hy/Allox/monitor-e2e-20261114/wheels', '.', './plugins/agent-monitor']
+Processing ./.
+  Preparing metadata (pyproject.toml): started
+  Preparing metadata (pyproject.toml): finished with status 'done'
+Processing ./plugins/agent-monitor
+  Preparing metadata (pyproject.toml): started
+  Preparing metadata (pyproject.toml): finished with status 'done'
+Building wheels for collected packages: allox-os, allox-agent-monitor
+  Building wheel for allox-os (pyproject.toml): started
+  Building wheel for allox-os (pyproject.toml): finished with status 'done'
+  Created wheel for allox-os: filename=allox_os-0.1.0-py3-none-any.whl size=59119 sha256=3025d265ebdcc139ef7ec5397702a7778d5a46d164affb7177730cd8e8af23ba
+  Stored in directory: /tmp/pip-ephem-wheel-cache-itxh2lkn/wheels/d3/1d/af/5802fed51728ef6ac765342cbca8d77b9d97db4c2a18fcc564
+  Building wheel for allox-agent-monitor (pyproject.toml): started
+  Building wheel for allox-agent-monitor (pyproject.toml): finished with status 'done'
+  Created wheel for allox-agent-monitor: filename=allox_agent_monitor-0.1.0-py3-none-any.whl size=30896 sha256=4ed4952c1ed7a36bdaffe33f93857c6351a3ddf856ddeb3f53b72d4ec740c2e7
+  Stored in directory: /tmp/pip-ephem-wheel-cache-itxh2lkn/wheels/36/e0/ee/588e8dfc4e2ae85fa6278f446fb789d5efac37a10c675054f6
+Successfully built allox-os allox-agent-monitor
+
+[notice] A new release of pip is available: 26.2.2 -> 26.3
+[notice] To update, run: /data/hy/Allox/agent-monitoring-main-20261030-v2/.validation-venv/bin/python -m pip install --upgrade pip
+AFFINITY 24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47 COMMAND ['/data/hy/Allox/agent-monitoring-main-20261030-v2/.validation-venv/bin/ruff', 'check', '--select', 'E4,E7,E9,F', 'examples/monitor_e2e']
+All checks passed!

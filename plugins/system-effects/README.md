@@ -7,6 +7,41 @@ Linux/eBPF `deployment-observe` protocol. The Observer remains a separate
 privileged process; it is not imported into the workspace daemon and is never
 mounted into the Agent sandbox.
 
+## Optional resident Observer / probes (experimental)
+
+Set `resident_observer: true` in the trusted system-effects feature config and
+use the native build from [observer/resident-v1.patch](observer/README.md).
+Default is **false**: the existing one-shot path remains available. This first
+mode accepts only balanced / `KERNEL_OBJECT_EXPANDED_PARTIAL` observation-only
+protocol v2, without optional state scopes or a recovery helper. Unsupported
+combinations fail, rather than silently dropping coverage.
+
+One process-global, serial native worker retains the principal BPF links,
+programs and maps across runs. It is not a concurrent multi-run service. The
+existing host-wide run lock and per-feature semaphore still apply. Every run
+gets a new binding, nonce, callback state, WALs, JSONL and exclusive evidence
+directory. The two asynchronous TCP producer links still detach at each seal
+boundary. Quiescence, drain, cleared registration/state maps, durable manifests,
+and independent per-run verification remain mandatory. A separate identity /
+epoch / nonce / artifact-hash-bound IDLE ACK is required before reuse; a run's
+`wait()` is an ACK wait, **not** a claim that the resident OS process exited.
+
+Service/feature close retires its run handles, but retains an idle worker for
+later services in the same daemon process. At application/VM shutdown call
+`allox_system_effects.resident.shutdown_resident_observers()`; an `atexit`
+fallback also exists. Native stdin EOF is fatal, so losing the owning process
+does not authorize reuse. Any protocol, drain, map-cleanliness or verification
+failure poisons and terminates the worker; affected runs remain subject to
+Core's fail-closed fencing. There is **no automatic restart**. After resolving
+the failed Session, explicitly shut down/recreate the worker. Configuration
+changes and the 4096-run replay-protection bound also require explicit restart.
+The registry is not usable after `fork`.
+
+This is a lifecycle optimization, not stronger event coverage. Existing
+PARTIAL / INCOMPLETE evidence boundaries remain unchanged. The 117 benchmark
+and fault-injection results are in
+[monitor-resident-20261115.md](../../docs/development/monitor-resident-20261115.md).
+
 ## Current scope: compatible v2 and opt-in v3
 
 Without a `process.start.params.recovery` object, the integration preserves the
@@ -144,6 +179,19 @@ The Guest kernel must include the options in
 `/sys/kernel/btf/vmlinux`, mount writable cgroup v2, and have `bpf` in the
 effective LSM order (`cat /sys/kernel/security/lsm`). Bubblewrap is required by
 the Allox managed-execution path.
+
+Mount tracefs in that same execution environment and verify
+`/sys/kernel/tracing/events/raw_syscalls/sys_enter/id` exists before starting
+Observer. Enabling tracing in the kernel does not mount tracefs inside a Guest.
+
+Those flags are necessary, not sufficient: the current object resolver attaches
+`file_post_open`. Our 6.1 fixture lacks that hook even with BTF/BPF LSM enabled;
+the upstream [6.12 hook definitions](https://github.com/torvalds/linux/blob/v6.12/include/linux/lsm_hook_defs.h)
+include it. Validate the pinned BPF objects against the actual Guest kernel,
+rather than skipping unsupported hooks and claiming unchanged object coverage.
+Running both Observer and Agent inside one Kata Guest uses this DIRECT boundary
+against that Guest's kernel; it does not give a host Observer visibility into
+Guest syscalls or constitute a host-side Kata adapter.
 
 ```sh
 pip install ./plugins/system-effects

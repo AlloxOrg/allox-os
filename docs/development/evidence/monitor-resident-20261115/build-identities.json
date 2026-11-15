@@ -1,0 +1,23 @@
+{
+  "benchmark": "/data/hy/Allox/monitor-e2e-20261114/attempt-be59046548",
+  "safety": "/data/hy/Allox/monitor-e2e-20261114/attempt-8038072d55",
+  "files": {
+    "/data/hy/Allox/monitor-resident-20261115/bin/deployment-observe": {
+      "sha256": "abf5721316c9d02ae34f5e63a563a7141c1d12b2fb2709fc39d28c72ce1c0e8c",
+      "size": 4481720
+    },
+    "/data/hy/Allox/monitor-resident-20261115/bin/deployment-observe-verify": {
+      "sha256": "0d8a60f29dfe79e85a669f07d56f1867baa279d2ef062b6cc08a27e8d015332f",
+      "size": 4017168
+    },
+    "/data/hy/Allox/monitor-e2e-20261114/bin/system_effects.bpf.o": {
+      "sha256": "032fad9aefa0993400f734f86fb0b2a6b32a9cec2b2b79c384d84ee73e45970c",
+      "size": 246520
+    },
+    "/data/hy/Allox/monitor-e2e-20261114/bin/process_lifecycle.bpf.o": {
+      "sha256": "d42ab44f4623c3857c8debd50470d45722e57bf4e524d4c7ba535302fa775ef6",
+      "size": 39048
+    }
+  },
+  "raw_artifacts_retained_on_117": true
+}

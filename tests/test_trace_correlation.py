@@ -107,6 +107,9 @@ def test_cached_pages_rehash_and_detect_same_size_tampering(records):
     assert second["events"][0]["event_index"] == 1
     stream = audit / "run-1/system-effects/system-effects.jsonl"
     data = stream.read_bytes()
+    expected = hashlib.sha256(data).hexdigest()
+    assert first["provenance"]["stream_sha256"] == expected
+    assert second["provenance"]["stream_sha256"] == expected
     before = stream.stat()
     changed = data.replace(b'"pid": 42', b'"pid": 43')
     assert changed != data and len(changed) == len(data)
@@ -135,7 +138,10 @@ def test_cached_pages_only_reparse_selected_events(records, monkeypatch):
 def test_large_stream_fallback_keeps_integrity(records, monkeypatch):
     import allox_trace_correlation.stream as stream_module
     monkeypatch.setattr(stream_module, "MAX_BUFFER", 1)
-    assert query(records)["event_count"] == 3
+    result = query(records)
+    assert result["event_count"] == 3
+    data = (records[1] / "run-1/system-effects/system-effects.jsonl").read_bytes()
+    assert result["provenance"]["stream_sha256"] == hashlib.sha256(data).hexdigest()
 
 
 def test_multiple_turns_stay_ambiguous(records):

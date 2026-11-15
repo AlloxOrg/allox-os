@@ -1,0 +1,147 @@
+{
+  "guest_required": false,
+  "rows": [
+    {
+      "case": "pair-0-batch",
+      "stream": "system-effects.jsonl",
+      "events": 562,
+      "turn_status": "declared_parent_turn",
+      "passed": true
+    },
+    {
+      "case": "pair-0-batch",
+      "stream": "process-lifecycle.jsonl",
+      "events": 63,
+      "turn_status": "declared_parent_turn",
+      "passed": true
+    },
+    {
+      "case": "pair-1-batch",
+      "stream": "system-effects.jsonl",
+      "events": 562,
+      "turn_status": "declared_parent_turn",
+      "passed": true
+    },
+    {
+      "case": "pair-1-batch",
+      "stream": "process-lifecycle.jsonl",
+      "events": 63,
+      "turn_status": "declared_parent_turn",
+      "passed": true
+    },
+    {
+      "case": "pair-2-batch",
+      "stream": "system-effects.jsonl",
+      "events": 562,
+      "turn_status": "declared_parent_turn",
+      "passed": true
+    },
+    {
+      "case": "pair-2-batch",
+      "stream": "process-lifecycle.jsonl",
+      "events": 63,
+      "turn_status": "declared_parent_turn",
+      "passed": true
+    },
+    {
+      "case": "pair-3-batch",
+      "stream": "system-effects.jsonl",
+      "events": 562,
+      "turn_status": "declared_parent_turn",
+      "passed": true
+    },
+    {
+      "case": "pair-3-batch",
+      "stream": "process-lifecycle.jsonl",
+      "events": 63,
+      "turn_status": "declared_parent_turn",
+      "passed": true
+    },
+    {
+      "case": "pair-4-batch",
+      "stream": "system-effects.jsonl",
+      "events": 562,
+      "turn_status": "declared_parent_turn",
+      "passed": true
+    },
+    {
+      "case": "pair-4-batch",
+      "stream": "process-lifecycle.jsonl",
+      "events": 63,
+      "turn_status": "declared_parent_turn",
+      "passed": true
+    },
+    {
+      "case": "pair-5-batch",
+      "stream": "system-effects.jsonl",
+      "events": 562,
+      "turn_status": "declared_parent_turn",
+      "passed": true
+    },
+    {
+      "case": "pair-5-batch",
+      "stream": "process-lifecycle.jsonl",
+      "events": 63,
+      "turn_status": "declared_parent_turn",
+      "passed": true
+    },
+    {
+      "case": "pair-6-batch",
+      "stream": "system-effects.jsonl",
+      "events": 562,
+      "turn_status": "declared_parent_turn",
+      "passed": true
+    },
+    {
+      "case": "pair-6-batch",
+      "stream": "process-lifecycle.jsonl",
+      "events": 63,
+      "turn_status": "declared_parent_turn",
+      "passed": true
+    },
+    {
+      "case": "pair-7-batch",
+      "stream": "system-effects.jsonl",
+      "events": 562,
+      "turn_status": "declared_parent_turn",
+      "passed": true
+    },
+    {
+      "case": "pair-7-batch",
+      "stream": "process-lifecycle.jsonl",
+      "events": 63,
+      "turn_status": "declared_parent_turn",
+      "passed": true
+    },
+    {
+      "case": "pair-8-batch",
+      "stream": "system-effects.jsonl",
+      "events": 562,
+      "turn_status": "declared_parent_turn",
+      "passed": true
+    },
+    {
+      "case": "pair-8-batch",
+      "stream": "process-lifecycle.jsonl",
+      "events": 63,
+      "turn_status": "declared_parent_turn",
+      "passed": true
+    },
+    {
+      "case": "pair-9-batch",
+      "stream": "system-effects.jsonl",
+      "events": 550,
+      "turn_status": "declared_parent_turn",
+      "passed": true
+    },
+    {
+      "case": "pair-9-batch",
+      "stream": "process-lifecycle.jsonl",
+      "events": 63,
+      "turn_status": "declared_parent_turn",
+      "passed": true
+    }
+  ],
+  "limited_contract_passed": true,
+  "passed": true
+}

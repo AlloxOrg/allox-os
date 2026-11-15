@@ -142,13 +142,15 @@ class Correlator:
                 count += 1
         if page is None and (digest.hexdigest() != entry.get("sha256") or nbytes != entry.get("size_bytes")):
             raise WorkspaceError("event stream digest or length mismatch")
+        # The indexed path rehashes inside StreamIndex, not this fallback hasher.
+        verified_digest = entry["sha256"] if page is not None else digest.hexdigest()
         result.update(status="correlated", integrity="matched_recorded_sha256",
                       stream=stream, event_count=count, events=selected,
                       next_offset=offset + len(selected) if offset + len(selected) < count else None,
                       provenance={"receipt": f"{run_id}/system-effects-receipt.json",
                                   "manifest": f"{run_id}/system-effects/{manifest_name}",
                                   "stream": f"{run_id}/system-effects/{stream}",
-                                  "stream_sha256": digest.hexdigest()},
+                                  "stream_sha256": verified_digest},
                       warning="Recorded hashes are not signatures; independent verifier is not rerun. "
                               "Run attribution does not prove delegated effects or a precise tool span.")
         return result
